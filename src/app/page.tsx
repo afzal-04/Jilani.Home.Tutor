@@ -6,7 +6,7 @@ import LeadForm from "@/sections/LeadForm";
 
 export default function Home() {
   return (
-    <main>
+    <main className="">
       <Hero />
       <Problems />
       <Trust />

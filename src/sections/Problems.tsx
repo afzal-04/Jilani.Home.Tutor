@@ -1,25 +1,34 @@
 export default function Problems() {
   return (
-    <div className="relative -mt-16 z-20 px-6">
-      
-      <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-        
-        <div>
-          <h3 className="font-semibold text-gray-800">Low Marks?</h3>
-          <p className="text-gray-500 text-sm">We can help improve</p>
-        </div>
+    <section className="py-20 md:py-24 px-6 bg-gray-50 text-center">
+      <div className="max-w-6xl mx-auto"></div>
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-800">
+          Is Your Child Facing These Problems?
+        </h2>
 
-        <div>
-          <h3 className="font-semibold text-gray-800">No Focus?</h3>
-          <p className="text-gray-500 text-sm">Personalized Attention</p>
-        </div>
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-red-500">Low Marks</h3>
+            <p className="mt-2 text-gray-600 text-lg leading-relaxed">
+              Your child is scoring less despite studying
+            </p>
+          </div>
 
-        <div>
-          <h3 className="font-semibold text-gray-800">Weak in Maths?</h3>
-          <p className="text-gray-500 text-sm">Expert Tutors</p>
-        </div>
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-yellow-500">No Focus</h3>
+            <p className="mt-2 text-gray-600 text-lg leading-relaxed">
+              Easily distracted and unable to concentrate
+            </p>
+          </div>
 
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-blue-500">Weak in Maths/Science</h3>
+            <p className="mt-2 text-gray-600 text-lg leading-relaxed">
+              Struggling to understand core concepts
+            </p>
+          </div>
       </div>
-    </div>
+    </section>
   );
 }
