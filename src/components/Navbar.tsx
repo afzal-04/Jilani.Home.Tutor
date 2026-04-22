@@ -12,7 +12,7 @@ export default function Navbar() {
         {/* LOGO + NAME */}
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="hometutor/logo.png" 
+            src="/hometutor/logo.png" 
             alt="Jilani Home Tutor"
             width={45}
             height={45}

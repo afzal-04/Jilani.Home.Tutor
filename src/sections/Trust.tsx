@@ -20,7 +20,7 @@ export default function Trust() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
           className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2">
-            <Image src="hometutor/tutor1.jpg" alt="Teacher" width={400} height={250} className="w-full h-52 object-cover" />
+            <Image src="/hometutor/tutor1.jpg" alt="Teacher" width={400} height={250} className="w-full h-52 object-cover" />
             <div className="bg-blue-900 text-white p-4">
               <h3 className="font-semibold">Experienced Teachers</h3>
               <p className="text-sm">5+ Years Experience</p>
@@ -34,7 +34,7 @@ export default function Trust() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
           className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2">
-            <Image src="hometutor/tutor2.jpg" alt="Results" width={400} height={250} className="w-full h-52 object-cover" />
+            <Image src="/hometutor/tutor2.jpg" alt="Results" width={400} height={250} className="w-full h-52 object-cover" />
             <div className="bg-blue-900 text-white p-4">
               <h3 className="font-semibold">Proven Results</h3>
               <p className="text-sm">Personalized Attention</p>
@@ -48,7 +48,7 @@ export default function Trust() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
           className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2">
-            <Image src="hometutor/tutor3.jpg" alt="1 to 1" width={400} height={250} className="w-full h-52 object-cover" />
+            <Image src="/hometutor/tutor3.jpg" alt="1 to 1" width={400} height={250} className="w-full h-52 object-cover" />
             <div className="bg-blue-900 text-white p-4">
               <h3 className="font-semibold">1-to-1 Learning</h3>
               <p className="text-sm">At Your Home</p>

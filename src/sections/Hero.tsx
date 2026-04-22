@@ -8,7 +8,7 @@ export default function Hero() {
 
       {/* BACKGROUND IMAGE */}
       <Image
-        src="hometutor/hero.jpg" // 👉 make sure this file exists in /public
+        src="/hometutor/hero.jpg" // 👉 make sure this file exists in /public
         alt="Home Tutor"
         fill
         priority
