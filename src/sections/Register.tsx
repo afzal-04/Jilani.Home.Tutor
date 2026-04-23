@@ -2,7 +2,7 @@
 // src/sections/Register.tsx
 import { useState } from 'react';
 import Reveal from '@/components/Reveal';
-import { registerParent, registerTutor } from '@/lib/firestore';
+import { addParentLead, addTutorLead } from '@/lib/firestore';
 import styles from './Register.module.css';
 
 type Tab = 'parent' | 'tutor';
@@ -29,7 +29,7 @@ export default function Register() {
     e.preventDefault();
     setPLoading(true);
     try {
-      await registerParent(pForm);
+      await addParentLead(pForm);
       setPSuccess(true);
       setPForm({ name: '', phone: '', area: '', class: '', subject: '' });
       setTimeout(() => setPSuccess(false), 5000);
@@ -41,7 +41,7 @@ export default function Register() {
     e.preventDefault();
     setTLoading(true);
     try {
-      await registerTutor(tForm);
+      await addTutorLead(tForm);
       setTSuccess(true);
       setTForm({ name: '', phone: '', area: '', qualification: '', subjects: '', classes: '' });
       setTimeout(() => setTSuccess(false), 5000);

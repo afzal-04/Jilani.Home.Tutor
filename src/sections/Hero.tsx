@@ -2,7 +2,7 @@
 // src/sections/Hero.tsx
 import { useEffect, useState } from 'react';
 import { getSiteConfig } from '@/lib/firestore';
-import { registerParent } from '@/lib/firestore';
+import { addParentLead, addTutorLead } from '@/lib/firestore';
 import styles from './Hero.module.css';
 
 export default function Hero() {
@@ -30,7 +30,7 @@ export default function Hero() {
     e.preventDefault();
     setLoading(true);
     try {
-      await registerParent(form);
+      await addParentLead(form);
       setSuccess(true);
       setForm({ name: '', phone: '', area: '', class: '', subject: '' });
       setTimeout(() => setSuccess(false), 5000);

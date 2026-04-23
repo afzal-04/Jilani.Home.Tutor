@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { addParentLead } from "@/lib/firestore";
 
 export default function FindTutor() {
   const [form, setForm] = useState({
+    name: "",
     class: "",
     subject: "",
     location: "",
@@ -17,10 +19,28 @@ export default function FindTutor() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+  try {
+    // 🔥 Save to Firestore
+    await addParentLead({
+      name: "Not Provided",              // you don't have name field yet
+      phone: form.phone,
+      area: form.location,
+      class: form.class,
+      subject: form.subject,
+    });
+
+    // 📲 WhatsApp message
     const message = `New Tutor Request:%0AClass: ${form.class}%0ASubject: ${form.subject}%0ALocation: ${form.location}%0APhone: ${form.phone}`;
     window.open(`https://wa.me/917999854628?text=${message}`, "_blank");
-  };
+
+    alert("✅ Request submitted!");
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Failed to submit");
+  }
+};
 
   return (
     <section className="py-20 px-6 bg-gradient-to-r from-blue-50 via-white to-blue-50 min-h-screen">
@@ -95,7 +115,13 @@ export default function FindTutor() {
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
-
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter Your Name"
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-lg"
+            />
             {/* Phone */}
             <input
               type="tel"

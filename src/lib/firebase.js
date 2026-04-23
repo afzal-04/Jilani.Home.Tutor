@@ -1,5 +1,5 @@
 "use client";
-
+import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 // Optional (analytics)
@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 
 // Firestore DB
 export const db = getFirestore(app);
-
+export const auth = getAuth(app);
 // Analytics (safe for Next.js)
 export const analyticsPromise = isSupported().then((yes) =>
   yes ? getAnalytics(app) : null
