@@ -3,8 +3,8 @@ import Reveal from '@/components/Reveal';
 import styles from './Testimonials.module.css';
 
 const testimonials = [
-  { initial: 'R', name: 'Ramesh Verma', location: 'Shankar Nagar, Raipur', text: 'My son was failing in Maths in Class 9. After just 2 months with Jilani tutor, he scored 85 in his exams. The tutor explained concepts so patiently.' },
-  { initial: 'S', name: 'Sunita Agarwal', location: 'Civil Lines, Raipur', text: 'We tried online classes but my daughter could not focus. Home tutor from Jilani was a game changer. She cleared Class 10 boards with 91%!' },
+  { initial: 'R', name: 'Ramesh Verma', location: 'Shankar Nagar, Raipur', text: 'My son was failing in Maths in Class 9. After just 2 months with Jilani Home tutor, he scored 85 in his exams. The tutor explained concepts so patiently.' },
+  { initial: 'S', name: 'Sunita Agarwal', location: 'Civil Lines, Raipur', text: 'We tried online classes but my daughter could not focus. Jilani Home tutor was a game changer. She cleared Class 10 boards with 91%!' },
   { initial: 'P', name: 'Priya Chandrakar', location: 'Pandri, Raipur', text: 'Very professional service. They matched us with the right tutor in less than a day. My twins both improved in Science this semester.' },
 ];
 

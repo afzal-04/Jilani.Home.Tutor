@@ -21,7 +21,7 @@ export default function Navbar() {
         <Link href="/" className={styles.logo}>
           <div className={styles.logoIcon}>📚</div>
           <div className={styles.logoText}>
-            Jilani <span>Tutor</span>
+            Jilani Home <span>Tutor</span>
           </div>
         </Link>
 
