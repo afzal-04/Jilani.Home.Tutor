@@ -1,61 +1,61 @@
-"use client";
-
-import Image from "next/image";
-import Link from "next/link";
+'use client';
+// src/components/Navbar.tsx
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import styles from './Navbar.module.css';
 
 export default function Navbar() {
-  return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
-      
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-        {/* LOGO + NAME */}
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/hometutor/logo.png" 
-            alt="Jilani Home Tutor"
-            width={45}
-            height={45}
-          />
-          <span className="text-xl font-bold text-gray-800">
-            Jilani Home Tutor
-          </span>
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
+      <div className={styles.inner}>
+        {/* Logo */}
+        <Link href="/" className={styles.logo}>
+          <div className={styles.logoIcon}>📚</div>
+          <div className={styles.logoText}>
+            Jilani <span>Tutor</span>
+          </div>
         </Link>
 
-        {/* NAV LINKS */}
-        <nav className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
-          <Link href="/" className="hover:text-blue-600 transition">
-            Home
-          </Link>
-          <Link href="/#services" className="hover:text-blue-600 transition">
-            Services
-          </Link>
-          <Link href="/find-tutor" className="hover:text-blue-600 transition">
-            Find Tutor
-          </Link>
-          <Link href="/contact" className="hover:text-blue-600 transition">
-            Contact
-          </Link>
-        </nav>
-
-        {/* CTA BUTTON */}
-        <div className="flex items-center gap-4">
-          
-          <a
-            href="#form"
-            className="hidden md:inline-block bg-green-500 text-white px-5 py-2 rounded-lg font-semibold hover:bg-green-600 transition"
-          >
-            Book Demo
-          </a>
-
-          {/* MOBILE MENU ICON (future use) */}
-          <button className="md:hidden text-gray-700 text-2xl">
-            ☰
-          </button>
-
+        {/* Desktop Links */}
+        <div className={styles.links}>
+          <Link href="#services">Services</Link>
+          <Link href="#register">Register</Link>
+          <Link href="#testimonials">Results</Link>
+          <Link href="#faq">FAQ</Link>
+          <Link href="#register" className={styles.cta}>Book Free Demo</Link>
         </div>
 
+        {/* Mobile hamburger */}
+        <button
+          className={styles.hamburger}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? '✕' : '☰'}
+        </button>
       </div>
-    </header>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className={styles.mobileMenu}>
+          <Link href="#services" onClick={() => setMenuOpen(false)}>Services</Link>
+          <Link href="#register" onClick={() => setMenuOpen(false)}>Register</Link>
+          <Link href="#testimonials" onClick={() => setMenuOpen(false)}>Results</Link>
+          <Link href="#faq" onClick={() => setMenuOpen(false)}>FAQ</Link>
+          <Link href="#register" className={styles.cta} onClick={() => setMenuOpen(false)}>
+            Book Free Demo
+          </Link>
+        </div>
+      )}
+    </nav>
   );
 }

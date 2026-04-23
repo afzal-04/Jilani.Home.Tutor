@@ -1,11 +1,21 @@
-export default function WhatsAppButton() {
+'use client';
+// src/components/WhatsappButton.tsx
+import { useEffect, useState } from 'react';
+import { getSiteConfig } from '@/lib/firestore';
+import styles from './WhatsappButton.module.css';
+
+export default function WhatsappButton() {
+  const [href, setHref] = useState('https://wa.me/917999854628');
+
+  useEffect(() => {
+    getSiteConfig().then(cfg => {
+      if (cfg?.whatsappNumber) setHref(`https://wa.me/${cfg.whatsappNumber}`);
+    });
+  }, []);
+
   return (
-    <a
-      href="https://wa.me/917999854628"
-      target="_blank"
-      className="fixed bottom-5 right-5 bg-green-500 text-white px-5 py-3 rounded-full shadow-lg hover:bg-green-600 z-50"
-    >
-      Chat Now
+    <a href={href} target="_blank" rel="noreferrer" className={styles.btn} aria-label="Chat on WhatsApp">
+      💬
     </a>
   );
 }

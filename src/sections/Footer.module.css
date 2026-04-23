@@ -1,0 +1,7 @@
+/* src/sections/Footer.module.css */
+.footer { background: var(--ink); color: rgba(255,255,255,0.6); padding: 40px 5%; text-align: center; }
+.links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 18px; font-size: 14px; }
+.links a { color: var(--gold-light); text-decoration: none; transition: opacity .2s; }
+.links a:hover { opacity: 0.8; }
+.footer p { font-size: 13px; margin-bottom: 6px; }
+.areas { font-size: 12px; opacity: 0.4; }
