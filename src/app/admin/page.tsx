@@ -2,7 +2,9 @@
 // src/app/admin/page.tsx
 import { useState, useEffect, useCallback } from 'react';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getAuth } from "firebase/auth";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import {
   getAllParents, getAllTutors, updateLeadStatus,
   getSiteConfig, saveSiteConfig,
@@ -28,7 +30,7 @@ function LoginScreen() {
     e.preventDefault();
     setLoading(true); setError('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(getAuth(), email, password);
     } catch {
       setError('Invalid email or password.');
     }
@@ -83,7 +85,7 @@ export default function AdminPage() {
 
   // Auth
   useEffect(() => {
-    return onAuthStateChanged(auth, u => { setUser(u); setAuthLoading(false); });
+    return onAuthStateChanged(getAuth(), u => { setUser(u); setAuthLoading(false); });
   }, []);
 
   const loadAll = useCallback(async () => {
@@ -165,7 +167,7 @@ export default function AdminPage() {
         </nav>
         <div className={styles.sidebarFooter}>
           <div className={styles.adminEmail}>{user.email}</div>
-          <button onClick={() => signOut(auth)} className={styles.logoutBtn}>🚪 Logout</button>
+          <button onClick={() => signOut(getAuth())} className={styles.logoutBtn}>🚪 Logout</button>
         </div>
       </aside>
 
