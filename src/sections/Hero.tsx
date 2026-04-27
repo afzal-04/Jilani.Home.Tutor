@@ -92,10 +92,19 @@ export default function Hero() {
                 <label>Class</label>
                 <select value={form.class} onChange={e => setForm({ ...form, class: e.target.value })} required>
                   <option value="">Select Class</option>
-                  <option>Class 1–5</option>
-                  <option>Class 6–8</option>
-                  <option>Class 9–10</option>
-                  <option>Class 11–12</option>
+                  <option>Class 1</option>
+                  <option>Class 2</option>
+                  <option>Class 3</option>
+                  <option>Class 4</option>
+                  <option>Class 5</option>
+                  <option>Class 6</option>
+                  <option>Class 7</option>
+                  <option>Class 8</option>
+                  <option>Class 9</option>
+                  <option>Class 10</option>
+                  <option>Class 11</option>
+                  <option>Class 12</option>
+                  <option> Competative Exam</option>
                 </select>
               </div>
               <div className="form-group">
