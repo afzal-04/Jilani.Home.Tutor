@@ -1,0 +1,13 @@
+/* src/sections/Services.module.css */
+.section { background: #fff; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 48px; }
+.card { background: var(--cream); border: 2px solid var(--border); border-radius: 16px; padding: 28px 22px; text-align: center; cursor: pointer; transition: all .3s; }
+.card:hover, .featured { background: var(--ink); border-color: var(--ink); }
+.card:hover h3, .featured h3,
+.card:hover p, .featured p { color: #fff; }
+.card:hover .badge, .featured .badge { background: var(--gold); color: #fff; }
+.num { font-family: var(--font-display); font-size: 38px; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+.card:hover .num, .featured .num { color: var(--gold-light); }
+.card h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.card p { font-size: 13px; color: #777; line-height: 1.6; }
+.badge { display: inline-block; margin-top: 12px; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; background: var(--accent2); color: var(--accent); transition: all .3s; }

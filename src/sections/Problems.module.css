@@ -1,0 +1,9 @@
+/* src/sections/Problems.module.css */
+.section { background: var(--ink); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 48px; }
+.card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px; transition: transform .3s, border-color .3s; }
+.card:hover { transform: translateY(-4px); border-color: rgba(200,148,42,0.3); }
+.icon { font-size: 36px; margin-bottom: 16px; }
+.card h3 { color: #fff; font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+.card p { color: rgba(255,255,255,0.55); font-size: 14px; line-height: 1.6; }
+.sol { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 13px; color: var(--gold-light); font-weight: 500; }

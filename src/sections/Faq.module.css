@@ -1,0 +1,10 @@
+/* src/sections/Faq.module.css */
+.section { background: #fff; }
+.list { margin-top: 48px; max-width: 780px; }
+.item { border-bottom: 1px solid var(--border); overflow: hidden; }
+.question { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 20px 0; background: none; border: none; cursor: pointer; font-weight: 600; font-size: 15px; color: var(--ink); font-family: var(--font-body); text-align: left; gap: 16px; }
+.icon { font-size: 22px; color: var(--gold); transition: transform .3s; flex-shrink: 0; }
+.rotated { transform: rotate(45deg); }
+.answer { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+.answerOpen { max-height: 200px; }
+.answer p { padding-bottom: 18px; font-size: 14px; color: #666; line-height: 1.7; }

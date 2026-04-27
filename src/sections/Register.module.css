@@ -1,0 +1,42 @@
+/* src/sections/Register.module.css */
+.section { background: linear-gradient(135deg, #0f1923 0%, #1a3a5c 100%); }
+
+.tabs {
+  display: flex;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 4px;
+  width: fit-content;
+  margin-bottom: 32px;
+}
+
+.tab {
+  padding: 12px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  transition: all .2s;
+}
+
+.tab.active {
+  background: #fff;
+  color: var(--ink);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.fullCol { grid-column: 1 / -1; }
+
+@media (max-width: 600px) {
+  .formGrid { grid-template-columns: 1fr; }
+}
