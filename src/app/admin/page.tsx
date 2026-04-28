@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 // src/app/admin/page.tsx
 import { useState, useEffect, useCallback } from 'react';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
