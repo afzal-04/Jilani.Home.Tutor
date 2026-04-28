@@ -150,7 +150,7 @@ export default function AdminPage() {
       {/* ── Sidebar ── */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarLogo}>
-          <div className={styles.sidebarLogoText}>📚 Jilani Tutor</div>
+          <div className={styles.sidebarLogoText}>📚 Jilani Home Tutor</div>
           <div className={styles.sidebarLogoSub}>Admin Dashboard</div>
         </div>
         <nav className={styles.nav}>
