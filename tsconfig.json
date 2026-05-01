@@ -36,7 +36,7 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "next.config.js"
-, "src/lib/firebase.js", "src/lib/firestore.ts"  ],
+, "src/lib/firebase.ts", "src/lib/firestore.ts"  ],
   "exclude": [
     "node_modules"
   ]
