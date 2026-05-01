@@ -1,5 +1,6 @@
 // src/app/page.tsx
 export const dynamic = 'force-dynamic';
+
 import Navbar        from '@/components/Navbar';
 import WhatsappButton from '@/components/WhatsappButton';
 import Hero          from '@/sections/Hero';
