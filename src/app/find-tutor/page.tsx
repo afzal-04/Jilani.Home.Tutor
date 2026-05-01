@@ -1,152 +1,140 @@
-"use client";
-export const dynamic = 'force-dynamic';
+'use client';
+
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { addParentLead } from "@/lib/firestore";
+import { registerParent } from "@/lib/firestore";
+import styles from "./find-tutor.module.css";
 
 export default function FindTutor() {
   const [form, setForm] = useState({
     name: "",
+    phone: "",
+    area: "",
     class: "",
     subject: "",
-    location: "",
-    phone: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async () => {
-  try {
-    // 🔥 Save to Firestore
-    await addParentLead({
-      name: "Not Provided",              // you don't have name field yet
-      phone: form.phone,
-      area: form.location,
-      class: form.class,
-      subject: form.subject,
-    });
-
-    // 📲 WhatsApp message
-    const message = `New Tutor Request:%0AClass: ${form.class}%0ASubject: ${form.subject}%0ALocation: ${form.location}%0APhone: ${form.phone}`;
-    window.open(`https://wa.me/917999854628?text=${message}`, "_blank");
-
-    alert("✅ Request submitted!");
-
-  } catch (err) {
-    console.error(err);
-    alert("❌ Failed to submit");
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await registerParent(form);
+      setSuccess(true);
+      setForm({ name: "", phone: "", area: "", class: "", subject: "" });
+      setTimeout(() => setSuccess(false), 5000);
+    } catch {
+      alert("Something went wrong. Please try again.");
+    }
+    setLoading(false);
   }
-};
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-r from-blue-50 via-white to-blue-50 min-h-screen">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-
-        {/* LEFT SIDE */}
-        <div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-            Struggling with Your Child’s Studies?
-          </h1>
-
-          <p className="mt-4 text-lg text-gray-600">
-            Get expert home tutors in Raipur at your doorstep.
-          </p>
-
-          <p className="mt-2 text-green-600 font-semibold">
-            📈 Guaranteed Improvement in Marks
-          </p>
-
-          <div className="mt-6 space-y-3 text-gray-700 text-base">
-            <p>✔ 500+ Verified Tutors</p>
-            <p>✔ Free Demo Class</p>
-            <p>✔ 24hr Tutor Matching</p>
-            <p>✔ Trusted by 100+ Parents</p>
-          </div>
+    <main className={styles.page}>
+      <div className={styles.card}>
+        <div className={styles.header}>
+          <span className={styles.icon}>🎓</span>
+          <h1>Find a Home Tutor in Raipur</h1>
+          <p>Fill in your details and we&apos;ll match you with the right tutor within 24 hours.</p>
         </div>
 
-        {/* RIGHT SIDE FORM */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="bg-white p-8 rounded-2xl shadow-2xl border border-gray-100"
-        >
-          <h2 className="text-2xl font-semibold text-gray-800 text-center">
-            Get Started Now
-          </h2>
-
-          <div className="mt-6 space-y-4">
-
-            {/* Class */}
-            <select
-              name="class"
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              <option value="">Select Class</option>
-              <option>Class 1-5</option>
-              <option>Class 6-8</option>
-              <option>Class 9-10</option>
-              <option>Class 11-12</option>
-            </select>
-
-            {/* Subject */}
-            <select
-              name="subject"
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              <option value="">Select Subject</option>
-              <option>Maths</option>
-              <option>Science</option>
-              <option>English</option>
-              <option>Physics</option>
-            </select>
-
-            {/* Location */}
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.group}>
+            <label>Parent / Guardian Name *</label>
             <input
               type="text"
-              name="location"
-              placeholder="Enter Location (e.g. Shankar Nagar)"
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Your full name"
+              value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })}
+              required
             />
-            <input
-              type="text"
-              name="name"
-              placeholder="Enter Your Name"
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-            />
-            {/* Phone */}
+          </div>
+
+          <div className={styles.group}>
+            <label>Phone Number *</label>
             <input
               type="tel"
-              name="phone"
-              placeholder="Enter Phone Number"
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="+91 XXXXX XXXXX"
+              value={form.phone}
+              onChange={e => setForm({ ...form, phone: e.target.value })}
+              required
             />
-
-            {/* Urgency */}
-            <p className="text-sm text-red-500 text-center">
-              ⚡ Limited tutors available today
-            </p>
-
-            {/* CTA */}
-            <button
-              onClick={handleSubmit}
-              className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-green-600 transition transform hover:scale-105"
-            >
-              Get Best Tutor Now
-            </button>
           </div>
-        </motion.div>
 
+          <div className={styles.group}>
+            <label>Area / Locality in Raipur *</label>
+            <input
+              type="text"
+              placeholder="e.g. Shankar Nagar, Civil Lines, Pandri"
+              value={form.area}
+              onChange={e => setForm({ ...form, area: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className={styles.row}>
+            <div className={styles.group}>
+              <label>Class Needed *</label>
+              <select
+                value={form.class}
+                onChange={e => setForm({ ...form, class: e.target.value })}
+                required
+              >
+                <option value="">Select Class</option>
+                <option>Class 1–5</option>
+                <option>Class 6–8</option>
+                <option>Class 9–10</option>
+                <option>Class 11–12</option>
+                <option>Competitive Exam</option>
+                <option>Summer Class</option>
+                <option>Drawing</option>
+                <option>Music</option>
+                <option>Dance</option>
+              </select>
+            </div>
+
+            <div className={styles.group}>
+              <label>Subject Needed *</label>
+              <select
+                value={form.subject}
+                onChange={e => setForm({ ...form, subject: e.target.value })}
+                required
+              >
+                <option value="">Select Subject</option>
+                <option>Maths</option>
+                <option>Science</option>
+                <option>English</option>
+                <option>Hindi</option>
+                <option>Social Science</option>
+                <option>Physics</option>
+                <option>Chemistry</option>
+                <option>Biology</option>
+                <option>Maths + Science</option>
+                <option>All Subjects</option>
+                <option>Drawing / Art</option>
+                <option>Music / Singing</option>
+                <option>Dance</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" className={styles.btn} disabled={loading}>
+            {loading ? "Submitting…" : "📅 Find My Tutor — FREE"}
+          </button>
+
+          {success && (
+            <div className={styles.success}>
+              ✅ Thank you! We&apos;ll call you within 24 hours to confirm your free demo class.
+            </div>
+          )}
+        </form>
+
+        <div className={styles.trust}>
+          <span>✅ Verified Tutors</span>
+          <span>🆓 First Demo FREE</span>
+          <span>⚡ Matched in 24hrs</span>
+        </div>
       </div>
-    </section>
+    </main>
   );
 }
