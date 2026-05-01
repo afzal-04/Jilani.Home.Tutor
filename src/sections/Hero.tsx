@@ -2,12 +2,12 @@
 // src/sections/Hero.tsx
 import { useEffect, useState } from 'react';
 import { getSiteConfig } from '@/lib/firestore';
-import { addParentLead, addTutorLead } from '@/lib/firestore';
+import { registerParent } from '@/lib/firestore';
 import styles from './Hero.module.css';
 
 export default function Hero() {
   const [heroSubtext, setHeroSubtext] = useState(
-    'Looking for the best home tutor in Raipur? We provide experienced tutors for Class 1–12. Maths, Science, English. Get a FREE demo class today and see real improvement.'
+    'Personalized 1-on-1 home tuition for Class 1–12. Maths, Science, English & more. Real teachers, real results.'
   );
   const [offerBanner, setOfferBanner] = useState('');
   const [whatsappHref, setWhatsappHref] = useState('https://wa.me/917999854628');
@@ -30,7 +30,7 @@ export default function Hero() {
     e.preventDefault();
     setLoading(true);
     try {
-      await addParentLead(form);
+      await registerParent(form);
       setSuccess(true);
       setForm({ name: '', phone: '', area: '', class: '', subject: '' });
       setTimeout(() => setSuccess(false), 5000);
@@ -54,13 +54,13 @@ export default function Hero() {
         <div className={styles.content}>
           {/* Left: headline */}
           <div className={styles.left}>
-            <div className={styles.badge}>⭐ Trusted Home Tutor Service in Raipur</div>
+            <div className={styles.badge}>⭐ #1 Home Tutor Service in Raipur</div>
             <h1 className={styles.heading}>
               Your Child Deserves <em>Expert</em> Attention at Home
             </h1>
             <p className={styles.sub}>{heroSubtext}</p>
             <div className={styles.btns}>
-              <a href="#register" className="btn-primary">📅 Book FREE Demo </a>
+              <a href="#register" className="btn-primary">📅 Book FREE Demo</a>
               <a href={whatsappHref} target="_blank" rel="noreferrer" className="btn-outline">
                 💬 WhatsApp Us
               </a>
@@ -74,7 +74,7 @@ export default function Hero() {
 
           {/* Right: quick enquiry form */}
           <div className={styles.card}>
-            <h3>🎯 Book Your Free Demo Class</h3>
+            <h3>🎯 Quick Enquiry</h3>
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className="form-group">
                 <label>Parent Name</label>
@@ -92,19 +92,10 @@ export default function Hero() {
                 <label>Class</label>
                 <select value={form.class} onChange={e => setForm({ ...form, class: e.target.value })} required>
                   <option value="">Select Class</option>
-                  <option>Class 1</option>
-                  <option>Class 2</option>
-                  <option>Class 3</option>
-                  <option>Class 4</option>
-                  <option>Class 5</option>
-                  <option>Class 6</option>
-                  <option>Class 7</option>
-                  <option>Class 8</option>
-                  <option>Class 9</option>
-                  <option>Class 10</option>
-                  <option>Class 11</option>
-                  <option>Class 12</option>
-                  <option> Competative Exam</option>
+                  <option>Class 1–5</option>
+                  <option>Class 6–8</option>
+                  <option>Class 9–10</option>
+                  <option>Class 11–12</option>
                 </select>
               </div>
               <div className="form-group">
@@ -120,11 +111,7 @@ export default function Hero() {
               <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>
                 {loading ? 'Submitting...' : '📅 Book Free Demo'}
               </button>
-              {success && (
-                <div className="success-msg">
-                  ✅ Request submitted! Our team will contact you within 24 hours.
-                </div>
-              )}            
+              {success && <div className="success-msg">✅ Submitted! We&apos;ll call you within 24 hours.</div>}
             </form>
           </div>
         </div>

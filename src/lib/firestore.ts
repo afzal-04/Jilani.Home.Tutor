@@ -1,19 +1,15 @@
-import { db } from "./firebase";
-
+// src/lib/firestore.ts
 import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-  getDoc,
-  addDoc,
-  setDoc,
-  serverTimestamp,
-  DocumentData
-} from "firebase/firestore";
+  collection, addDoc, getDocs, doc,
+  updateDoc, setDoc, getDoc, deleteDoc,
+  query, orderBy, serverTimestamp,
+} from 'firebase/firestore';
+import { db } from './firebase';
 
-// ✅ Types
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 export type LeadStatus = 'new' | 'contacted' | 'converted' | 'closed';
+export type ClassStatus = 'active' | 'paused' | 'completed';
 
 export interface ParentLead {
   id?: string;
@@ -23,7 +19,7 @@ export interface ParentLead {
   class: string;
   subject: string;
   status: LeadStatus;
-  createdAt?: any;
+  createdAt?: { seconds: number };
 }
 
 export interface TutorLead {
@@ -34,8 +30,9 @@ export interface TutorLead {
   qualification: string;
   subjects: string;
   classes: string;
+  gender?: string;
   status: LeadStatus;
-  createdAt?: any;
+  createdAt?: { seconds: number };
 }
 
 export interface SiteConfig {
@@ -45,65 +42,138 @@ export interface SiteConfig {
   address: string;
 }
 
-// ✅ Get all parents
+// NEW: Fee record — one row per tutor-parent engagement
+export interface FeeRecord {
+  id?: string;
+  tutorName: string;
+  parentName: string;
+  subject: string;
+  classLevel: string;           // e.g. Class 9–10
+  parentFee: number;            // what parent pays you (₹/month)
+  tutorFee: number;             // what you pay tutor (₹/month)
+  profit: number;               // auto = parentFee - tutorFee
+  month: string;                // e.g. "April 2025"
+  paymentStatus: 'pending' | 'received' | 'paid';
+  notes: string;
+  createdAt?: { seconds: number };
+}
+
+// NEW: Class assignment record
+export interface ClassRecord {
+  id?: string;
+  tutorName: string;
+  tutorPhone: string;
+  parentName: string;
+  parentPhone: string;
+  subject: string;
+  classLevel: string;
+  classesPerWeek: number;
+  startDate: string;            // ISO date string
+  status: ClassStatus;
+  area: string;
+  notes: string;
+  createdAt?: { seconds: number };
+}
+
+// ─── Parents ──────────────────────────────────────────────────────────────────
+
+export async function registerParent(data: Omit<ParentLead, 'id' | 'status' | 'createdAt'>) {
+  return addDoc(collection(db, 'parents'), {
+    ...data,
+    status: 'new' as LeadStatus,
+    createdAt: serverTimestamp(),
+  });
+}
+
 export async function getAllParents(): Promise<ParentLead[]> {
-  const snapshot = await getDocs(collection(db, "parents"));
-  return snapshot.docs.map(d => ({
-    id: d.id,
-    ...(d.data() as ParentLead)
-  }));
+  const snap = await getDocs(query(collection(db, 'parents'), orderBy('createdAt', 'desc')));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ParentLead));
 }
 
-// ✅ Get all tutors
+// ─── Tutors ───────────────────────────────────────────────────────────────────
+
+export async function registerTutor(data: Omit<TutorLead, 'id' | 'status' | 'createdAt'>) {
+  return addDoc(collection(db, 'tutors'), {
+    ...data,
+    status: 'new' as LeadStatus,
+    createdAt: serverTimestamp(),
+  });
+}
+
 export async function getAllTutors(): Promise<TutorLead[]> {
-  const snapshot = await getDocs(collection(db, "tutors"));
-  return snapshot.docs.map(d => ({
-    id: d.id,
-    ...(d.data() as TutorLead)
-  }));
+  const snap = await getDocs(query(collection(db, 'tutors'), orderBy('createdAt', 'desc')));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() } as TutorLead));
 }
 
-// ✅ Update status
+// ─── Status Update ────────────────────────────────────────────────────────────
+
 export async function updateLeadStatus(
-  col: "parents" | "tutors",
+  collectionName: 'parents' | 'tutors',
   id: string,
   status: LeadStatus
-): Promise<void> {
-  const ref = doc(db, col, id);
-  await updateDoc(ref, { status });
+) {
+  return updateDoc(doc(db, collectionName, id), { status });
 }
 
-// ✅ Get config
+// ─── Site Config ──────────────────────────────────────────────────────────────
+
 export async function getSiteConfig(): Promise<SiteConfig | null> {
-  const ref = doc(db, "config", "main");
-  const snap = await getDoc(ref);
+  const snap = await getDoc(doc(db, 'config', 'site'));
   return snap.exists() ? (snap.data() as SiteConfig) : null;
 }
 
-// ✅ Save config
-export async function saveSiteConfig(data: SiteConfig): Promise<void> {
-  const ref = doc(db, "config", "main");
-  await setDoc(ref, data, { merge: true });
+export async function saveSiteConfig(config: SiteConfig) {
+  return setDoc(doc(db, 'config', 'site'), {
+    ...config,
+    updatedAt: serverTimestamp(),
+  });
 }
 
-// ✅ Add parent lead
-export async function addParentLead(
-  data: Omit<ParentLead, "status" | "createdAt" | "id">
-): Promise<void> {
-  await addDoc(collection(db, "parents"), {
+// ─── Fees ─────────────────────────────────────────────────────────────────────
+
+export async function getAllFees(): Promise<FeeRecord[]> {
+  const snap = await getDocs(query(collection(db, 'fees'), orderBy('createdAt', 'desc')));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() } as FeeRecord));
+}
+
+export async function addFeeRecord(data: Omit<FeeRecord, 'id' | 'createdAt'>) {
+  return addDoc(collection(db, 'fees'), {
     ...data,
-    status: "new",
+    profit: data.parentFee - data.tutorFee,
     createdAt: serverTimestamp(),
   });
 }
 
-// ✅ Add tutor lead
-export async function addTutorLead(
-  data: Omit<TutorLead, "status" | "createdAt" | "id">
-): Promise<void> {
-  await addDoc(collection(db, "tutors"), {
+export async function updateFeeRecord(id: string, data: Partial<FeeRecord>) {
+  const updated = { ...data };
+  if (data.parentFee !== undefined && data.tutorFee !== undefined) {
+    updated.profit = data.parentFee - data.tutorFee;
+  }
+  return updateDoc(doc(db, 'fees', id), updated);
+}
+
+export async function deleteFeeRecord(id: string) {
+  return deleteDoc(doc(db, 'fees', id));
+}
+
+// ─── Classes ──────────────────────────────────────────────────────────────────
+
+export async function getAllClasses(): Promise<ClassRecord[]> {
+  const snap = await getDocs(query(collection(db, 'classes'), orderBy('createdAt', 'desc')));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ClassRecord));
+}
+
+export async function addClassRecord(data: Omit<ClassRecord, 'id' | 'createdAt'>) {
+  return addDoc(collection(db, 'classes'), {
     ...data,
-    status: "new",
     createdAt: serverTimestamp(),
   });
+}
+
+export async function updateClassRecord(id: string, data: Partial<ClassRecord>) {
+  return updateDoc(doc(db, 'classes', id), data);
+}
+
+export async function deleteClassRecord(id: string) {
+  return deleteDoc(doc(db, 'classes', id));
 }
