@@ -7,28 +7,28 @@ import styles from './Problems.module.css';
 
 const problems = [
   {
-    image: '/low-marks.jpg',
+    image: '/low-marks.png',
     alt: 'Student struggling with low marks',
     title: 'Low Marks Despite Studying',
     desc: "Your child spends hours with books but scores don't improve. Effort without the right guidance is wasted.",
     sol: 'Our tutors identify weak areas and target them specifically',
   },
   {
-    image: '/classroom.jpg',
+    image: '/classroom.png',
     alt: 'Overcrowded classroom with distracted students',
     title: "Can't Focus in Big Classrooms",
     desc: "40+ students per class means your child's doubts never get answered in school.",
     sol: '1-on-1 attention means every doubt gets solved immediately',
   },
   {
-    image: '/maths.jpg',
+    image: '/maths.png',
     alt: 'Student confused by maths and science problems',
     title: 'Weak in Maths & Science',
     desc: 'These subjects build on each other. One missed concept creates confusion for years.',
     sol: 'We rebuild foundations from the ground up, patiently',
   },
   {
-    image: '/board-exam.jpg',
+    image: '/board-exam.png',
     alt: 'Student stressed about board exams',
     title: 'Board Exam Pressure',
     desc: 'Class 10 & 12 results decide college admissions. The pressure is real and parents worry.',
