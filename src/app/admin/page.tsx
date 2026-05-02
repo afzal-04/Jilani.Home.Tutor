@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useCallback } from 'react';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getAuthInstance } from '@/lib/firebase';
 import {
   getAllParents, getAllTutors, updateLeadStatus,
   getSiteConfig, saveSiteConfig,
@@ -74,7 +74,7 @@ function LoginScreen() {
     e.preventDefault();
     setLoading(true); setError('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(getAuthInstance(), email, password);
     } catch {
       setError('Invalid email or password.');
     }
@@ -349,7 +349,7 @@ export default function AdminPage() {
   const [clsModal, setClsModal]   = useState<{ open: boolean; record?: ClassRecord }>({ open: false });
 
   // Auth
-  useEffect(() => onAuthStateChanged(auth, u => { setUser(u); setAuthLoading(false); }), []);
+  useEffect(() => onAuthStateChanged(getAuthInstance(), u => { setUser(u); setAuthLoading(false); }), []);
 
   const loadAll = useCallback(async () => {
     const [p, t, f, c, cfg] = await Promise.all([
@@ -471,7 +471,7 @@ export default function AdminPage() {
         </nav>
         <div className={styles.sidebarFooter}>
           <div className={styles.adminEmail}>{user.email}</div>
-          <button onClick={() => signOut(auth)} className={styles.logoutBtn}>🚪 Logout</button>
+          <button onClick={() => signOut(getAuthInstance())} className={styles.logoutBtn}>🚪 Logout</button>
         </div>
       </aside>
 

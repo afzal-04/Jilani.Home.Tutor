@@ -3,15 +3,8 @@ import {
   collection, addDoc, getDocs, doc,
   updateDoc, setDoc, getDoc, deleteDoc,
   query, orderBy, serverTimestamp,
-  Firestore,
 } from 'firebase/firestore';
-import { db as _db } from './firebase';
-
-// Helper — throws a clear error if called on server accidentally
-function getDb(): Firestore {
-  if (!_db) throw new Error('Firestore is not available on the server.');
-  return _db;
-}
+import { getDbInstance } from './firebase';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -83,55 +76,57 @@ export interface ClassRecord {
 // ─── Parents ──────────────────────────────────────────────────────────────────
 
 export async function registerParent(data: Omit<ParentLead, 'id' | 'status' | 'createdAt'>) {
-  return addDoc(collection(getDb(), 'parents'), {
+  return addDoc(collection(getDbInstance(), 'parents'), {
     ...data, status: 'new' as LeadStatus, createdAt: serverTimestamp(),
   });
 }
 
 export async function getAllParents(): Promise<ParentLead[]> {
-  const snap = await getDocs(query(collection(getDb(), 'parents'), orderBy('createdAt', 'desc')));
+  const snap = await getDocs(query(collection(getDbInstance(), 'parents'), orderBy('createdAt', 'desc')));
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as ParentLead));
 }
 
 // ─── Tutors ───────────────────────────────────────────────────────────────────
 
 export async function registerTutor(data: Omit<TutorLead, 'id' | 'status' | 'createdAt'>) {
-  return addDoc(collection(getDb(), 'tutors'), {
+  return addDoc(collection(getDbInstance(), 'tutors'), {
     ...data, status: 'new' as LeadStatus, createdAt: serverTimestamp(),
   });
 }
 
 export async function getAllTutors(): Promise<TutorLead[]> {
-  const snap = await getDocs(query(collection(getDb(), 'tutors'), orderBy('createdAt', 'desc')));
+  const snap = await getDocs(query(collection(getDbInstance(), 'tutors'), orderBy('createdAt', 'desc')));
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as TutorLead));
 }
 
 // ─── Status Update ────────────────────────────────────────────────────────────
 
 export async function updateLeadStatus(col: 'parents' | 'tutors', id: string, status: LeadStatus) {
-  return updateDoc(doc(getDb(), col, id), { status });
+  return updateDoc(doc(getDbInstance(), col, id), { status });
 }
 
 // ─── Site Config ──────────────────────────────────────────────────────────────
 
 export async function getSiteConfig(): Promise<SiteConfig | null> {
-  const snap = await getDoc(doc(getDb(), 'config', 'site'));
+  const snap = await getDoc(doc(getDbInstance(), 'config', 'site'));
   return snap.exists() ? (snap.data() as SiteConfig) : null;
 }
 
 export async function saveSiteConfig(config: SiteConfig) {
-  return setDoc(doc(getDb(), 'config', 'site'), { ...config, updatedAt: serverTimestamp() });
+  return setDoc(doc(getDbInstance(), 'config', 'site'), {
+    ...config, updatedAt: serverTimestamp(),
+  });
 }
 
 // ─── Fees ─────────────────────────────────────────────────────────────────────
 
 export async function getAllFees(): Promise<FeeRecord[]> {
-  const snap = await getDocs(query(collection(getDb(), 'fees'), orderBy('createdAt', 'desc')));
+  const snap = await getDocs(query(collection(getDbInstance(), 'fees'), orderBy('createdAt', 'desc')));
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as FeeRecord));
 }
 
 export async function addFeeRecord(data: Omit<FeeRecord, 'id' | 'createdAt'>) {
-  return addDoc(collection(getDb(), 'fees'), {
+  return addDoc(collection(getDbInstance(), 'fees'), {
     ...data, profit: data.parentFee - data.tutorFee, createdAt: serverTimestamp(),
   });
 }
@@ -141,28 +136,30 @@ export async function updateFeeRecord(id: string, data: Partial<FeeRecord>) {
   if (data.parentFee !== undefined && data.tutorFee !== undefined) {
     updated.profit = data.parentFee - data.tutorFee;
   }
-  return updateDoc(doc(getDb(), 'fees', id), updated);
+  return updateDoc(doc(getDbInstance(), 'fees', id), updated);
 }
 
 export async function deleteFeeRecord(id: string) {
-  return deleteDoc(doc(getDb(), 'fees', id));
+  return deleteDoc(doc(getDbInstance(), 'fees', id));
 }
 
 // ─── Classes ──────────────────────────────────────────────────────────────────
 
 export async function getAllClasses(): Promise<ClassRecord[]> {
-  const snap = await getDocs(query(collection(getDb(), 'classes'), orderBy('createdAt', 'desc')));
+  const snap = await getDocs(query(collection(getDbInstance(), 'classes'), orderBy('createdAt', 'desc')));
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as ClassRecord));
 }
 
 export async function addClassRecord(data: Omit<ClassRecord, 'id' | 'createdAt'>) {
-  return addDoc(collection(getDb(), 'classes'), { ...data, createdAt: serverTimestamp() });
+  return addDoc(collection(getDbInstance(), 'classes'), {
+    ...data, createdAt: serverTimestamp(),
+  });
 }
 
 export async function updateClassRecord(id: string, data: Partial<ClassRecord>) {
-  return updateDoc(doc(getDb(), 'classes', id), data);
+  return updateDoc(doc(getDbInstance(), 'classes', id), data);
 }
 
 export async function deleteClassRecord(id: string) {
-  return deleteDoc(doc(getDb(), 'classes', id));
+  return deleteDoc(doc(getDbInstance(), 'classes', id));
 }

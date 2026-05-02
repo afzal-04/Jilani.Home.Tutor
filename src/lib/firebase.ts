@@ -1,7 +1,7 @@
 // src/lib/firebase.ts
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
-import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,16 +12,17 @@ const firebaseConfig = {
   appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// ── Only initialize Firebase on the browser, never during SSR / build ────────
-let app:  FirebaseApp | null = null;
-let db:   Firestore   | null = null;
-let auth: Auth        | null = null;
-
-if (typeof window !== 'undefined') {
-  app  = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-  db   = getFirestore(app);
-  auth = getAuth(app);
+function getFirebaseApp(): FirebaseApp {
+  if (getApps().length > 0) return getApp();
+  return initializeApp(firebaseConfig);
 }
 
-export { app, db, auth };
-export default app;
+// These are functions, not values — called at runtime (browser), not at import time (build)
+export const getDbInstance   = () => getFirestore(getFirebaseApp());
+export const getAuthInstance = () => getAuth(getFirebaseApp());
+
+// Keep these for backward compat — safe because they're lazy too
+export const db   = typeof window !== 'undefined' ? getFirestore(getFirebaseApp()) : null as any;
+export const auth = typeof window !== 'undefined' ? getAuth(getFirebaseApp())      : null as any;
+
+export default getFirebaseApp;
