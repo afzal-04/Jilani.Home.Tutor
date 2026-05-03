@@ -2,7 +2,7 @@
 import {
   collection, addDoc, getDocs, doc,
   updateDoc, setDoc, getDoc, deleteDoc,
-  query, orderBy, serverTimestamp,
+  query, orderBy, serverTimestamp, increment,
 } from 'firebase/firestore';
 import { getDbInstance } from './firebase';
 
@@ -162,4 +162,86 @@ export async function updateClassRecord(id: string, data: Partial<ClassRecord>) 
 
 export async function deleteClassRecord(id: string) {
   return deleteDoc(doc(getDbInstance(), 'classes', id));
+}
+
+// ─── Visitor Analytics ────────────────────────────────────────────────────────
+
+export interface VisitorStats {
+  totalViews: number;
+  uniqueVisitors: number;
+  todayViews: number;
+  todayUnique: number;
+  weekViews: number;
+  daily: { date: string; views: number; unique: number }[];
+}
+
+/** Called on every page load. Increments counters in Firestore. */
+export async function trackVisit(): Promise<void> {
+  try {
+    const db = getDbInstance();
+    const today = new Date().toISOString().split('T')[0]; // e.g. "2026-05-03"
+    const isReturning =
+      typeof window !== 'undefined' && localStorage.getItem('jht_visited') === '1';
+
+    const summaryRef = doc(db, 'analytics', 'summary');
+    const dailyRef   = doc(db, 'analytics', `daily_${today}`);
+
+    const writes: Promise<void>[] = [
+      setDoc(summaryRef, { totalViews: increment(1) }, { merge: true }),
+      setDoc(dailyRef,   { views: increment(1), date: today }, { merge: true }),
+    ];
+
+    if (!isReturning) {
+      writes.push(setDoc(summaryRef, { uniqueVisitors: increment(1) }, { merge: true }));
+      writes.push(setDoc(dailyRef,   { unique: increment(1) }, { merge: true }));
+      if (typeof window !== 'undefined') localStorage.setItem('jht_visited', '1');
+    }
+
+    await Promise.all(writes);
+  } catch {
+    // Never break the page if analytics fails
+  }
+}
+
+/** Fetches all visitor stats for the admin dashboard. */
+export async function getVisitorStats(): Promise<VisitorStats> {
+  const db = getDbInstance();
+
+  const summarySnap = await getDoc(doc(db, 'analytics', 'summary'));
+  const summary = summarySnap.exists()
+    ? summarySnap.data()
+    : { totalViews: 0, uniqueVisitors: 0 };
+
+  // Build last 14 days and fetch in parallel
+  const dayKeys: { key: string; label: string }[] = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dayKeys.push({
+      key:   d.toISOString().split('T')[0],
+      label: d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
+    });
+  }
+
+  const daySnaps = await Promise.all(
+    dayKeys.map(({ key }) => getDoc(doc(db, 'analytics', `daily_${key}`)))
+  );
+
+  const daily = daySnaps.map((snap, i) => ({
+    date:   dayKeys[i].label,
+    views:  snap.exists() ? (snap.data().views  || 0) : 0,
+    unique: snap.exists() ? (snap.data().unique || 0) : 0,
+  }));
+
+  const today     = daily[daily.length - 1];
+  const weekViews = daily.slice(-7).reduce((s, d) => s + d.views, 0);
+
+  return {
+    totalViews:     summary.totalViews     || 0,
+    uniqueVisitors: summary.uniqueVisitors || 0,
+    todayViews:     today.views,
+    todayUnique:    today.unique,
+    weekViews,
+    daily,
+  };
 }

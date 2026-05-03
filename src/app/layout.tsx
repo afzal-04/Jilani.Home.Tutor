@@ -1,6 +1,10 @@
 // src/app/layout.tsx
+// CHANGES: Added import for VisitorTracker + <VisitorTracker /> inside <body>
+// Everything else is UNCHANGED.
+
 import type { Metadata } from 'next';
 import './globals.css';
+import VisitorTracker from '@/components/VisitorTracker'; // ← ADD THIS LINE
 
 export const metadata: Metadata = {
   title: 'Best Home Tutor in Raipur | Jilani Home Tutor – Guaranteed Results',
@@ -78,7 +82,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <VisitorTracker /> {/* ← ADD THIS LINE */}
+        {children}
+      </body>
     </html>
   );
 }

@@ -11,7 +11,7 @@ import {
   getAllFees, addFeeRecord, updateFeeRecord, deleteFeeRecord,
   getAllClasses, addClassRecord, updateClassRecord, deleteClassRecord,
   ParentLead, TutorLead, LeadStatus, SiteConfig,
-  FeeRecord, ClassRecord, ClassStatus,
+  FeeRecord, ClassRecord, ClassStatus,getVisitorStats,VisitorStats
 } from '@/lib/firestore';
 import styles from './admin.module.css';
 
@@ -332,6 +332,7 @@ export default function AdminPage() {
   const [fees, setFees]           = useState<FeeRecord[]>([]);
   const [classes, setClasses]     = useState<ClassRecord[]>([]);
   const [config, setConfig]       = useState<SiteConfig>({ offerBanner: '', whatsappNumber: '', heroSubtext: '', address: '' });
+  const [visitorStats, setVisitorStats] = useState<VisitorStats | null>(null);
 
   // UI state
   const [pSearch, setPSearch]     = useState('');
@@ -351,13 +352,25 @@ export default function AdminPage() {
   // Auth
   useEffect(() => onAuthStateChanged(getAuthInstance(), u => { setUser(u); setAuthLoading(false); }), []);
 
-  const loadAll = useCallback(async () => {
-    const [p, t, f, c, cfg] = await Promise.all([
-      getAllParents(), getAllTutors(), getAllFees(), getAllClasses(), getSiteConfig(),
-    ]);
-    setParents(p); setTutors(t); setFees(f); setClasses(c);
-    if (cfg) setConfig(cfg);
-  }, []);
+ const loadAll = useCallback(async () => {
+  const [p, t, f, c, cfg, vs] = await Promise.all([
+    getAllParents(),
+    getAllTutors(),
+    getAllFees(),
+    getAllClasses(),
+    getSiteConfig(),
+    getVisitorStats(), // ← this was missing in destructuring
+  ]);
+
+  setParents(p);
+  setTutors(t);
+  setFees(f);
+  setClasses(c);
+
+  if (cfg) setConfig(cfg);
+
+  setVisitorStats(vs); // ← now this works correctly
+}, []);
 
   useEffect(() => { if (user) loadAll(); }, [user, loadAll]);
 
@@ -454,7 +467,7 @@ export default function AdminPage() {
       {/* ── Sidebar ── */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarLogo}>
-          <div className={styles.sidebarLogoText}>📚 Jilani Tutor</div>
+          <div className={styles.sidebarLogoText}>📚 Jilani Home Tutor</div>
           <div className={styles.sidebarLogoSub}>Admin Dashboard</div>
         </div>
         <nav className={styles.nav}>
@@ -529,6 +542,54 @@ export default function AdminPage() {
                       <span className={styles.actDate}>{fmt(r)}</span>
                     </div>
                   ))}
+
+                  {visitorStats && (
+                <>
+                  <div className={styles.statsRow}>
+                    <StatCard icon="👁️"  num={visitorStats.totalViews.toLocaleString('en-IN')}     label="Total Page Views"  sub="all time"       color="blue"  />
+                    <StatCard icon="👤"  num={visitorStats.uniqueVisitors.toLocaleString('en-IN')}  label="Unique Visitors"   sub="by browser"     color="gold"  />
+                    <StatCard icon="📅"  num={visitorStats.todayViews}                              label="Today's Views"     sub="so far today"   color="green" />
+                    <StatCard icon="📈"  num={visitorStats.weekViews.toLocaleString('en-IN')}       label="This Week"         sub="last 7 days"    color="red"   />
+                  </div>
+ 
+                  {/* Mini bar chart — last 14 days */}
+                  <div className={styles.tableCard} style={{ padding: '20px 24px' }}>
+                    <div className={styles.tableHeader} style={{ marginBottom: 16 }}>
+                      <h3>📊 Website Traffic — Last 14 Days</h3>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 120, borderBottom: '1px solid #f0f0f0', paddingBottom: 4 }}>
+                      {(() => {
+                        const maxV = Math.max(...visitorStats.daily.map(d => d.views), 1);
+                        return visitorStats.daily.map((day, i) => (
+                          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                            <div
+                              title={`${day.date}: ${day.views} views, ${day.unique} unique`}
+                              style={{
+                                width: '100%',
+                                height: `${Math.round((day.views / maxV) * 100)}%`,
+                                minHeight: day.views > 0 ? 4 : 0,
+                                background: '#3b82f6',
+                                borderRadius: '3px 3px 0 0',
+                                cursor: 'default',
+                              }}
+                            />
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                      {visitorStats.daily.map((day, i) => (
+                        <div key={i} style={{ flex: 1, fontSize: 9, color: '#aaa', textAlign: 'center', overflow: 'hidden' }}>
+                          {day.date}
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: 12, color: '#aaa', marginTop: 12 }}>
+                      Hover over a bar to see exact numbers. Unique visitors tracked by browser.
+                    </p>
+                  </div>
+                </>
+              )}
                 </div>
               </div>
             </>
