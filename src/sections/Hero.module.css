@@ -147,3 +147,24 @@
   .content { grid-template-columns: 1fr; }
   .stats { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Other area input */
+.otherInput {
+  margin-top: 8px;
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid var(--gold);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-family: var(--font-body);
+  animation: slideDown 0.2s ease;
+}
+.otherInput::placeholder { color: rgba(255,255,255,0.4); }
+.otherInput:focus { outline: none; border-color: var(--gold-light); }
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

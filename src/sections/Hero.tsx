@@ -1,27 +1,28 @@
 'use client';
 // src/sections/Hero.tsx
 import { useEffect, useState } from 'react';
-import { getSiteConfig } from '@/lib/firestore';
-import { registerParent } from '@/lib/firestore';
+import { getSiteConfig, registerParent } from '@/lib/firestore';
+import { RAIPUR_AREAS, PARENT_CLASSES, PARENT_SUBJECTS } from './Register';
 import styles from './Hero.module.css';
 
 export default function Hero() {
   const [heroSubtext, setHeroSubtext] = useState(
     'Personalized 1-on-1 home tuition for Class 1–12. Maths, Science, English & more. Real teachers, real results.'
   );
-  const [offerBanner, setOfferBanner] = useState('');
+  const [offerBanner,  setOfferBanner]  = useState('');
   const [whatsappHref, setWhatsappHref] = useState('https://wa.me/917999854628');
 
   // Form state
-  const [form, setForm] = useState({ name: '', phone: '', area: '', class: '', subject: '' });
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [form, setForm]           = useState({ name: '', phone: '', area: '', class: '', subject: '' });
+  const [customArea, setCustomArea] = useState('');
+  const [loading,   setLoading]   = useState(false);
+  const [success,   setSuccess]   = useState(false);
 
   useEffect(() => {
     getSiteConfig().then(cfg => {
       if (!cfg) return;
-      if (cfg.heroSubtext) setHeroSubtext(cfg.heroSubtext);
-      if (cfg.offerBanner) setOfferBanner(cfg.offerBanner);
+      if (cfg.heroSubtext)    setHeroSubtext(cfg.heroSubtext);
+      if (cfg.offerBanner)    setOfferBanner(cfg.offerBanner);
       if (cfg.whatsappNumber) setWhatsappHref(`https://wa.me/${cfg.whatsappNumber}`);
     });
   }, []);
@@ -29,12 +30,14 @@ export default function Hero() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    const finalArea = form.area === 'Other Area' ? (customArea.trim() || 'Other Area') : form.area;
     try {
-      await registerParent(form);
+      await registerParent({ ...form, area: finalArea });
       setSuccess(true);
       setForm({ name: '', phone: '', area: '', class: '', subject: '' });
+      setCustomArea('');
       setTimeout(() => setSuccess(false), 5000);
-    } catch (err) {
+    } catch {
       alert('Something went wrong. Please try again.');
     }
     setLoading(false);
@@ -42,7 +45,6 @@ export default function Hero() {
 
   return (
     <>
-      {/* Dynamic offer strip from admin config */}
       {offerBanner && (
         <div className={styles.offerStrip}>{offerBanner}</div>
       )}
@@ -54,7 +56,7 @@ export default function Hero() {
         <div className={styles.content}>
           {/* Left: headline */}
           <div className={styles.left}>
-            <div className={styles.badge}>✔ Trusted Home Tutor Service in Raipur</div>
+            <div className={styles.badge}>⭐ #1 Home Tutor Service in Raipur</div>
             <h1 className={styles.heading}>
               Your Child Deserves <em>Expert</em> Attention at Home
             </h1>
@@ -76,42 +78,87 @@ export default function Hero() {
           <div className={styles.card}>
             <h3>🎯 Quick Enquiry</h3>
             <form onSubmit={handleSubmit} className={styles.form}>
+
               <div className="form-group">
                 <label>Parent Name</label>
-                <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your full name" required />
+                <input
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  placeholder="Your full name"
+                  required
+                />
               </div>
+
               <div className="form-group">
                 <label>Phone Number</label>
-                <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 XXXXX XXXXX" required />
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={e => setForm({ ...form, phone: e.target.value })}
+                  placeholder="+91 XXXXX XXXXX"
+                  required
+                />
               </div>
+
               <div className="form-group">
                 <label>Area in Raipur</label>
-                <input value={form.area} onChange={e => setForm({ ...form, area: e.target.value })} placeholder="e.g. Shankar Nagar, Civil Lines" required />
+                <select
+                  value={form.area}
+                  onChange={e => setForm({ ...form, area: e.target.value })}
+                  required
+                >
+                  <option value="">Select Your Area</option>
+                  {RAIPUR_AREAS.map(a => <option key={a}>{a}</option>)}
+                </select>
+                {/* Show text input when Other Area is selected */}
+                {form.area === 'Other Area' && (
+                  <input
+                    type="text"
+                    value={customArea}
+                    onChange={e => setCustomArea(e.target.value)}
+                    placeholder="Type your area name"
+                    required
+                    className={styles.otherInput}
+                  />
+                )}
               </div>
+
               <div className="form-group">
                 <label>Class</label>
-                <select value={form.class} onChange={e => setForm({ ...form, class: e.target.value })} required>
+                <select
+                  value={form.class}
+                  onChange={e => setForm({ ...form, class: e.target.value })}
+                  required
+                >
                   <option value="">Select Class</option>
-                  <option>Class 1–5</option>
-                  <option>Class 6–8</option>
-                  <option>Class 9–10</option>
-                  <option>Class 11–12</option>
+                  {PARENT_CLASSES.map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
+
               <div className="form-group">
                 <label>Subject Needed</label>
-                <select value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} required>
+                <select
+                  value={form.subject}
+                  onChange={e => setForm({ ...form, subject: e.target.value })}
+                  required
+                >
                   <option value="">Select Subject</option>
-                  <option>Maths</option>
-                  <option>Science</option>
-                  <option>English</option>
-                  <option>All Subjects</option>
+                  {PARENT_SUBJECTS.map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
-              <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>
+
+              <button
+                type="submit"
+                className="btn-primary"
+                style={{ width: '100%', justifyContent: 'center' }}
+                disabled={loading}
+              >
                 {loading ? 'Submitting...' : '📅 Book Free Demo'}
               </button>
-              {success && <div className="success-msg">✅ Submitted! We&apos;ll call you within 24 hours.</div>}
+
+              {success && (
+                <div className="success-msg">✅ Submitted! We&apos;ll call you within 24 hours.</div>
+              )}
             </form>
           </div>
         </div>
