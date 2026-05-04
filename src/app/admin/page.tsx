@@ -11,7 +11,7 @@ import {
   getAllFees, addFeeRecord, updateFeeRecord, deleteFeeRecord,
   getAllClasses, addClassRecord, updateClassRecord, deleteClassRecord,
   ParentLead, TutorLead, LeadStatus, SiteConfig,
-  FeeRecord, ClassRecord, ClassStatus,getVisitorStats,VisitorStats
+  FeeRecord, ClassRecord, ClassStatus, getVisitorStats, VisitorStats,
 } from '@/lib/firestore';
 import styles from './admin.module.css';
 
@@ -322,55 +322,46 @@ function ClassModal({ initial, onSave, onClose }: {
 // ─── Main Admin App ────────────────────────────────────────────────────────────
 
 export default function AdminPage() {
-  const [user, setUser]           = useState<User | null>(null);
+  const [user, setUser]               = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [page, setPage]           = useState<AdminPage>('dashboard');
+  const [page, setPage]               = useState<AdminPage>('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false); // ← mobile drawer state
 
   // Data
-  const [parents, setParents]     = useState<ParentLead[]>([]);
-  const [tutors, setTutors]       = useState<TutorLead[]>([]);
-  const [fees, setFees]           = useState<FeeRecord[]>([]);
-  const [classes, setClasses]     = useState<ClassRecord[]>([]);
-  const [config, setConfig]       = useState<SiteConfig>({ offerBanner: '', whatsappNumber: '', heroSubtext: '', address: '' });
+  const [parents, setParents]   = useState<ParentLead[]>([]);
+  const [tutors, setTutors]     = useState<TutorLead[]>([]);
+  const [fees, setFees]         = useState<FeeRecord[]>([]);
+  const [classes, setClasses]   = useState<ClassRecord[]>([]);
+  const [config, setConfig]     = useState<SiteConfig>({ offerBanner: '', whatsappNumber: '', heroSubtext: '', address: '' });
   const [visitorStats, setVisitorStats] = useState<VisitorStats | null>(null);
 
   // UI state
-  const [pSearch, setPSearch]     = useState('');
-  const [pFilter, setPFilter]     = useState<LeadStatus | 'all'>('all');
-  const [tSearch, setTSearch]     = useState('');
-  const [tFilter, setTFilter]     = useState<LeadStatus | 'all'>('all');
-  const [fSearch, setFSearch]     = useState('');
-  const [cSearch, setCSearch]     = useState('');
-  const [cFilter, setCFilter]     = useState<ClassStatus | 'all'>('all');
+  const [pSearch, setPSearch] = useState('');
+  const [pFilter, setPFilter] = useState<LeadStatus | 'all'>('all');
+  const [tSearch, setTSearch] = useState('');
+  const [tFilter, setTFilter] = useState<LeadStatus | 'all'>('all');
+  const [fSearch, setFSearch] = useState('');
+  const [cSearch, setCSearch] = useState('');
+  const [cFilter, setCFilter] = useState<ClassStatus | 'all'>('all');
   const [cfgSaving, setCfgSaving] = useState(false);
   const [cfgSaved, setCfgSaved]   = useState(false);
 
   // Modals
-  const [feeModal, setFeeModal]   = useState<{ open: boolean; record?: FeeRecord }>({ open: false });
-  const [clsModal, setClsModal]   = useState<{ open: boolean; record?: ClassRecord }>({ open: false });
+  const [feeModal, setFeeModal] = useState<{ open: boolean; record?: FeeRecord }>({ open: false });
+  const [clsModal, setClsModal] = useState<{ open: boolean; record?: ClassRecord }>({ open: false });
 
   // Auth
   useEffect(() => onAuthStateChanged(getAuthInstance(), u => { setUser(u); setAuthLoading(false); }), []);
 
- const loadAll = useCallback(async () => {
-  const [p, t, f, c, cfg, vs] = await Promise.all([
-    getAllParents(),
-    getAllTutors(),
-    getAllFees(),
-    getAllClasses(),
-    getSiteConfig(),
-    getVisitorStats(), // ← this was missing in destructuring
-  ]);
-
-  setParents(p);
-  setTutors(t);
-  setFees(f);
-  setClasses(c);
-
-  if (cfg) setConfig(cfg);
-
-  setVisitorStats(vs); // ← now this works correctly
-}, []);
+  const loadAll = useCallback(async () => {
+    const [p, t, f, c, cfg, vs] = await Promise.all([
+      getAllParents(), getAllTutors(), getAllFees(), getAllClasses(),
+      getSiteConfig(), getVisitorStats(),
+    ]);
+    setParents(p); setTutors(t); setFees(f); setClasses(c);
+    if (cfg) setConfig(cfg);
+    setVisitorStats(vs);
+  }, []);
 
   useEffect(() => { if (user) loadAll(); }, [user, loadAll]);
 
@@ -391,13 +382,13 @@ export default function AdminPage() {
     .filter(c => !cSearch || [c.tutorName, c.parentName, c.subject, c.area].some(v => v.toLowerCase().includes(cSearch.toLowerCase())));
 
   // ── Fee summary ──
-  const totalFromParents = fees.filter(f => f.paymentStatus !== 'pending').reduce((s, f) => s + f.parentFee, 0);
-  const totalToTutors    = fees.filter(f => f.paymentStatus !== 'pending').reduce((s, f) => s + f.tutorFee, 0);
+  const totalFromParents  = fees.filter(f => f.paymentStatus !== 'pending').reduce((s, f) => s + f.parentFee, 0);
+  const totalToTutors     = fees.filter(f => f.paymentStatus !== 'pending').reduce((s, f) => s + f.tutorFee, 0);
   const totalPaidToTutors = fees.filter(f => f.paymentStatus === 'paid').reduce((s, f) => s + f.tutorFee, 0);
-  const totalProfit      = totalFromParents - totalToTutors;
+  const totalProfit       = totalFromParents - totalToTutors;
 
   // ── Class summary ──
-  const activeClasses    = classes.filter(c => c.status === 'active').length;
+  const activeClasses = classes.filter(c => c.status === 'active').length;
 
   // ── Handlers ──
   async function handleStatusChange(col: 'parents' | 'tutors', id: string, status: LeadStatus) {
@@ -452,20 +443,31 @@ export default function AdminPage() {
   }
 
   // ── Counts ──
-  const convertedCount = [...parents, ...tutors].filter(x => x.status === 'converted').length;
-  const newParents     = parents.filter(p => p.status === 'new').length;
-  const newTutors      = tutors.filter(t => t.status === 'new').length;
+  const newParents  = parents.filter(p => p.status === 'new').length;
+  const newTutors   = tutors.filter(t => t.status === 'new').length;
   const recentActivity = [...parents.map(p => ({ ...p, type: 'Parent' })), ...tutors.map(t => ({ ...t, type: 'Tutor' }))]
     .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)).slice(0, 10);
 
   if (authLoading) return <div className={styles.loadingScreen}>⏳ Loading…</div>;
   if (!user) return <LoginScreen />;
 
+  // ── Nav click: navigate + close sidebar on mobile ──
+  function handleNav(key: AdminPage) {
+    setPage(key);
+    setSidebarOpen(false);
+  }
+
   return (
     <div className={styles.app}>
 
+      {/* ── Mobile backdrop — closes sidebar when tapped ── */}
+      <div
+        className={`${styles.sidebarOverlay} ${sidebarOpen ? styles.overlayVisible : ''}`}
+        onClick={() => setSidebarOpen(false)}
+      />
+
       {/* ── Sidebar ── */}
-      <aside className={styles.sidebar}>
+      <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.sidebarLogo}>
           <div className={styles.sidebarLogoText}>📚 Jilani Home Tutor</div>
           <div className={styles.sidebarLogoSub}>Admin Dashboard</div>
@@ -475,7 +477,7 @@ export default function AdminPage() {
             <button
               key={key}
               className={`${styles.navItem} ${page === key ? styles.navActive : ''}`}
-              onClick={() => setPage(key)}
+              onClick={() => handleNav(key)}
             >
               <span className={styles.navIcon}>{icon}</span>
               {PAGE_TITLES[key]}
@@ -491,7 +493,17 @@ export default function AdminPage() {
       {/* ── Main ── */}
       <div className={styles.main}>
         <div className={styles.topbar}>
-          <h1>{PAGE_TITLES[page]}</h1>
+          {/* Left side: hamburger + title */}
+          <div className={styles.topbarLeft}>
+            <button
+              className={styles.hamburger}
+              onClick={() => setSidebarOpen(o => !o)}
+              aria-label="Toggle menu"
+            >
+              ☰
+            </button>
+            <h1>{PAGE_TITLES[page]}</h1>
+          </div>
           <button onClick={loadAll} className={styles.refreshBtn}>🔄 Refresh</button>
         </div>
 
@@ -500,14 +512,15 @@ export default function AdminPage() {
           {/* ══ DASHBOARD ══ */}
           {page === 'dashboard' && (
             <>
+              {/* ── Business stats ── */}
               <div className={styles.statsRow}>
-                <StatCard icon="👨‍👩‍👧" num={parents.length} label="Total Parents"  sub={`${newParents} new`}       color="blue"  />
-                <StatCard icon="👩‍🏫" num={tutors.length}   label="Total Tutors"   sub={`${newTutors} new`}        color="gold"  />
-                <StatCard icon="📅"   num={activeClasses}   label="Active Classes" sub={`${classes.length} total`} color="green" />
-                <StatCard icon="💰"   num={currency(totalProfit)} label="Total Profit" sub="all time"             color="red"   />
+                <StatCard icon="👨‍👩‍👧" num={parents.length}       label="Total Parents"  sub={`${newParents} new`}       color="blue"  />
+                <StatCard icon="👩‍🏫" num={tutors.length}         label="Total Tutors"   sub={`${newTutors} new`}        color="gold"  />
+                <StatCard icon="📅"   num={activeClasses}         label="Active Classes" sub={`${classes.length} total`} color="green" />
+                <StatCard icon="💰"   num={currency(totalProfit)} label="Total Profit"   sub="all time"                  color="red"   />
               </div>
 
-              {/* Finance summary strip */}
+              {/* ── Finance strip ── */}
               <div className={styles.financeStrip}>
                 <div className={styles.finItem}>
                   <span>💳 Received from Parents</span>
@@ -517,7 +530,7 @@ export default function AdminPage() {
                 <div className={styles.finItem}>
                   <span>📤 Tutor Fee (Due)</span>
                   <strong className={styles.finNeg}>{currency(totalToTutors)}</strong>
-                  <small style={{color:'#aaa',fontSize:11}}>Actually paid: {currency(totalPaidToTutors)}</small>
+                  <small style={{ color: '#aaa', fontSize: 11 }}>Actually paid: {currency(totalPaidToTutors)}</small>
                 </div>
                 <div className={styles.finDivider} />
                 <div className={styles.finItem}>
@@ -526,6 +539,55 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* ── Visitor analytics stats ── */}
+              {visitorStats && (
+                <div className={styles.statsRow}>
+                  <StatCard icon="👤"  num={visitorStats.uniqueVisitors.toLocaleString('en-IN')} label="Total Unique Visitors" sub="all time"    color="blue"  />
+                  <StatCard icon="📅"  num={visitorStats.todayViews}                             label="Today's Visitors"      sub="unique today" color="green" />
+                  <StatCard icon="📈"  num={visitorStats.weekViews.toLocaleString('en-IN')}      label="This Week"             sub="last 7 days" color="gold"  />
+                </div>
+              )}
+
+              {/* ── Traffic chart ── */}
+              {visitorStats && (
+                <div className={styles.tableCard} style={{ padding: '20px 24px' }}>
+                  <div className={styles.tableHeader} style={{ marginBottom: 16, border: 'none', padding: 0 }}>
+                    <h3>📊 Website Traffic — Last 14 Days</h3>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 120, borderBottom: '1px solid #f0f0f0', paddingBottom: 4 }}>
+                    {(() => {
+                      const maxV = Math.max(...visitorStats.daily.map(d => d.views), 1);
+                      return visitorStats.daily.map((day, i) => (
+                        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <div
+                            title={`${day.date}: ${day.views} views`}
+                            style={{
+                              width: '100%',
+                              height: `${Math.max(Math.round((day.views / maxV) * 100), day.views > 0 ? 3 : 0)}%`,
+                              background: '#3b82f6',
+                              borderRadius: '3px 3px 0 0',
+                              cursor: 'default',
+                              transition: 'opacity .2s',
+                            }}
+                          />
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                  <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
+                    {visitorStats.daily.map((day, i) => (
+                      <div key={i} style={{ flex: 1, fontSize: 9, color: '#bbb', textAlign: 'center', overflow: 'hidden' }}>
+                        {day.date}
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: 11, color: '#ccc', marginTop: 10 }}>
+                    Hover a bar to see exact numbers · Unique visitors tracked by browser cookie
+                  </p>
+                </div>
+              )}
+
+              {/* ── Recent registrations ── */}
               <div className={styles.tableCard}>
                 <div className={styles.tableHeader}><h3>📋 Recent Registrations</h3></div>
                 <div className={styles.activityList}>
@@ -542,54 +604,6 @@ export default function AdminPage() {
                       <span className={styles.actDate}>{fmt(r)}</span>
                     </div>
                   ))}
-
-                  {visitorStats && (
-                <>
-                  <div className={styles.statsRow}>
-                    <StatCard icon="👁️"  num={visitorStats.totalViews.toLocaleString('en-IN')}     label="Total Page Views"  sub="all time"       color="blue"  />
-                    <StatCard icon="👤"  num={visitorStats.uniqueVisitors.toLocaleString('en-IN')}  label="Unique Visitors"   sub="by browser"     color="gold"  />
-                    <StatCard icon="📅"  num={visitorStats.todayViews}                              label="Today's Views"     sub="so far today"   color="green" />
-                    <StatCard icon="📈"  num={visitorStats.weekViews.toLocaleString('en-IN')}       label="This Week"         sub="last 7 days"    color="red"   />
-                  </div>
- 
-                  {/* Mini bar chart — last 14 days */}
-                  <div className={styles.tableCard} style={{ padding: '20px 24px' }}>
-                    <div className={styles.tableHeader} style={{ marginBottom: 16 }}>
-                      <h3>📊 Website Traffic — Last 14 Days</h3>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 120, borderBottom: '1px solid #f0f0f0', paddingBottom: 4 }}>
-                      {(() => {
-                        const maxV = Math.max(...visitorStats.daily.map(d => d.views), 1);
-                        return visitorStats.daily.map((day, i) => (
-                          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                            <div
-                              title={`${day.date}: ${day.views} views, ${day.unique} unique`}
-                              style={{
-                                width: '100%',
-                                height: `${Math.round((day.views / maxV) * 100)}%`,
-                                minHeight: day.views > 0 ? 4 : 0,
-                                background: '#3b82f6',
-                                borderRadius: '3px 3px 0 0',
-                                cursor: 'default',
-                              }}
-                            />
-                          </div>
-                        ));
-                      })()}
-                    </div>
-                    <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-                      {visitorStats.daily.map((day, i) => (
-                        <div key={i} style={{ flex: 1, fontSize: 9, color: '#aaa', textAlign: 'center', overflow: 'hidden' }}>
-                          {day.date}
-                        </div>
-                      ))}
-                    </div>
-                    <p style={{ fontSize: 12, color: '#aaa', marginTop: 12 }}>
-                      Hover over a bar to see exact numbers. Unique visitors tracked by browser.
-                    </p>
-                  </div>
-                </>
-              )}
                 </div>
               </div>
             </>
@@ -678,12 +692,11 @@ export default function AdminPage() {
           {/* ══ FEES ══ */}
           {page === 'fees' && (
             <>
-              {/* Summary cards */}
               <div className={styles.statsRow}>
-                <StatCard icon="💳" num={currency(totalFromParents)} label="Received from Parents" sub="confirmed payments" color="green" />
-                <StatCard icon="📤" num={currency(totalPaidToTutors)} label="Actually Paid to Tutors" sub="status = paid" color="gold"  />
-                <StatCard icon="🏦" num={currency(totalProfit)}      label="Net Profit"             sub="all records"        color="blue"  />
-                <StatCard icon="📋" num={fees.length}                label="Fee Records"            sub="total entries"      color="red"   />
+                <StatCard icon="💳" num={currency(totalFromParents)}  label="Received from Parents"    sub="confirmed payments" color="green" />
+                <StatCard icon="📤" num={currency(totalPaidToTutors)} label="Actually Paid to Tutors"  sub="status = paid"      color="gold"  />
+                <StatCard icon="🏦" num={currency(totalProfit)}       label="Net Profit"               sub="all records"        color="blue"  />
+                <StatCard icon="📋" num={fees.length}                 label="Fee Records"              sub="total entries"      color="red"   />
               </div>
 
               <div className={styles.tableCard}>
@@ -737,9 +750,9 @@ export default function AdminPage() {
           {page === 'classes' && (
             <>
               <div className={styles.statsRow}>
-                <StatCard icon="✅" num={classes.filter(c => c.status === 'active').length}    label="Active Classes"    sub="currently running" color="green" />
-                <StatCard icon="⏸️" num={classes.filter(c => c.status === 'paused').length}    label="Paused"            sub="on hold"           color="gold"  />
-                <StatCard icon="🎓" num={classes.filter(c => c.status === 'completed').length} label="Completed"         sub="finished batches"  color="blue"  />
+                <StatCard icon="✅" num={classes.filter(c => c.status === 'active').length}    label="Active Classes"     sub="currently running" color="green" />
+                <StatCard icon="⏸️" num={classes.filter(c => c.status === 'paused').length}    label="Paused"             sub="on hold"           color="gold"  />
+                <StatCard icon="🎓" num={classes.filter(c => c.status === 'completed').length} label="Completed"          sub="finished batches"  color="blue"  />
                 <StatCard icon="📊" num={classes.reduce((s, c) => s + c.classesPerWeek, 0)}    label="Classes/Week Total" sub="across all tutors" color="red"   />
               </div>
 

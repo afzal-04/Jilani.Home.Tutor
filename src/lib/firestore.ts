@@ -167,39 +167,50 @@ export async function deleteClassRecord(id: string) {
 // ─── Visitor Analytics ────────────────────────────────────────────────────────
 
 export interface VisitorStats {
-  totalViews: number;
   uniqueVisitors: number;
   todayViews: number;
-  todayUnique: number;
   weekViews: number;
-  daily: { date: string; views: number; unique: number }[];
+  daily: { date: string; views: number }[];
 }
 
-/** Called on every page load. Increments counters in Firestore. */
+/** Called on every page load. Counts:
+ *  - Total : each browser counted once ever     (localStorage 'jht_visited')
+ *  - Daily : each browser counted once per day  (localStorage 'jht_day' = today's date)
+ *  Reloading the page never increments anything.
+ */
 export async function trackVisit(): Promise<void> {
   try {
-    const db = getDbInstance();
-    const today = new Date().toISOString().split('T')[0]; // e.g. "2026-05-03"
-    const isReturning =
-      typeof window !== 'undefined' && localStorage.getItem('jht_visited') === '1';
+    if (typeof window === 'undefined') return;
 
+    const today = new Date().toISOString().split('T')[0]; // e.g. "2026-05-04"
+
+    const countedToday = localStorage.getItem('jht_day') === today;
+    const everCounted  = localStorage.getItem('jht_visited') === '1';
+
+    // Already counted today — skip everything (handles reloads + same-day returns)
+    if (countedToday) return;
+
+    // Mark this browser as counted today
+    localStorage.setItem('jht_day', today);
+
+    const db         = getDbInstance();
     const summaryRef = doc(db, 'analytics', 'summary');
     const dailyRef   = doc(db, 'analytics', `daily_${today}`);
 
     const writes: Promise<void>[] = [
-      setDoc(summaryRef, { totalViews: increment(1) }, { merge: true }),
-      setDoc(dailyRef,   { views: increment(1), date: today }, { merge: true }),
+      // Daily: once per browser per day
+      setDoc(dailyRef, { views: increment(1), date: today }, { merge: true }),
     ];
 
-    if (!isReturning) {
+    if (!everCounted) {
+      // Total unique: only on first-ever visit from this browser
       writes.push(setDoc(summaryRef, { uniqueVisitors: increment(1) }, { merge: true }));
-      writes.push(setDoc(dailyRef,   { unique: increment(1) }, { merge: true }));
-      if (typeof window !== 'undefined') localStorage.setItem('jht_visited', '1');
+      localStorage.setItem('jht_visited', '1');
     }
 
     await Promise.all(writes);
   } catch {
-    // Never break the page if analytics fails
+    // Never break the page
   }
 }
 
@@ -208,9 +219,7 @@ export async function getVisitorStats(): Promise<VisitorStats> {
   const db = getDbInstance();
 
   const summarySnap = await getDoc(doc(db, 'analytics', 'summary'));
-  const summary = summarySnap.exists()
-    ? summarySnap.data()
-    : { totalViews: 0, uniqueVisitors: 0 };
+  const summary     = summarySnap.exists() ? summarySnap.data() : { uniqueVisitors: 0 };
 
   // Build last 14 days and fetch in parallel
   const dayKeys: { key: string; label: string }[] = [];
@@ -228,19 +237,16 @@ export async function getVisitorStats(): Promise<VisitorStats> {
   );
 
   const daily = daySnaps.map((snap, i) => ({
-    date:   dayKeys[i].label,
-    views:  snap.exists() ? (snap.data().views  || 0) : 0,
-    unique: snap.exists() ? (snap.data().unique || 0) : 0,
+    date:  dayKeys[i].label,
+    views: snap.exists() ? (snap.data().views || 0) : 0,
   }));
 
-  const today     = daily[daily.length - 1];
-  const weekViews = daily.slice(-7).reduce((s, d) => s + d.views, 0);
+  const todayViews = daily[daily.length - 1].views;
+  const weekViews  = daily.slice(-7).reduce((s, d) => s + d.views, 0);
 
   return {
-    totalViews:     summary.totalViews     || 0,
     uniqueVisitors: summary.uniqueVisitors || 0,
-    todayViews:     today.views,
-    todayUnique:    today.unique,
+    todayViews,
     weekViews,
     daily,
   };

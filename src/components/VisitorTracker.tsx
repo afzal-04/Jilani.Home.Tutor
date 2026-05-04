@@ -1,14 +1,18 @@
 'use client';
 // src/components/VisitorTracker.tsx
-// Paste this as a NEW file. Then add <VisitorTracker /> to layout.tsx (see Step 3).
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { trackVisit } from '@/lib/firestore';
 
 export default function VisitorTracker() {
-  useEffect(() => {
-    trackVisit(); // fire-and-forget, errors are caught inside trackVisit
-  }, []);
+  const pathname = usePathname();
 
-  return null; // renders nothing visible
+  useEffect(() => {
+    // Only count real visitors — skip /admin and /find-tutor internal pages
+    if (pathname.startsWith('/admin') || pathname.startsWith('/find-tutor')) return;
+    trackVisit();
+  }, [pathname]);
+
+  return null;
 }
