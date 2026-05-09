@@ -56,7 +56,7 @@ export default function Hero() {
         <div className={styles.content}>
           {/* Left: headline */}
           <div className={styles.left}>
-            <div className={styles.badge}>⭐ #1 Home Tutor Service in Raipur</div>
+            <div className={styles.badge}>✨ Trusted Home Tutors in Raipur</div>
             <h1 className={styles.heading}>
               Your Child Deserves <em>Expert</em> Attention at Home
             </h1>
