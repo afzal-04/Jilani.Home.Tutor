@@ -96,7 +96,7 @@ export default function WhyUs() {
               </div>
               <div className={styles.trustDivider} />
               <div className={styles.trustItem}>
-                <strong>5+</strong><span>Years in Raipur</span>
+                <strong>3+</strong><span>Years in Raipur</span>
               </div>
               <div className={styles.trustDivider} />
               <div className={styles.trustItem}>
