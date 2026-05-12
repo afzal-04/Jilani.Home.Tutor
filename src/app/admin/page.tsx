@@ -26,6 +26,33 @@ const PAGE_TITLES: Record<AdminPage, string> = {
   config:    'Site Configuration',
 };
 
+
+// ─── Shared dropdown options ───────────────────────────────────────────────────
+
+const ALL_CLASSES = [
+  'Nursery', 'LKG', 'UKG',
+  'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5',
+  'Class 6', 'Class 7', 'Class 8',
+  'Class 9', 'Class 10 (Board)',
+  'Class 11', 'Class 12 (Board)',
+  'Competitive Exam (JEE / NEET)',
+  'Competitive Exam (Govt Job)',
+  'Summer Classes',
+  'Drawing / Art',
+  'Music / Singing',
+  'Dance',
+  'Other',
+];
+
+const ALL_SUBJECTS = [
+  'Maths', 'Science', 'Physics', 'Chemistry', 'Biology',
+  'English', 'Hindi', 'Social Science', 'Computer Science',
+  'Accountancy / Commerce', 'Economics',
+  'JEE Coaching', 'NEET Coaching',
+  'Drawing / Art', 'Music / Singing', 'Dance',
+  'All Subjects', 'Other',
+];
+
 const NAV_ITEMS: { key: AdminPage; icon: string }[] = [
   { key: 'dashboard', icon: '🏠' },
   { key: 'parents',   icon: '👨‍👩‍👧' },
@@ -149,13 +176,22 @@ function FeeModal({ initial, onSave, onClose }: {
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label>Subject *</label>
-              <input value={form.subject} onChange={e => f('subject', e.target.value)} placeholder="e.g. Maths, Science" required />
+              <select value={form.subject} onChange={e => f('subject', e.target.value)} required>
+                <option value="">Select Subject</option>
+                {ALL_SUBJECTS.map(s => <option key={s}>{s}</option>)}
+              </select>
+              {form.subject === 'Other' && (
+                <input style={{marginTop:8,width:'100%',padding:'10px 12px',border:'1.5px solid #c8942a',borderRadius:8,fontSize:14,fontFamily:'inherit'}}
+                  value={form.notes.startsWith('Subject: ') ? form.notes.replace('Subject: ','') : ''}
+                  onChange={e => f('notes', 'Subject: ' + e.target.value)}
+                  placeholder="Enter subject name" required />
+              )}
             </div>
             <div className={styles.formGroup}>
               <label>Class Level *</label>
               <select value={form.classLevel} onChange={e => f('classLevel', e.target.value)} required>
-                <option value="">Select</option>
-                {['Class 1–5','Class 6–8','Class 9–10','Class 11–12','Competitive Exam'].map(c => <option key={c}>{c}</option>)}
+                <option value="">Select Class</option>
+                {ALL_CLASSES.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
           </div>
@@ -267,13 +303,22 @@ function ClassModal({ initial, onSave, onClose }: {
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label>Subject *</label>
-              <input value={form.subject} onChange={e => f('subject', e.target.value)} placeholder="e.g. Maths, Science" required />
+              <select value={form.subject} onChange={e => f('subject', e.target.value)} required>
+                <option value="">Select Subject</option>
+                {ALL_SUBJECTS.map(s => <option key={s}>{s}</option>)}
+              </select>
+              {form.subject === 'Other' && (
+                <input style={{marginTop:8,width:'100%',padding:'10px 12px',border:'1.5px solid #c8942a',borderRadius:8,fontSize:14,fontFamily:'inherit'}}
+                  value={form.notes.startsWith('Subject: ') ? form.notes.replace('Subject: ','') : ''}
+                  onChange={e => f('notes', 'Subject: ' + e.target.value)}
+                  placeholder="Enter subject name" required />
+              )}
             </div>
             <div className={styles.formGroup}>
               <label>Class Level *</label>
               <select value={form.classLevel} onChange={e => f('classLevel', e.target.value)} required>
-                <option value="">Select</option>
-                {['Class 1–5','Class 6–8','Class 9–10','Class 11–12','Competitive Exam','Summer Class','Drawing','Music','Dance'].map(c => <option key={c}>{c}</option>)}
+                <option value="">Select Class</option>
+                {ALL_CLASSES.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
           </div>

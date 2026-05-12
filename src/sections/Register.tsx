@@ -10,6 +10,7 @@ type Tab = 'parent' | 'tutor';
 // ── Dropdown Options ──────────────────────────────────────────────────────────
 
 export const PARENT_CLASSES = [
+  'Nursery', 'LKG', 'UKG',
   'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5',
   'Class 6', 'Class 7', 'Class 8',
   'Class 9', 'Class 10 (Board)',
@@ -20,6 +21,7 @@ export const PARENT_CLASSES = [
   'Drawing / Art Classes',
   'Music / Singing Classes',
   'Dance Classes',
+  'Other',
 ];
 
 export const PARENT_SUBJECTS = [
@@ -39,9 +41,13 @@ export const RAIPUR_AREAS = [
 ];
 
 export const TUTOR_CLASSES = [
-  'Class 1–5 (Primary)', 'Class 6–8 (Middle)',
-  'Class 9–10 (Board)', 'Class 11–12 (Senior)',
-  'Competitive Exams', 'Summer / Activity Classes',
+  'Pre-Primary (Nursery / LKG / UKG)',
+  'Class 1–5 (Primary)',
+  'Class 6–8 (Middle)',
+  'Class 9–10 (Board)',
+  'Class 11–12 (Senior)',
+  'Competitive Exams',
+  'Summer / Activity Classes',
 ];
 
 export const TUTOR_SUBJECTS = [
@@ -87,10 +93,8 @@ function AreaSelect({ value, customValue, onChange, onCustomChange }: {
 // ── Multi-Select Checkbox Group ───────────────────────────────────────────────
 
 function MultiCheckGroup({ options, selected, onChange, label }: {
-  options: string[];
-  selected: string[];
-  onChange: (vals: string[]) => void;
-  label: string;
+  options: string[]; selected: string[];
+  onChange: (vals: string[]) => void; label: string;
 }) {
   function toggle(val: string) {
     onChange(selected.includes(val)
@@ -98,19 +102,13 @@ function MultiCheckGroup({ options, selected, onChange, label }: {
       : [...selected, val]
     );
   }
-
   return (
     <div className={styles.checkGroup}>
       <div className={styles.checkLabel}>{label}</div>
       <div className={styles.checkGrid}>
         {options.map(opt => (
           <label key={opt} className={`${styles.checkItem} ${selected.includes(opt) ? styles.checkSelected : ''}`}>
-            <input
-              type="checkbox"
-              checked={selected.includes(opt)}
-              onChange={() => toggle(opt)}
-              className={styles.checkInput}
-            />
+            <input type="checkbox" checked={selected.includes(opt)} onChange={() => toggle(opt)} className={styles.checkInput} />
             {opt}
           </label>
         ))}
@@ -129,21 +127,22 @@ function MultiCheckGroup({ options, selected, onChange, label }: {
 export default function Register() {
   const [tab, setTab] = useState<Tab>('parent');
 
-  // ── Parent form ──
-  const [pForm, setPForm] = useState({ name: '', phone: '', area: '', class: '', subject: '' });
-  const [pCustomArea,    setPCustomArea]    = useState('');
+  // Parent form
+  const [pForm, setPForm]             = useState({ name: '', phone: '', area: '', class: '', subject: '' });
+  const [pCustomArea, setPCustomArea] = useState('');
+  const [pCustomClass, setPCustomClass] = useState('');
   const [pCustomSubject, setPCustomSubject] = useState('');
-  const [pLoading, setPLoading] = useState(false);
-  const [pSuccess, setPSuccess] = useState(false);
+  const [pLoading, setPLoading]       = useState(false);
+  const [pSuccess, setPSuccess]       = useState(false);
 
-  // ── Tutor form ──
-  const [tForm, setTForm] = useState({ name: '', phone: '', gender: '', area: '', qualification: '' });
-  const [tCustomArea,    setTCustomArea]    = useState('');
-  const [tCustomQual,    setTCustomQual]    = useState('');
-  const [tClasses,       setTClasses]       = useState<string[]>([]);
-  const [tSubjects,      setTSubjects]      = useState<string[]>([]);
-  const [tLoading, setTLoading] = useState(false);
-  const [tSuccess, setTSuccess] = useState(false);
+  // Tutor form
+  const [tForm, setTForm]             = useState({ name: '', phone: '', gender: '', area: '', qualification: '' });
+  const [tCustomArea, setTCustomArea] = useState('');
+  const [tCustomQual, setTCustomQual] = useState('');
+  const [tClasses,    setTClasses]    = useState<string[]>([]);
+  const [tSubjects,   setTSubjects]   = useState<string[]>([]);
+  const [tLoading, setTLoading]       = useState(false);
+  const [tSuccess, setTSuccess]       = useState(false);
 
   function resolveArea(area: string, custom: string) {
     return area === 'Other Area' ? (custom.trim() || 'Other Area') : area;
@@ -151,14 +150,14 @@ export default function Register() {
 
   async function handleParent(e: React.FormEvent) {
     e.preventDefault();
-    const finalSubject = pForm.subject === 'Other'
-      ? (pCustomSubject.trim() || 'Other') : pForm.subject;
+    const finalClass   = pForm.class   === 'Other' ? (pCustomClass.trim()   || 'Other') : pForm.class;
+    const finalSubject = pForm.subject === 'Other' ? (pCustomSubject.trim() || 'Other') : pForm.subject;
     setPLoading(true);
     try {
-      await registerParent({ ...pForm, area: resolveArea(pForm.area, pCustomArea), subject: finalSubject });
+      await registerParent({ ...pForm, area: resolveArea(pForm.area, pCustomArea), class: finalClass, subject: finalSubject });
       setPSuccess(true);
       setPForm({ name: '', phone: '', area: '', class: '', subject: '' });
-      setPCustomArea(''); setPCustomSubject('');
+      setPCustomArea(''); setPCustomClass(''); setPCustomSubject('');
       setTimeout(() => setPSuccess(false), 5000);
     } catch { alert('Something went wrong. Please try again.'); }
     setPLoading(false);
@@ -166,15 +165,13 @@ export default function Register() {
 
   async function handleTutor(e: React.FormEvent) {
     e.preventDefault();
-    if (tClasses.length === 0) { alert('Please select at least one class you can teach.'); return; }
+    if (tClasses.length === 0)  { alert('Please select at least one class you can teach.');   return; }
     if (tSubjects.length === 0) { alert('Please select at least one subject you can teach.'); return; }
-    const finalQual = tForm.qualification === 'Other'
-      ? (tCustomQual.trim() || 'Other') : tForm.qualification;
+    const finalQual = tForm.qualification === 'Other' ? (tCustomQual.trim() || 'Other') : tForm.qualification;
     setTLoading(true);
     try {
       await registerTutor({
-        ...tForm,
-        qualification: finalQual,
+        ...tForm, qualification: finalQual,
         area: resolveArea(tForm.area, tCustomArea),
         classes: tClasses.join(', '),
         subjects: tSubjects.join(', '),
@@ -232,12 +229,19 @@ export default function Register() {
                   onChange={v => setPForm({ ...pForm, area: v })} onCustomChange={setPCustomArea} />
               </div>
 
+              {/* Class with Nursery/LKG/UKG + Other */}
               <div className="form-group">
                 <label>Class / Grade Needed *</label>
                 <select value={pForm.class} onChange={e => setPForm({ ...pForm, class: e.target.value })} required>
                   <option value="">Select Class</option>
                   {PARENT_CLASSES.map(c => <option key={c}>{c}</option>)}
                 </select>
+                {pForm.class === 'Other' && (
+                  <input type="text" value={pCustomClass}
+                    onChange={e => setPCustomClass(e.target.value)}
+                    placeholder="Please describe the class / grade"
+                    required className={styles.otherInput} />
+                )}
               </div>
 
               {/* Subject with Other option */}
@@ -248,12 +252,10 @@ export default function Register() {
                   {PARENT_SUBJECTS.map(s => <option key={s}>{s}</option>)}
                 </select>
                 {pForm.subject === 'Other' && (
-                  <input
-                    type="text" value={pCustomSubject}
+                  <input type="text" value={pCustomSubject}
                     onChange={e => setPCustomSubject(e.target.value)}
                     placeholder="Please describe the subject you need"
-                    required className={styles.otherInput}
-                  />
+                    required className={styles.otherInput} />
                 )}
               </div>
 
@@ -297,7 +299,7 @@ export default function Register() {
                   onChange={v => setTForm({ ...tForm, area: v })} onCustomChange={setTCustomArea} />
               </div>
 
-              {/* Qualification with Other option */}
+              {/* Qualification with Other */}
               <div className={`form-group ${styles.fullCol}`}>
                 <label>Highest Qualification *</label>
                 <select value={tForm.qualification} onChange={e => setTForm({ ...tForm, qualification: e.target.value })} required>
@@ -305,16 +307,14 @@ export default function Register() {
                   {QUALIFICATIONS.map(q => <option key={q}>{q}</option>)}
                 </select>
                 {tForm.qualification === 'Other' && (
-                  <input
-                    type="text" value={tCustomQual}
+                  <input type="text" value={tCustomQual}
                     onChange={e => setTCustomQual(e.target.value)}
                     placeholder="Please enter your qualification"
-                    required className={styles.otherInput}
-                  />
+                    required className={styles.otherInput} />
                 )}
               </div>
 
-              {/* Multi-select: Classes */}
+              {/* Multi-select: Classes — includes Pre-Primary */}
               <div className={styles.fullCol}>
                 <MultiCheckGroup
                   label="Classes You Can Teach * (select all that apply)"
