@@ -3,18 +3,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --ink: #0f1923;
-  --cream: #faf7f2;
-  --gold: #c8942a;
-  --gold-light: #f0c55a;
-  --accent: #1a5276;
-  --accent2: #e8f4f8;
-  --green: #1a7a4a;
-  --red: #c0392b;
-  --border: #e2ddd6;
-  --shadow: 0 8px 40px rgba(15, 25, 35, 0.1);
+  /* ── Gold — from logo ──────────────────────────────────────────────────── */
+  --gold:        #C8941A;
+  --gold-light:  #F0C55A;
+  --gold-dark:   #A0720F;
+
+  /* ── Blue — from logo outline ─────────────────────────────────────────── */
+  --accent:      #1A6FBF;        /* Medium royal blue — exact logo blue */
+  --accent-dark: #1255A0;        /* Deeper blue for hover states */
+  --accent2:     #EAF3FC;        /* Very light blue for tag backgrounds */
+
+  /* ── Dark sections (Hero, Problems, Register) ─────────────────────────── */
+  --ink:         #0B1A35;        /* Deep navy blue — richer than pure black */
+  --ink2:        #112244;        /* Slightly lighter navy */
+
+  /* ── Page background — pure white ────────────────────────────────────── */
+  --cream:       #FFFFFF;        /* Pure white — clean and professional */
+
+  /* ── Borders and shadows ──────────────────────────────────────────────── */
+  --border:      #D8E6F5;        /* Soft blue border */
+  --shadow:      0 8px 40px rgba(26, 111, 191, 0.10);
+
   --font-display: 'Playfair Display', serif;
-  --font-body: 'DM Sans', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
 }
 
 * {
@@ -23,9 +34,7 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-body);
@@ -34,7 +43,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Shared Utility Classes ─────────────────────────────────── */
+/* ── Shared Utility Classes ──────────────────────────────────────────────── */
 
 .sec-inner {
   max-width: 1100px;
@@ -56,7 +65,7 @@ body {
 }
 
 .sec-tag--gold {
-  background: rgba(200, 148, 42, 0.15);
+  background: rgba(200, 148, 26, 0.15);
   color: var(--gold-light);
 }
 
@@ -73,14 +82,14 @@ body {
 
 .sec-sub {
   font-size: 16px;
-  color: #666;
+  color: #4A6A8A;
   max-width: 520px;
   line-height: 1.7;
 }
 
-.sec-sub--muted { color: rgba(255, 255, 255, 0.6); }
+.sec-sub--muted { color: rgba(255, 255, 255, 0.65); }
 
-/* ── Buttons ─────────────────────────────────────────────────── */
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
 
 .btn-primary {
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
@@ -101,7 +110,7 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(200, 148, 42, 0.45);
+  box-shadow: 0 8px 30px rgba(200, 148, 26, 0.5);
 }
 
 .btn-outline {
@@ -112,7 +121,7 @@ body {
   text-decoration: none;
   font-weight: 600;
   font-size: 15px;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -121,11 +130,9 @@ body {
   cursor: pointer;
 }
 
-.btn-outline:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
+.btn-outline:hover { background: rgba(255, 255, 255, 0.1); }
 
-/* ── Form Shared ─────────────────────────────────────────────── */
+/* ── Form Shared ─────────────────────────────────────────────────────────── */
 
 .form-group {
   display: flex;
@@ -135,7 +142,7 @@ body {
 
 .form-group label {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.75);
   font-weight: 500;
 }
 
@@ -144,7 +151,7 @@ body {
 .form-group textarea {
   padding: 13px 16px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 10px;
   color: #fff;
   font-family: var(--font-body);
@@ -152,7 +159,7 @@ body {
   transition: border-color 0.2s;
 }
 
-.form-group select option { background: #1a3a5c; }
+.form-group select option { background: #112244; }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
@@ -165,17 +172,17 @@ body {
   border-color: var(--gold);
 }
 
-/* ── Success Message ─────────────────────────────────────────── */
+/* ── Success Message ─────────────────────────────────────────────────────── */
 
 .success-msg {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(26, 122, 74, 0.2);
-  border: 1px solid rgba(26, 122, 74, 0.4);
+  background: rgba(26, 111, 191, 0.15);
+  border: 1px solid rgba(26, 111, 191, 0.3);
   border-radius: 10px;
   padding: 14px 18px;
-  color: #6ee0a0;
+  color: #90C0F5;
   font-size: 14px;
   margin-top: 14px;
   animation: fadeIn 0.3s ease;
@@ -186,7 +193,7 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Reveal animation ────────────────────────────────────────── */
+/* ── Reveal animation ────────────────────────────────────────────────────── */
 
 .reveal {
   opacity: 0;
