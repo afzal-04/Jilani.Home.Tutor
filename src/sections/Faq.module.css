@@ -1,6 +1,9 @@
 /* src/sections/Faq.module.css */
 
-.section { background: #fff; }
+.section {
+  background: var(--cream);
+  position: relative;
+}
 
 /* ── Category filters ── */
 .filters {
@@ -11,48 +14,56 @@
 }
 
 .filterBtn {
-  padding: 8px 18px;
-  border-radius: 100px;
+  padding: 9px 20px;
+  border-radius: 999px;
   border: 1.5px solid var(--border);
-  background: #fff;
+  background: var(--surface-white);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   font-family: var(--font-body);
-  color: #666;
-  transition: all 0.2s ease;
+  color: #64748B;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-sm);
 }
 
 .filterBtn:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .filterActive {
-  background: var(--ink);
-  color: #fff !important;
+  background: var(--ink) !important;
+  color: #FFFFFF !important;
   border-color: var(--ink) !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
 }
 
 /* ── FAQ list ── */
 .list {
-  max-width: 800px;
+  max-width: 860px;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 14px;
 }
 
 .item {
-  border-bottom: 1px solid var(--border);
+  background: var(--surface-white);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
   overflow: hidden;
-  transition: background 0.2s;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  box-shadow: var(--shadow-sm);
 }
 
-.item:first-child { border-top: 1px solid var(--border); }
+.item:hover {
+  border-color: var(--accent2);
+}
 
 .itemOpen {
-  background: #faf7f2;
-  border-radius: 0;
+  border-color: var(--accent) !important;
+  box-shadow: var(--shadow-md);
+  background: #FFFFFF;
 }
 
 .question {
@@ -60,26 +71,26 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 20px 4px;
+  padding: 20px 24px;
   background: none;
   border: none;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: 700;
+  font-size: 16px;
   color: var(--ink);
   font-family: var(--font-body);
   text-align: left;
   gap: 16px;
-  line-height: 1.4;
-  transition: color 0.2s;
+  line-height: 1.45;
+  transition: color 0.2s ease;
 }
 
-.question:hover { color: var(--gold); }
+.question:hover { color: var(--accent); }
 
 .icon {
-  font-size: 22px;
-  color: var(--gold);
-  transition: transform 0.3s ease;
+  font-size: 20px;
+  color: var(--gold-light);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
   line-height: 1;
 }
@@ -89,83 +100,80 @@
 .answer {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.35s ease;
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.answerOpen { max-height: 300px; }
+.answerOpen { max-height: 350px; }
 
 .answer p {
-  padding: 0 4px 20px;
-  font-size: 14px;
-  color: #555;
+  padding: 0 24px 22px;
+  font-size: 14.5px;
+  color: #475569;
   line-height: 1.8;
 }
 
 /* ── CTA Box below FAQ ── */
 .ctaBox {
-  margin-top: 48px;
-  background: linear-gradient(135deg, #0f1923, #1a3a5c);
-  border-radius: 16px;
-  padding: 32px 36px;
+  margin-top: 52px;
+  background: linear-gradient(135deg, #0F172A, #1E293B);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 36px 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
-  max-width: 800px;
+  max-width: 860px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
 }
 
 .ctaBox p {
-  color: rgba(255,255,255,0.85);
-  font-size: 16px;
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .ctaBtns {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
 .ctaPrimary {
-  background: linear-gradient(135deg, var(--gold), var(--gold-light));
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 10px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  color: #FFFFFF;
+  padding: 13px 26px;
+  border-radius: 12px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 14.5px;
   text-decoration: none;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   white-space: nowrap;
+  box-shadow: 0 6px 18px var(--gold-glow);
 }
 
 .ctaPrimary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(200,148,42,0.4);
+  box-shadow: 0 10px 24px rgba(245, 158, 11, 0.45);
 }
 
 .ctaWa {
   background: #25D366;
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 10px;
+  color: #FFFFFF;
+  padding: 13px 26px;
+  border-radius: 12px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 14.5px;
   text-decoration: none;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.3);
 }
 
 .ctaWa:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37,211,102,0.4);
-}
-
-@media (max-width: 640px) {
-  .ctaBox { flex-direction: column; text-align: center; padding: 24px 20px; }
-  .ctaBtns { justify-content: center; }
-  .filters { gap: 8px; }
-  .filterBtn { font-size: 12px; padding: 7px 14px; }
+  box-shadow: 0 10px 24px rgba(37, 211, 102, 0.45);
 }
 
 /* ── View More button ── */
@@ -174,24 +182,32 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin: 20px auto 0;
-  padding: 13px 32px;
-  border: 2px dashed var(--gold);
+  margin: 24px auto 0;
+  padding: 14px 32px;
+  border: 2px dashed var(--gold-light);
   background: transparent;
-  color: var(--gold);
-  border-radius: 12px;
-  font-size: 14px;
+  color: var(--gold-light);
+  border-radius: 14px;
+  font-size: 14.5px;
   font-weight: 700;
   font-family: var(--font-body);
   cursor: pointer;
   transition: all 0.25s ease;
   letter-spacing: 0.3px;
   width: 100%;
-  max-width: 800px;
+  max-width: 860px;
 }
 
 .viewMoreBtn:hover {
-  background: rgba(200, 148, 42, 0.07);
+  background: rgba(245, 158, 11, 0.08);
   border-style: solid;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .ctaBox { flex-direction: column; text-align: center; padding: 28px 20px; }
+  .ctaBtns { justify-content: center; width: 100%; }
+  .ctaPrimary, .ctaWa { width: 100%; text-align: center; }
+  .filters { gap: 8px; }
+  .filterBtn { font-size: 12.5px; padding: 8px 16px; }
 }

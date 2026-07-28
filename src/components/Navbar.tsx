@@ -7,6 +7,7 @@ import styles from './Navbar.module.css';
 
 const navLinks = [
   { href: '#services',     label: 'Services' },
+  { href: '/find-tutor',   label: 'Find Tutor' },
   { href: '#register',     label: 'Register' },
   { href: '#testimonials', label: 'Results'  },
   { href: '#faq',          label: 'FAQ'      },

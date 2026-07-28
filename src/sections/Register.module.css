@@ -1,38 +1,67 @@
 /* src/sections/Register.module.css */
-.section { background: linear-gradient(135deg, #0f1923 0%, #1a3a5c 100%); }
+.section {
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+
+.section::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, transparent 60%);
+  pointer-events: none;
+}
 
 .tabs {
   display: flex;
-  background: rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 4px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 6px;
   width: fit-content;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
+  backdrop-filter: blur(12px);
 }
 
 .tab {
   padding: 12px 28px;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.6);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
   border: none;
   background: transparent;
   font-family: var(--font-body);
-  transition: all .2s;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab:hover {
+  color: #FFFFFF;
 }
 
 .tab.active {
-  background: #fff;
-  color: var(--ink);
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  color: #FFFFFF;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
 }
 
 .formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  max-width: 720px;
+  gap: 20px;
+  max-width: 780px;
+  background: rgba(30, 41, 59, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  padding: 36px 32px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
 }
 
 .fullCol { grid-column: 1 / -1; }
@@ -42,16 +71,17 @@
   margin-top: 10px;
   width: 100%;
   padding: 13px 16px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1.5px solid var(--gold) !important;
-  border-radius: 10px;
-  color: #fff;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1.5px solid var(--gold-light) !important;
+  border-radius: 12px;
+  color: #FFFFFF;
   font-family: var(--font-body);
   font-size: 14px;
-  animation: slideDown 0.2s ease;
+  animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.otherInput::placeholder { color: rgba(255,255,255,0.45); }
-.otherInput:focus { outline: none; border-color: var(--gold-light) !important; }
+
+.otherInput::placeholder { color: rgba(255, 255, 255, 0.4); }
+.otherInput:focus { outline: none; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
 
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-6px); }
@@ -66,67 +96,68 @@
 }
 
 .checkLabel {
-  font-size: 13px;
-  color: rgba(255,255,255,0.7);
-  font-weight: 500;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
 }
 
 .checkGrid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .checkItem {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 14px;
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
+  gap: 8px;
+  padding: 9px 16px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 13px;
-  color: rgba(255,255,255,0.75);
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.8);
   font-family: var(--font-body);
-  transition: all 0.18s ease;
+  transition: all 0.2s ease;
   user-select: none;
 }
 
 .checkItem:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(200,148,42,0.4);
-  color: #fff;
+  background: rgba(15, 23, 42, 0.75);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #FFFFFF;
 }
 
 .checkSelected {
-  background: rgba(200,148,42,0.18) !important;
-  border-color: var(--gold) !important;
-  color: var(--gold-light) !important;
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: var(--gold-light) !important;
+  color: #FBBF24 !important;
 }
 
 /* Hide default checkbox — use styled label instead */
 .checkInput {
-  width: 14px;
-  height: 14px;
-  accent-color: var(--gold);
+  width: 15px;
+  height: 15px;
+  accent-color: var(--gold-light);
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .selectedCount {
-  font-size: 12px;
-  color: var(--gold-light);
-  background: rgba(200,148,42,0.1);
-  border: 1px solid rgba(200,148,42,0.2);
-  border-radius: 8px;
-  padding: 8px 12px;
+  font-size: 12.5px;
+  color: #FBBF24;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
   line-height: 1.5;
   animation: slideDown 0.2s ease;
 }
 
-@media (max-width: 600px) {
-  .formGrid { grid-template-columns: 1fr; }
-  .tab { padding: 10px 18px; font-size: 13px; }
-  .checkItem { font-size: 12px; padding: 7px 12px; }
+@media (max-width: 680px) {
+  .formGrid { grid-template-columns: 1fr; padding: 24px 20px; }
+  .tabs { width: 100%; }
+  .tab { flex: 1; text-align: center; padding: 10px 14px; font-size: 13.5px; }
+  .checkItem { font-size: 12.5px; padding: 8px 12px; }
 }

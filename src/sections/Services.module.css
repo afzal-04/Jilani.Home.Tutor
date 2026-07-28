@@ -1,51 +1,51 @@
 /* src/sections/Services.module.css */
 
 .section {
-  background: #fff;
+  background: var(--cream);
+  position: relative;
 }
 
-/* ── Grid — 3 columns desktop, 2 tablet, 1 mobile ── */
+/* ── Grid ── */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  margin-top: 48px;
+  gap: 26px;
+  margin-top: 52px;
 }
 
 /* ── Card ── */
 .card {
-  background: #fafafa;
-  border: 1.5px solid #f0f0f0;
-  border-radius: 20px;
-  padding: 24px;
+  background: var(--surface-white);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  padding: 30px 26px;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
-  border-color: var(--color, #e2e8f0);
-  background: #fff;
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color, var(--accent));
 }
 
-/* ── Most Popular ribbon ── */
+/* ── Ribbon ── */
 .ribbon {
   position: absolute;
-  top: 16px;
-  right: -28px;
-  padding: 5px 36px;
+  top: 18px;
+  right: -32px;
+  padding: 6px 40px;
   font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  transform: rotate(35deg);
-  letter-spacing: 0.04em;
+  font-weight: 800;
+  color: #FFFFFF;
+  transform: rotate(38deg);
+  letter-spacing: 0.05em;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* ── Top row ── */
@@ -53,52 +53,52 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .iconBox {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: transform 0.3s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
 }
 
 .card:hover .iconBox {
-  transform: scale(1.1) rotate(-5deg);
+  transform: scale(1.12) rotate(-6deg);
 }
 
 .iconEmoji {
-  font-size: 22px;
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
+  font-size: 24px;
 }
 
 .num {
-  font-size: 28px;
-  font-weight: 900;
-  color: var(--color, #0f1923);
-  font-family: var(--font-display, serif);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--color, var(--ink));
+  font-family: var(--font-display);
   line-height: 1;
-  text-align: right;
+  opacity: 0.25;
 }
 
 /* ── Text ── */
 .title {
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 700;
-  color: #0f1923;
-  margin-bottom: 8px;
-  line-height: 1.3;
+  color: var(--ink);
+  margin-bottom: 10px;
+  line-height: 1.35;
 }
 
 .desc {
-  font-size: 13px;
-  color: #777;
-  line-height: 1.7;
-  margin-bottom: 16px;
+  font-size: 14px;
+  color: #64748B;
+  line-height: 1.75;
+  margin-bottom: 20px;
   flex: 1;
 }
 
@@ -106,39 +106,43 @@
 .pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 24px;
 }
 
 .pill {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 100px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
   border: 1px solid;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.2px;
   white-space: nowrap;
 }
 
 /* ── CTA button ── */
 .cta {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   text-align: center;
-  padding: 11px 16px;
-  border-radius: 10px;
-  font-size: 13px;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-size: 14px;
   font-weight: 700;
-  color: #fff;
-  background: var(--btn-bg, #0f1923);
+  color: #FFFFFF;
+  background: var(--btn-bg, var(--ink));
   text-decoration: none;
-  letter-spacing: 0.02em;
-  transition: opacity 0.2s, transform 0.2s;
+  letter-spacing: 0.2px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
   margin-top: auto;
 }
 
 .cta:hover {
-  opacity: 0.88;
-  transform: scale(1.02);
+  opacity: 0.95;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* ── Responsive ── */
@@ -148,13 +152,9 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 580px) {
   .grid {
     grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .num {
-    font-size: 24px;
+    gap: 20px;
   }
 }
