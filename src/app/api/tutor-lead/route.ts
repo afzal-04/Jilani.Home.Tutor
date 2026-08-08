@@ -10,31 +10,33 @@ const SECRET = process.env.LEAD_API_SECRET;
 export async function POST(request: Request) {
   try {
     const secret = request.headers.get('x-api-secret');
-    if (SECRET && secret !== SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (SECRET) {
+      if (!secret || secret !== SECRET) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
     }
 
     const body = await request.json();
 
     const data = {
-      name:           body.name           || '',
-      phone:          cleanPhone(body.phone || ''),
-      gender:         body.gender         || '',
-      age:            body.age            || '',
-      email:          body.email          || '',
-      address:        body.address        || '',
-      area:           body.area           || '',
-      qualification:  body.qualification  || '',
-      college:        body.college        || '',
-      graduationYear: body.graduationYear || '',
-      specialSkills:  body.specialSkills  || '',
-      subjects:       body.subjects       || '',
-      classes:        body.classes        || '',
-      timeSlots:      body.timeSlots      || '',
-      expectedFee:    body.expectedFee    || '',
-      experience:     body.experience     || '',
-      whyJoin:        body.whyJoin        || '',
-      source:         normaliseSource(body.source || ''),
+      name:           String(body.name || ''),
+      phone:          cleanPhone(body.phone),
+      gender:         String(body.gender || ''),
+      age:            String(body.age || ''),
+      email:          String(body.email || ''),
+      address:        String(body.address || ''),
+      area:           String(body.area || ''),
+      qualification:  String(body.qualification || ''),
+      college:        String(body.college || ''),
+      graduationYear: String(body.graduationYear || ''),
+      specialSkills:  String(body.specialSkills || ''),
+      subjects:       String(body.subjects || ''),
+      classes:        String(body.classes || ''),
+      timeSlots:      String(body.timeSlots || ''),
+      expectedFee:    String(body.expectedFee || ''),
+      experience:     String(body.experience || ''),
+      whyJoin:        String(body.whyJoin || ''),
+      source:         normaliseSource(String(body.source || '')),
       status:         'new',
       dataSource:     'google_form_live',
       createdAt:      serverTimestamp(),
@@ -56,8 +58,9 @@ export async function POST(request: Request) {
   }
 }
 
-function cleanPhone(phone: string) {
-  const first = phone.split(',')[0].split('/')[0];
+function cleanPhone(phone: any) {
+  const str = String(phone || '');
+  const first = str.split(',')[0].split('/')[0];
   return first.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
 }
 

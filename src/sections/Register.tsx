@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Reveal from '@/components/Reveal';
 import { registerParent, registerTutor } from '@/lib/firestore';
+import { isValidIndianMobile, cleanPhoneForStorage } from '@/lib/phone';
 import styles from './Register.module.css';
 
 type Tab = 'parent' | 'tutor';
@@ -68,13 +69,14 @@ const GENDERS = ['Male', 'Female', 'Other'];
 
 // ── Reusable Area Selector ────────────────────────────────────────────────────
 
-function AreaSelect({ value, customValue, onChange, onCustomChange }: {
+function AreaSelect({ value, customValue, onChange, onCustomChange, id }: {
   value: string; customValue: string;
   onChange: (v: string) => void; onCustomChange: (v: string) => void;
+  id?: string;
 }) {
   return (
     <>
-      <select value={value} onChange={e => onChange(e.target.value)} required>
+      <select id={id} value={value} onChange={e => onChange(e.target.value)} required>
         <option value="">Select Your Area</option>
         {RAIPUR_AREAS.map(a => <option key={a}>{a}</option>)}
       </select>
@@ -134,6 +136,7 @@ export default function Register() {
   const [pCustomSubject, setPCustomSubject] = useState('');
   const [pLoading, setPLoading]       = useState(false);
   const [pSuccess, setPSuccess]       = useState(false);
+  const [pError, setPError]           = useState('');
 
   // Tutor form
   const [tForm, setTForm]             = useState({ name: '', phone: '', gender: '', area: '', qualification: '' });
@@ -143,6 +146,7 @@ export default function Register() {
   const [tSubjects,   setTSubjects]   = useState<string[]>([]);
   const [tLoading, setTLoading]       = useState(false);
   const [tSuccess, setTSuccess]       = useState(false);
+  const [tError, setTError]           = useState('');
 
   function resolveArea(area: string, custom: string) {
     return area === 'Other Area' ? (custom.trim() || 'Other Area') : area;
@@ -150,28 +154,49 @@ export default function Register() {
 
   async function handleParent(e: React.FormEvent) {
     e.preventDefault();
+    setPError('');
+    if (!isValidIndianMobile(pForm.phone)) {
+      setPError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
     const finalClass   = pForm.class   === 'Other' ? (pCustomClass.trim()   || 'Other') : pForm.class;
     const finalSubject = pForm.subject === 'Other' ? (pCustomSubject.trim() || 'Other') : pForm.subject;
     setPLoading(true);
     try {
-      await registerParent({ ...pForm, area: resolveArea(pForm.area, pCustomArea), class: finalClass, subject: finalSubject });
+      await registerParent({
+        ...pForm,
+        phone: cleanPhoneForStorage(pForm.phone),
+        area: resolveArea(pForm.area, pCustomArea),
+        class: finalClass,
+        subject: finalSubject,
+        source: 'Website Register Form',
+      });
       setPSuccess(true);
       setPForm({ name: '', phone: '', area: '', class: '', subject: '' });
       setPCustomArea(''); setPCustomClass(''); setPCustomSubject('');
       setTimeout(() => setPSuccess(false), 5000);
-    } catch { alert('Something went wrong. Please try again.'); }
+    } catch {
+      setPError('Something went wrong. Please try again or WhatsApp us.');
+    }
     setPLoading(false);
   }
 
   async function handleTutor(e: React.FormEvent) {
     e.preventDefault();
-    if (tClasses.length === 0)  { alert('Please select at least one class you can teach.');   return; }
-    if (tSubjects.length === 0) { alert('Please select at least one subject you can teach.'); return; }
+    setTError('');
+    if (!isValidIndianMobile(tForm.phone)) {
+      setTError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    if (tClasses.length === 0)  { setTError('Please select at least one class you can teach.'); return; }
+    if (tSubjects.length === 0) { setTError('Please select at least one subject you can teach.'); return; }
     const finalQual = tForm.qualification === 'Other' ? (tCustomQual.trim() || 'Other') : tForm.qualification;
     setTLoading(true);
     try {
       await registerTutor({
-        ...tForm, qualification: finalQual,
+        ...tForm,
+        phone: cleanPhoneForStorage(tForm.phone),
+        qualification: finalQual,
         area: resolveArea(tForm.area, tCustomArea),
         classes: tClasses.join(', '),
         subjects: tSubjects.join(', '),
@@ -181,7 +206,9 @@ export default function Register() {
       setTCustomArea(''); setTCustomQual('');
       setTClasses([]); setTSubjects([]);
       setTimeout(() => setTSuccess(false), 5000);
-    } catch { alert('Something went wrong. Please try again.'); }
+    } catch {
+      setTError('Something went wrong. Please try again or WhatsApp us.');
+    }
     setTLoading(false);
   }
 
@@ -214,25 +241,25 @@ export default function Register() {
             <form onSubmit={handleParent} className={styles.formGrid}>
 
               <div className="form-group">
-                <label>Parent / Guardian Name *</label>
-                <input value={pForm.name} onChange={e => setPForm({ ...pForm, name: e.target.value })} placeholder="Your full name" required />
+                <label htmlFor="reg-pname">Parent / Guardian Name *</label>
+                <input id="reg-pname" value={pForm.name} onChange={e => setPForm({ ...pForm, name: e.target.value })} placeholder="Your full name" required />
               </div>
 
               <div className="form-group">
-                <label>Phone Number *</label>
-                <input type="tel" value={pForm.phone} onChange={e => setPForm({ ...pForm, phone: e.target.value })} placeholder="+91 XXXXX XXXXX" required />
+                <label htmlFor="reg-pphone">Phone Number *</label>
+                <input id="reg-pphone" type="tel" value={pForm.phone} onChange={e => setPForm({ ...pForm, phone: e.target.value })} placeholder="+91 XXXXX XXXXX" required />
               </div>
 
               <div className="form-group">
-                <label>Area in Raipur *</label>
-                <AreaSelect value={pForm.area} customValue={pCustomArea}
+                <label htmlFor="reg-parea">Area in Raipur *</label>
+                <AreaSelect id="reg-parea" value={pForm.area} customValue={pCustomArea}
                   onChange={v => setPForm({ ...pForm, area: v })} onCustomChange={setPCustomArea} />
               </div>
 
               {/* Class with Nursery/LKG/UKG + Other */}
               <div className="form-group">
-                <label>Class / Grade Needed *</label>
-                <select value={pForm.class} onChange={e => setPForm({ ...pForm, class: e.target.value })} required>
+                <label htmlFor="reg-pclass">Class / Grade Needed *</label>
+                <select id="reg-pclass" value={pForm.class} onChange={e => setPForm({ ...pForm, class: e.target.value })} required>
                   <option value="">Select Class</option>
                   {PARENT_CLASSES.map(c => <option key={c}>{c}</option>)}
                 </select>
@@ -246,8 +273,8 @@ export default function Register() {
 
               {/* Subject with Other option */}
               <div className={`form-group ${styles.fullCol}`}>
-                <label>Subject Needed *</label>
-                <select value={pForm.subject} onChange={e => setPForm({ ...pForm, subject: e.target.value })} required>
+                <label htmlFor="reg-psubject">Subject Needed *</label>
+                <select id="reg-psubject" value={pForm.subject} onChange={e => setPForm({ ...pForm, subject: e.target.value })} required>
                   <option value="">Select Subject</option>
                   {PARENT_SUBJECTS.map(s => <option key={s}>{s}</option>)}
                 </select>
@@ -260,7 +287,8 @@ export default function Register() {
               </div>
 
               <div className={styles.fullCol}>
-                <button type="submit" className="btn-primary" disabled={pLoading}>
+                {pError ? <div className="error-msg" role="alert">{pError}</div> : null}
+                <button type="submit" className="btn-primary" disabled={pLoading} style={{ width: '100%', justifyContent: 'center' }}>
                   {pLoading ? 'Submitting...' : '📅 Book My Free Demo'}
                 </button>
                 {pSuccess && <div className="success-msg">✅ Thank you! We&apos;ll call you within 24 hours to confirm your free demo class.</div>}
@@ -276,33 +304,33 @@ export default function Register() {
             <form onSubmit={handleTutor} className={styles.formGrid}>
 
               <div className="form-group">
-                <label>Full Name *</label>
-                <input value={tForm.name} onChange={e => setTForm({ ...tForm, name: e.target.value })} placeholder="Your full name" required />
+                <label htmlFor="reg-tname">Full Name *</label>
+                <input id="reg-tname" value={tForm.name} onChange={e => setTForm({ ...tForm, name: e.target.value })} placeholder="Your full name" required />
               </div>
 
               <div className="form-group">
-                <label>Phone Number *</label>
-                <input type="tel" value={tForm.phone} onChange={e => setTForm({ ...tForm, phone: e.target.value })} placeholder="+91 XXXXX XXXXX" required />
+                <label htmlFor="reg-tphone">Phone Number *</label>
+                <input id="reg-tphone" type="tel" value={tForm.phone} onChange={e => setTForm({ ...tForm, phone: e.target.value })} placeholder="+91 XXXXX XXXXX" required />
               </div>
 
               <div className="form-group">
-                <label>Gender *</label>
-                <select value={tForm.gender} onChange={e => setTForm({ ...tForm, gender: e.target.value })} required>
+                <label htmlFor="reg-tgender">Gender *</label>
+                <select id="reg-tgender" value={tForm.gender} onChange={e => setTForm({ ...tForm, gender: e.target.value })} required>
                   <option value="">Select Gender</option>
                   {GENDERS.map(g => <option key={g}>{g}</option>)}
                 </select>
               </div>
 
               <div className="form-group">
-                <label>Area in Raipur *</label>
-                <AreaSelect value={tForm.area} customValue={tCustomArea}
+                <label htmlFor="reg-tarea">Area in Raipur *</label>
+                <AreaSelect id="reg-tarea" value={tForm.area} customValue={tCustomArea}
                   onChange={v => setTForm({ ...tForm, area: v })} onCustomChange={setTCustomArea} />
               </div>
 
               {/* Qualification with Other */}
               <div className={`form-group ${styles.fullCol}`}>
-                <label>Highest Qualification *</label>
-                <select value={tForm.qualification} onChange={e => setTForm({ ...tForm, qualification: e.target.value })} required>
+                <label htmlFor="reg-tqual">Highest Qualification *</label>
+                <select id="reg-tqual" value={tForm.qualification} onChange={e => setTForm({ ...tForm, qualification: e.target.value })} required>
                   <option value="">Select Qualification</option>
                   {QUALIFICATIONS.map(q => <option key={q}>{q}</option>)}
                 </select>
@@ -335,7 +363,8 @@ export default function Register() {
               </div>
 
               <div className={styles.fullCol}>
-                <button type="submit" className="btn-primary" disabled={tLoading}>
+                {tError ? <div className="error-msg" role="alert">{tError}</div> : null}
+                <button type="submit" className="btn-primary" disabled={tLoading} style={{ width: '100%', justifyContent: 'center' }}>
                   {tLoading ? 'Submitting...' : '🎓 Join as Tutor'}
                 </button>
                 {tSuccess && <div className="success-msg">✅ Thank you! Our team will contact you within 24 hours.</div>}

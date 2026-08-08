@@ -11,34 +11,36 @@ const SECRET = process.env.LEAD_API_SECRET;
 export async function POST(request: Request) {
   try {
     const secret = request.headers.get('x-api-secret');
-    if (SECRET && secret !== SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (SECRET) {
+      if (!secret || secret !== SECRET) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
     }
 
     const body = await request.json();
 
     const data = {
-      name:           body.parentName        || body.name    || '',
-      phone:          cleanPhone(body.phone  || ''),
-      whatsapp:       cleanPhone(body.whatsapp || body.phone || ''),
-      email:          body.email             || '',
-      address:        body.address           || '',
-      area:           extractArea(body.address || ''),
-      studentName:    body.studentName       || '',
-      studentAge:     body.age               || '',
-      studentGender:  body.gender            || '',
-      class:          body.class             || body.grade   || '',
-      school:         body.school            || '',
-      board:          body.board             || '',
-      subject:        body.subject           || body.subjects || '',
-      preferredTeacherGender: body.preferredTeacherGender || '',
-      timeSlot:       body.timeSlot          || '',
-      daysPerWeek:    body.daysPerWeek       || '',
-      duration:       body.duration          || '',
-      specialNote:    body.specialNote       || '',
-      wantsDemo:      body.wantsDemo         || 'Yes',
-      preferredContact: body.preferredContact || '',
-      source:         normaliseSource(body.source || ''),
+      name:           String(body.parentName || body.name || ''),
+      phone:          cleanPhone(body.phone),
+      whatsapp:       cleanPhone(body.whatsapp || body.phone),
+      email:          String(body.email || ''),
+      address:        String(body.address || ''),
+      area:           extractArea(String(body.address || '')),
+      studentName:    String(body.studentName || ''),
+      studentAge:     String(body.age || ''),
+      studentGender:  String(body.gender || ''),
+      class:          String(body.class || body.grade || ''),
+      school:         String(body.school || ''),
+      board:          String(body.board || ''),
+      subject:        String(body.subject || body.subjects || ''),
+      preferredTeacherGender: String(body.preferredTeacherGender || ''),
+      timeSlot:       String(body.timeSlot || ''),
+      daysPerWeek:    String(body.daysPerWeek || ''),
+      duration:       String(body.duration || ''),
+      specialNote:    String(body.specialNote || ''),
+      wantsDemo:      String(body.wantsDemo || 'Yes'),
+      preferredContact: String(body.preferredContact || ''),
+      source:         normaliseSource(String(body.source || '')),
       status:         'new',
       dataSource:     'google_form_live',
       createdAt:      serverTimestamp(),
@@ -60,8 +62,9 @@ export async function POST(request: Request) {
   }
 }
 
-function cleanPhone(phone: string) {
-  return phone.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+function cleanPhone(phone: any) {
+  const str = String(phone || '');
+  return str.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
 }
 
 function extractArea(address: string) {

@@ -18,8 +18,17 @@ export interface ParentLead {
   area: string;
   class: string;
   subject: string;
+  /** Lead origin e.g. Website Hero Form, Website Register, google_form_live */
+  source?: string;
+  dataSource?: string;
   status: LeadStatus;
   createdAt?: { seconds: number };
+  // Optional fields from Google Form / extended intake
+  email?: string;
+  studentName?: string;
+  school?: string;
+  board?: string;
+  specialNote?: string;
 }
 
 export interface TutorLead {
@@ -31,8 +40,13 @@ export interface TutorLead {
   subjects: string;
   classes: string;
   gender?: string;
+  source?: string;
+  dataSource?: string;
   status: LeadStatus;
   createdAt?: { seconds: number };
+  email?: string;
+  experience?: string;
+  expectedFee?: string;
 }
 
 export interface SiteConfig {
@@ -75,28 +89,52 @@ export interface ClassRecord {
 
 // ─── Parents ──────────────────────────────────────────────────────────────────
 
-export async function registerParent(data: Omit<ParentLead, 'id' | 'status' | 'createdAt'>) {
+export async function registerParent(
+  data: Omit<ParentLead, 'id' | 'status' | 'createdAt'> & { source?: string },
+) {
   return addDoc(collection(getDbInstance(), 'parents'), {
-    ...data, status: 'new' as LeadStatus, createdAt: serverTimestamp(),
+    ...data,
+    source: data.source || 'Website',
+    dataSource: data.dataSource || 'website',
+    status: 'new' as LeadStatus,
+    createdAt: serverTimestamp(),
   });
 }
 
 export async function getAllParents(): Promise<ParentLead[]> {
-  const snap = await getDocs(query(collection(getDbInstance(), 'parents'), orderBy('createdAt', 'desc')));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ParentLead));
+  try {
+    const snap = await getDocs(collection(getDbInstance(), 'parents'));
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() } as ParentLead));
+    return items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  } catch (err) {
+    console.error('Error fetching parents:', err);
+    return [];
+  }
 }
 
 // ─── Tutors ───────────────────────────────────────────────────────────────────
 
-export async function registerTutor(data: Omit<TutorLead, 'id' | 'status' | 'createdAt'>) {
+export async function registerTutor(
+  data: Omit<TutorLead, 'id' | 'status' | 'createdAt'> & { source?: string },
+) {
   return addDoc(collection(getDbInstance(), 'tutors'), {
-    ...data, status: 'new' as LeadStatus, createdAt: serverTimestamp(),
+    ...data,
+    source: data.source || 'Website',
+    dataSource: data.dataSource || 'website',
+    status: 'new' as LeadStatus,
+    createdAt: serverTimestamp(),
   });
 }
 
 export async function getAllTutors(): Promise<TutorLead[]> {
-  const snap = await getDocs(query(collection(getDbInstance(), 'tutors'), orderBy('createdAt', 'desc')));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as TutorLead));
+  try {
+    const snap = await getDocs(collection(getDbInstance(), 'tutors'));
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() } as TutorLead));
+    return items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  } catch (err) {
+    console.error('Error fetching tutors:', err);
+    return [];
+  }
 }
 
 // ─── Status Update ────────────────────────────────────────────────────────────
@@ -108,8 +146,12 @@ export async function updateLeadStatus(col: 'parents' | 'tutors', id: string, st
 // ─── Site Config ──────────────────────────────────────────────────────────────
 
 export async function getSiteConfig(): Promise<SiteConfig | null> {
-  const snap = await getDoc(doc(getDbInstance(), 'config', 'site'));
-  return snap.exists() ? (snap.data() as SiteConfig) : null;
+  try {
+    const snap = await getDoc(doc(getDbInstance(), 'config', 'site'));
+    return snap.exists() ? (snap.data() as SiteConfig) : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function saveSiteConfig(config: SiteConfig) {
@@ -121,8 +163,14 @@ export async function saveSiteConfig(config: SiteConfig) {
 // ─── Fees ─────────────────────────────────────────────────────────────────────
 
 export async function getAllFees(): Promise<FeeRecord[]> {
-  const snap = await getDocs(query(collection(getDbInstance(), 'fees'), orderBy('createdAt', 'desc')));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as FeeRecord));
+  try {
+    const snap = await getDocs(collection(getDbInstance(), 'fees'));
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() } as FeeRecord));
+    return items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  } catch (err) {
+    console.error('Error fetching fees:', err);
+    return [];
+  }
 }
 
 export async function addFeeRecord(data: Omit<FeeRecord, 'id' | 'createdAt'>) {
@@ -146,8 +194,14 @@ export async function deleteFeeRecord(id: string) {
 // ─── Classes ──────────────────────────────────────────────────────────────────
 
 export async function getAllClasses(): Promise<ClassRecord[]> {
-  const snap = await getDocs(query(collection(getDbInstance(), 'classes'), orderBy('createdAt', 'desc')));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ClassRecord));
+  try {
+    const snap = await getDocs(collection(getDbInstance(), 'classes'));
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() } as ClassRecord));
+    return items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  } catch (err) {
+    console.error('Error fetching classes:', err);
+    return [];
+  }
 }
 
 export async function addClassRecord(data: Omit<ClassRecord, 'id' | 'createdAt'>) {

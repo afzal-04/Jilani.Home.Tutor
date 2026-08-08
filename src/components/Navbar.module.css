@@ -210,8 +210,8 @@
 }
 
 .mobileOpen {
-  max-height: 400px;
-  border-top-color: rgba(200, 148, 42, 0.15);
+  max-height: 480px;
+  border-top-color: rgba(217, 119, 6, 0.15);
 }
 
 .mobileLinks {
@@ -233,21 +233,38 @@
 }
 
 .mobileLink:hover {
-  background: rgba(200, 148, 42, 0.08);
+  background: rgba(245, 158, 11, 0.08);
   color: var(--ink);
+}
+
+.mobileWaBtn {
+  text-decoration: none;
+  background: #25D366;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 13px 16px;
+  border-radius: 10px;
+  text-align: center;
+  margin-top: 6px;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .mobileCta {
   text-decoration: none;
-  background: linear-gradient(135deg, #c8942a, #e8a830);
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
   color: #fff;
   font-size: 15px;
   font-weight: 700;
   padding: 14px 16px;
   border-radius: 10px;
   text-align: center;
-  margin-top: 8px;
-  box-shadow: 0 4px 14px rgba(200, 148, 42, 0.3);
+  margin-top: 6px;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */

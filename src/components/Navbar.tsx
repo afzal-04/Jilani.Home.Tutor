@@ -92,8 +92,17 @@ export default function Navbar() {
             </Link>
           ))}
           <Link href="tel:+917999854628" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-            📞 Call Us
+            📞 Call Us: +91 79998 54628
           </Link>
+          <a
+            href="https://wa.me/917999854628"
+            target="_blank"
+            rel="noreferrer"
+            className={styles.mobileWaBtn}
+            onClick={() => setMenuOpen(false)}
+          >
+            💬 Chat on WhatsApp
+          </a>
           <Link href="#register" className={styles.mobileCta} onClick={() => setMenuOpen(false)}>
             📅 Book Free Demo
           </Link>

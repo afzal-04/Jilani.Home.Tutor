@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState } from "react";
 import Link from "next/link";
 import { registerParent } from "@/lib/firestore";
+import { isValidIndianMobile, cleanPhoneForStorage } from "@/lib/phone";
 
 export default function FindTutor() {
   const [form, setForm] = useState({
@@ -12,17 +13,29 @@ export default function FindTutor() {
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
+
+    if (!isValidIndianMobile(form.phone)) {
+      setError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
     setLoading(true);
     try {
-      await registerParent(form);
+      await registerParent({
+        ...form,
+        phone: cleanPhoneForStorage(form.phone),
+        source: 'Find Tutor Page',
+      });
       setSuccess(true);
       setForm({ name: "", phone: "", area: "", class: "", subject: "" });
       setTimeout(() => setSuccess(false), 5000);
     } catch {
-      alert("Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again or WhatsApp us.");
     }
     setLoading(false);
   }
@@ -101,24 +114,27 @@ export default function FindTutor() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
           <div className="form-group">
-            <label>Parent / Guardian Name *</label>
+            <label htmlFor="ft-name">Parent / Guardian Name *</label>
             <input
+              id="ft-name"
               type="text" placeholder="Your full name" value={form.name}
               onChange={e => setForm({ ...form, name: e.target.value })} required
             />
           </div>
 
           <div className="form-group">
-            <label>Phone Number *</label>
+            <label htmlFor="ft-phone">Phone Number *</label>
             <input
+              id="ft-phone"
               type="tel" placeholder="+91 XXXXX XXXXX" value={form.phone}
               onChange={e => setForm({ ...form, phone: e.target.value })} required
             />
           </div>
 
           <div className="form-group">
-            <label>Area / Locality in Raipur *</label>
+            <label htmlFor="ft-area">Area / Locality in Raipur *</label>
             <input
+              id="ft-area"
               type="text" placeholder="e.g. Shankar Nagar, Civil Lines, Pandri" value={form.area}
               onChange={e => setForm({ ...form, area: e.target.value })} required
             />
@@ -126,8 +142,8 @@ export default function FindTutor() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div className="form-group">
-              <label>Class *</label>
-              <select value={form.class} onChange={e => setForm({ ...form, class: e.target.value })} required>
+              <label htmlFor="ft-class">Class *</label>
+              <select id="ft-class" value={form.class} onChange={e => setForm({ ...form, class: e.target.value })} required>
                 <option value="">Select Class</option>
                 <option>Class 1–5</option>
                 <option>Class 6–8</option>
@@ -141,8 +157,8 @@ export default function FindTutor() {
               </select>
             </div>
             <div className="form-group">
-              <label>Subject *</label>
-              <select value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} required>
+              <label htmlFor="ft-subject">Subject *</label>
+              <select id="ft-subject" value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} required>
                 <option value="">Select Subject</option>
                 <option>Maths</option>
                 <option>Science</option>
@@ -160,6 +176,8 @@ export default function FindTutor() {
               </select>
             </div>
           </div>
+
+          {error ? <div className="error-msg" role="alert">{error}</div> : null}
 
           <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: 8, padding: '16px', fontSize: 16 }}>
             {loading ? "Submitting…" : "📅 Find My Tutor — FREE DEMO"}

@@ -13,7 +13,7 @@ export default function WhatsappButton() {
     });
   }, []);
 
-  return (
+  return   (
     <a href={href} target="_blank" rel="noreferrer" className={styles.btn} aria-label="Chat on WhatsApp">
       💬
     </a>

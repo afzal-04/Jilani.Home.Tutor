@@ -255,7 +255,7 @@ body {
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
 }
 
-/* ── Success Alert Box ───────────────────────────────────────────────────── */
+/* ── Alert Messages (Success & Error) ─────────────────────────────────────── */
 
 .success-msg {
   display: flex;
@@ -266,6 +266,21 @@ body {
   border-radius: 12px;
   padding: 14px 20px;
   color: #34D399;
+  font-size: 14.5px;
+  font-weight: 600;
+  margin-top: 16px;
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.error-msg {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  padding: 14px 20px;
+  color: #FCA5A5;
   font-size: 14.5px;
   font-weight: 600;
   margin-top: 16px;
