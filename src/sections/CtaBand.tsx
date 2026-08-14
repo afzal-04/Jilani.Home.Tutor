@@ -7,7 +7,7 @@ export default function CtaBand() {
     <section className={styles.band}>
       <div className={styles.inner}>
         <Reveal><h2>Ready to Transform Your Child&apos;s Performance?</h2></Reveal>
-        <Reveal delay={80}><p>Join 100+ happy families in Raipur. First demo class is completely FREE!</p></Reveal>
+        <Reveal delay={80}><p>Join 1000+ happy families in Raipur. First demo class is completely FREE!</p></Reveal>
         <Reveal delay={140}>
           <div className={styles.btns}>
             <a href="#register" className={styles.btnWhite}>📅 Book Free Demo Now</a>

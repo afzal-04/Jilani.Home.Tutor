@@ -117,11 +117,11 @@ export default function WhyUs() {
           <Reveal delay={120}><p className="sec-sub" style={{ margin: '0 auto', textAlign: 'center' }}>The best home tutoring service in Raipur, trusted by hundreds of families</p></Reveal>
           <Reveal delay={160}>
             <div className={styles.trustBar}>
-              <div className={styles.trustItem}><strong>500+</strong><span>Happy Students</span></div>
+              <div className={styles.trustItem}><strong>1000+</strong><span>Happy Students</span></div>
               <div className={styles.trustDivider} />
               <div className={styles.trustItem}><strong>95%</strong><span>Score Improved</span></div>
               <div className={styles.trustDivider} />
-              <div className={styles.trustItem}><strong>5+</strong><span>Years in Raipur</span></div>
+              <div className={styles.trustItem}><strong>4+</strong><span>Years in Raipur</span></div>
               <div className={styles.trustDivider} />
               <div className={styles.trustItem}><strong>24hr</strong><span>Tutor Matching</span></div>
             </div>

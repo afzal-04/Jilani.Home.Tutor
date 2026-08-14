@@ -80,7 +80,7 @@ export default function Hero() {
             </div>
             <div className={styles.stats}>
               <div className={styles.stat}>
-                <span className={styles.statNum}>500+</span>
+                <span className={styles.statNum}>1000+</span>
                 <span className={styles.statLabel}>Students</span>
               </div>
               <div className={styles.stat}>
@@ -88,7 +88,7 @@ export default function Hero() {
                 <span className={styles.statLabel}>Pass Rate</span>
               </div>
               <div className={styles.stat}>
-                <span className={styles.statNum}>5+</span>
+                <span className={styles.statNum}>4+</span>
                 <span className={styles.statLabel}>Years</span>
               </div>
             </div>

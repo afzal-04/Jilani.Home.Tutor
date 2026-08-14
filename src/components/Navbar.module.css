@@ -132,6 +132,42 @@
   width: 60%;
 }
 
+.activeNavLink {
+  color: var(--gold-dark, #b37e1a);
+  font-weight: 700;
+  background: rgba(200, 148, 42, 0.12);
+}
+
+.activeNavLink::after {
+  width: 70% !important;
+  background: var(--gold-dark, #b37e1a);
+}
+
+/* Header WhatsApp link */
+.waHeaderLink {
+  text-decoration: none;
+  color: #059669;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 13px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.06);
+  transition: all 0.2s ease;
+  margin-left: 4px;
+  letter-spacing: 0.1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.waHeaderLink:hover {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: #10B981;
+  color: #047857;
+  transform: translateY(-1px);
+}
+
 /* Phone link */
 .phoneLink {
   text-decoration: none;
@@ -237,6 +273,13 @@
   color: var(--ink);
 }
 
+.mobileActiveLink {
+  background: rgba(200, 148, 42, 0.12);
+  color: var(--gold-dark, #b37e1a);
+  font-weight: 700;
+  border-left: 4px solid var(--gold, #c8942a);
+}
+
 .mobileWaBtn {
   text-decoration: none;
   background: #25D366;
@@ -267,7 +310,20 @@
   box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
 }
 
+.mobileBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 99;
+}
+
 /* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .waHeaderLink { display: none; }
+}
+
 @media (max-width: 900px) {
   .phoneLink { display: none; }
 }

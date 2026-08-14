@@ -2,7 +2,7 @@
 import styles from './Trust.module.css';
 
 const items = [
-  { stat: '500+', label: 'Students Taught',   sub: 'across Raipur'        },
+  { stat: '1000+', label: 'Students Taught',   sub: 'across Raipur'        },
   { stat: '95%',  label: 'Score Improvement', sub: 'within 3 months'      },
   { stat: '24hr', label: 'Tutor Matching',    sub: 'guaranteed'           },
   { stat: '100%', label: 'Verified Tutors',   sub: 'background checked'   },

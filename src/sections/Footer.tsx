@@ -59,7 +59,7 @@ export default function Footer() {
           </div>
 
           <p className={styles.brandDesc}>
-            Raipur&apos;s premier 1-on-1 home tuition service. Trusted by 500+ families for verified tutors and guaranteed score improvements.
+            Raipur&apos;s premier 1-on-1 home tuition service. Trusted by 1000+ families for verified tutors and guaranteed score improvements.
           </p>
 
           {/* Interactive Instant Callback Form */}
@@ -104,6 +104,22 @@ export default function Footer() {
             >
               💬 WhatsApp Us
             </a>
+          </div>
+
+          {/* Social Links & Location */}
+          <div className={styles.socialBar}>
+            <span className={styles.socialLabel}>Direct Connect:</span>
+            <div className={styles.socialLinks}>
+              <a href="https://wa.me/917999854628" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="WhatsApp" title="Chat on WhatsApp">
+                💬 WhatsApp
+              </a>
+              <a href="tel:+917999854628" className={styles.socialIcon} aria-label="Phone" title="Call directly">
+                📞 Call
+              </a>
+              <a href="https://www.google.com/maps/place/Jilani+Home+Tutor+-+Home+Tuition+in+Raipur/data=!4m2!3m1!1s0x0:0x43920a5ba8fc6790?sa=X&ved=1t:2428&hl=en-GB&ictx=111" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="Location" title="Raipur, Chhattisgarh">
+                📍 Raipur HQ
+              </a>
+            </div>
           </div>
         </div>
 
@@ -150,6 +166,13 @@ export default function Footer() {
       </div>
 
       <div className={styles.bottomBar}>
+        <div className={styles.legalLinks}>
+          <a href="#faq">Privacy Policy</a>
+          <span className={styles.legalDot}>&bull;</span>
+          <a href="#faq">Terms of Service</a>
+          <span className={styles.legalDot}>&bull;</span>
+          <a href="#register">Tutor Verification Guidelines</a>
+        </div>
         <p>© {new Date().getFullYear()} Jilani Home Tutor, Raipur, Chhattisgarh. All rights reserved.</p>
         <p className={styles.subtext}>Best Home Tutor in Raipur · Guaranteed 1-on-1 Personal Attention</p>
       </div>
