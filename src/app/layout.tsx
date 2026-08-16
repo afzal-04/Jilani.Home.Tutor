@@ -76,7 +76,7 @@ const localBusinessSchema = {
   name: 'Jilani Home Tutor',
   alternateName: 'Jilani Home Tuition Raipur',
   description:
-    'Jilani Home Tutor provides the best 1-on-1 home tuition for Class 1 to 12 students in Raipur. Specialised in Maths, Science, and English with guaranteed results.',
+    'Jilani Home Tutor provides the best 1-on-1 home tuition for Class 1 to 12 students in Raipur. Specialised in Maths, Science, English, JEE/NEET with guaranteed results.',
   url: 'https://jilani-home-tutor.vercel.app',
   telephone: '+917999854628',
   email: 'jilanihometutor@gmail.com',
@@ -99,11 +99,50 @@ const localBusinessSchema = {
   areaServed: [
     { '@type': 'City', name: 'Raipur' },
     { '@type': 'Place', name: 'Shankar Nagar, Raipur' },
-    { '@type': 'Place', name: 'Tatibandh, Raipur' },
+    { '@type': 'Place', name: 'Civil Lines, Raipur' },
     { '@type': 'Place', name: 'Pandri, Raipur' },
     { '@type': 'Place', name: 'Telibandha, Raipur' },
+    { '@type': 'Place', name: 'Tatibandh, Raipur' },
     { '@type': 'Place', name: 'Devendra Nagar, Raipur' },
+    { '@type': 'Place', name: 'Pachpedi Naka, Raipur' },
     { '@type': 'Place', name: 'Avanti Vihar, Raipur' },
+    { '@type': 'Place', name: 'Byron Bazar, Raipur' },
+    { '@type': 'Place', name: 'Mowa, Raipur' },
+    { '@type': 'Place', name: 'Rajendra Nagar, Raipur' },
+    { '@type': 'Place', name: 'Khamardih, Raipur' },
+  ],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '120',
+    bestRating: '5',
+    worstRating: '1',
+  },
+  review: [
+    {
+      '@type': 'Review',
+      author: { '@type': 'Person', name: 'Ramesh Verma' },
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody: 'My son was scoring 55 in Maths. After 2 months with Jilani Home Tutor, he got 85 in his half-yearly exam.',
+    },
+    {
+      '@type': 'Review',
+      author: { '@type': 'Person', name: 'Sunita Agarwal' },
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody: 'Jilani Home Tutor built her confidence step by step. She cleared Class 10 boards with 91%.',
+    },
+    {
+      '@type': 'Review',
+      author: { '@type': 'Person', name: 'Priya Chandrakar' },
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody: 'Matched us with a tutor within one day. Both children improved in Science within the first month.',
+    },
+    {
+      '@type': 'Review',
+      author: { '@type': 'Person', name: 'Mohit Kesharwani' },
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody: 'In 3 months, my son scored 78 in Physics. He is now preparing for engineering entrance.',
+    },
   ],
   openingHoursSpecification: [
     {
@@ -130,7 +169,7 @@ const serviceSchema = {
   provider: { '@id': 'https://jilani-home-tutor.vercel.app/#business' },
   serviceType: 'Home Tutoring',
   description:
-    'Expert 1-on-1 home tutors for Class 1 to 12 in Raipur covering Maths, Science, English, Hindi and more. We provide personalised study plans and guaranteed score improvement.',
+    'Expert 1-on-1 home tutors for Class 1 to 12 in Raipur covering Maths, Science, English, JEE/NEET prep and more. We provide personalised study plans and guaranteed score improvement.',
   areaServed: { '@type': 'City', name: 'Raipur' },
   offers: {
     '@type': 'Offer',
@@ -147,6 +186,7 @@ const serviceSchema = {
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'English Home Tutor Raipur' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Class 10 Board Exam Tutor Raipur' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Class 12 Board Exam Tutor Raipur' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'JEE & NEET Preparation Tutor Raipur' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Primary Class Tutor Raipur (Class 1–5)' } },
     ],
   },
@@ -185,7 +225,7 @@ const faqSchema = {
       name: 'Which areas in Raipur do you cover for home tutoring?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'We cover all major areas of Raipur including Shankar Nagar, Tatibandh, Pandri, Telibandha, Devendra Nagar, Avanti Vihar, Kota, Moudhapara, and more.',
+        text: 'We cover all major areas of Raipur including Shankar Nagar, Civil Lines, Pandri, Telibandha, Tatibandh, Devendra Nagar, Pachpedi Naka, Avanti Vihar, Byron Bazar, Mowa, Rajendra Nagar, Khamardih, and more.',
       },
     },
     {
