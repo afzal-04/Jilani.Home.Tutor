@@ -1,7 +1,13 @@
-// src/app/layout.tsx
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import VisitorTracker from '@/components/VisitorTracker';
+
+// ─── Viewport ─────────────────────────────────────────────────────────────────
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 // ─── Open Graph & Metadata ────────────────────────────────────────────────────
 
@@ -38,7 +44,7 @@ export const metadata: Metadata = {
       'Expert home tutors for Class 1–12 in Raipur. Personalised 1-on-1 attention. Guaranteed improvement in marks. Book your FREE demo class today!',
     images: [
       {
-        url: 'https://jilani-home-tutor.vercel.app/og-image.jpg', // add a 1200x630 image to /public
+        url: 'https://jilani-home-tutor.vercel.app/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'Jilani Home Tutor – Best Home Tutor in Raipur',
@@ -63,7 +69,6 @@ export const metadata: Metadata = {
 
 // ─── Schema.org JSON-LD ───────────────────────────────────────────────────────
 
-// 1. LocalBusiness — tells Google your name, phone, address, area served
 const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@type': ['LocalBusiness', 'EducationalOrganization'],
@@ -74,7 +79,7 @@ const localBusinessSchema = {
     'Jilani Home Tutor provides the best 1-on-1 home tuition for Class 1 to 12 students in Raipur. Specialised in Maths, Science, and English with guaranteed results.',
   url: 'https://jilani-home-tutor.vercel.app',
   telephone: '+917999854628',
-  email: 'jilanihometutor@gmail.com',        // update if different
+  email: 'jilanihometutor@gmail.com',
   priceRange: '₹₹',
   image: 'https://jilani-home-tutor.vercel.app/og-image.jpg',
   logo: 'https://jilani-home-tutor.vercel.app/favicon.ico',
@@ -114,14 +119,9 @@ const localBusinessSchema = {
     contactType: 'Customer Service',
     availableLanguage: ['Hindi', 'English'],
   },
-  sameAs: [
-    // Add your social media links here when ready
-    // 'https://www.facebook.com/yourpage',
-    // 'https://www.instagram.com/yourhandle',
-  ],
+  sameAs: [],
 };
 
-// 2. Service — describes what you offer so Google understands the business type
 const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
@@ -152,7 +152,6 @@ const serviceSchema = {
   },
 };
 
-// 3. FAQ — Google shows these as expandable dropdowns directly in search results
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -214,18 +213,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* Viewport & charset */}
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-        {/* Geo tags — helps local search */}
-        <meta name="geo.region"      content="IN-CT" />
-        <meta name="geo.placename"   content="Raipur, Chhattisgarh" />
-        <meta name="geo.position"    content="21.2514;81.6296" />
-        <meta name="ICBM"            content="21.2514, 81.6296" />
-
-        {/* Language */}
-        <meta httpEquiv="content-language" content="en-IN" />
+        {/* Geo tags */}
+        <meta name="geo.region" content="IN-CT" />
+        <meta name="geo.placename" content="Raipur, Chhattisgarh" />
+        <meta name="geo.position" content="21.2514;81.6296" />
+        <meta name="ICBM" content="21.2514, 81.6296" />
 
         {/* Schema.org JSON-LD blocks */}
         <script
@@ -247,4 +239,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </body>
     </html>
   );
-}
+}

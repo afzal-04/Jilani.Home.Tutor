@@ -69,8 +69,11 @@ export default function Hero() {
           <div className={styles.left}>
             <div className={styles.badge}>✨ Trusted Home Tutors in Raipur</div>
             <h1 className={styles.heading}>
-              Your Child Deserves <em>Expert</em> Attention at Home
+              Best Home Tutor in Raipur for Class 1–12
             </h1>
+            <h2 className={styles.tagline}>
+              Your Child Deserves <em>Expert</em> Attention at Home
+            </h2>
             <p className={styles.sub}>{heroSubtext}</p>
             <div className={styles.btns}>
               <a href="#demo-form" className="btn-primary">📅 Book FREE Demo</a>

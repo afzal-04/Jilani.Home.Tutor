@@ -94,7 +94,7 @@ export default function Footer() {
           {/* Action Buttons */}
           <div className={styles.ctaBtns}>
             <a href="tel:+917999854628" className={styles.phoneBtn}>
-              📞 Call: +91 79998 54628
+              📞 Call Us
             </a>
             <a
               href="https://wa.me/917999854628"
@@ -102,24 +102,8 @@ export default function Footer() {
               rel="noreferrer"
               className={styles.waBtn}
             >
-              💬 WhatsApp Us
+              💬 WhatsApp
             </a>
-          </div>
-
-          {/* Social Links & Location */}
-          <div className={styles.socialBar}>
-            <span className={styles.socialLabel}>Direct Connect:</span>
-            <div className={styles.socialLinks}>
-              <a href="https://wa.me/917999854628" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="WhatsApp" title="Chat on WhatsApp">
-                💬 WhatsApp
-              </a>
-              <a href="tel:+917999854628" className={styles.socialIcon} aria-label="Phone" title="Call directly">
-                📞 Call
-              </a>
-              <a href="https://www.google.com/maps/place/Jilani+Home+Tutor+-+Home+Tuition+in+Raipur/data=!4m2!3m1!1s0x0:0x43920a5ba8fc6790?sa=X&ved=1t:2428&hl=en-GB&ictx=111" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="Location" title="Raipur, Chhattisgarh">
-                📍 Raipur HQ
-              </a>
-            </div>
           </div>
         </div>
 
@@ -145,6 +129,38 @@ export default function Footer() {
             <li><Link href="#services">JEE & NEET Home Tuition</Link></li>
             <li><Link href="#services">Drawing, Music & Dance</Link></li>
           </ul>
+        </div>
+
+        {/* ── Google Map Location Column ── */}
+        <div className={styles.colMap}>
+          <div className={styles.mapHeader}>
+            <h4 className={styles.colTitle}>📍 Our Location</h4>
+            <a
+              href="https://www.google.com/maps/place/Jilani+Home+Tutor+-+Home+Tuition+in+Raipur/data=!4m2!3m1!1s0x0:0x43920a5ba8fc6790?sa=X&ved=1t:2428&hl=en-GB&ictx=111"
+              target="_blank"
+              rel="noreferrer"
+              className={styles.mapDirectionsBtn}
+            >
+              Get Directions ↗
+            </a>
+          </div>
+          <div className={styles.mapWrap}>
+            <iframe
+              title="Jilani Home Tutor Google Maps Location"
+              src="https://maps.google.com/maps?q=Jilani+Home+Tutor+-+Home+Tuition+in+Raipur&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="180"
+              style={{ border: 0 }}
+              allowFullScreen={false}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className={styles.mapIframe}
+            />
+            <div className={styles.mapCardFooter}>
+              <span className={styles.mapPinIcon}>📍</span>
+              <span className={styles.mapAddress}>Raipur, Chhattisgarh &bull; 1-on-1 Home Tuition</span>
+            </div>
+          </div>
         </div>
       </div>
 
