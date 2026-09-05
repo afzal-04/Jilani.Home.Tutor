@@ -55,11 +55,11 @@ export async function POST(req: NextRequest) {
       .where('date', '==', today())
       .get();
 
-    const existing: Record<string, { id: string; status: string }> = {};
+    const existing: Record<string, { id: string; status: string; notes: string }> = {};
     attSnap.docs.forEach(d => {
       const data = d.data();
       const match = assignments.find(a => a.parentName === data.studentName && a.subject === data.subject);
-      if (match) existing[match.id] = { id: d.id, status: data.status };
+      if (match) existing[match.id] = { id: d.id, status: data.status, notes: data.notes || '' };
     });
 
     return NextResponse.json({ tutorName, assignments, existing });

@@ -47,16 +47,22 @@ export async function POST(req: NextRequest) {
 
     const results: { assignmentId: string; ok: boolean }[] = [];
 
-    for (const [assignmentId, status] of Object.entries(selections)) {
+    for (const [assignmentId, entry] of Object.entries(selections)) {
       const a = validAssignments.get(assignmentId);
       if (!a) { results.push({ assignmentId, ok: false }); continue; } // not really this tutor's assignment — skip
+
+      const status = typeof entry === 'object' && entry !== null ? (entry as any).status : entry; // backward compatible with old plain-string payloads
+      const notes = typeof entry === 'object' && entry !== null && typeof (entry as any).notes === 'string'
+        ? (entry as any).notes.slice(0, 500) // hard cap so a client can't send an enormous payload
+        : '';
+
       if (typeof status !== 'string' || !VALID_STATUSES.includes(status)) { results.push({ assignmentId, ok: false }); continue; }
 
       const key = `${a.parentName}::${a.subject}`;
       const existingId = existingByKey.get(key);
 
       if (existingId) {
-        await db.collection('attendance').doc(existingId).update({ status });
+        await db.collection('attendance').doc(existingId).update({ status, notes });
       } else {
         await db.collection('attendance').add({
           studentName: a.parentName,
@@ -66,7 +72,7 @@ export async function POST(req: NextRequest) {
           date: today(),          // always server's today — a client can't backdate/forward-date
           status,
           sessionDuration: a.hoursPerSession || 1,
-          notes: '',
+          notes,
           createdAt: new Date(),
         });
       }

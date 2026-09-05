@@ -2,10 +2,10 @@
 // src/app/attendance/page.tsx
 //
 // This page no longer talks to Firestore directly — it calls the API routes
-// at /api/attendance/lookup and /api/attendance/submit, which run server-side
-// with the Admin SDK and re-verify everything (tutor identity, assignment
-// ownership, valid status values, today's date). Nothing here can read or
-// write Firestore on its own.
+// at /api/attendance/lookup, /api/attendance/submit, and /api/attendance/history,
+// which run server-side with the Admin SDK and re-verify everything (tutor
+// identity, assignment ownership, valid status values, today's date).
+// Nothing here can read or write Firestore on its own.
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -20,6 +20,17 @@ interface Assignment {
   tutorName: string;
 }
 
+interface HistoryRecord {
+  id: string;
+  studentName: string;
+  subject: string;
+  classLevel: string;
+  date: string;
+  status: AttendanceStatus;
+  notes?: string;
+  sessionDuration?: number;
+}
+
 const todayDisplay = () => new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
 const STATUS_OPTIONS: { key: AttendanceStatus; label: string; icon: string; color: string }[] = [
@@ -29,6 +40,25 @@ const STATUS_OPTIONS: { key: AttendanceStatus; label: string; icon: string; colo
   { key: 'cancelled', label: 'Cancelled', icon: '🚫', color: '#888' },
 ];
 
+const STATUS_META: Record<AttendanceStatus, { icon: string; color: string; bg: string }> = {
+  present: { icon: '✅', color: '#166534', bg: '#f0fdf4' },
+  absent: { icon: '❌', color: '#9f1239', bg: '#fff1f2' },
+  holiday: { icon: '🏖️', color: '#92400e', bg: '#fffbeb' },
+  cancelled: { icon: '🚫', color: '#4b5563', bg: '#f3f4f6' },
+};
+
+function StatCard({ icon, num, label, sub, accent }: { icon: string; num: string; label: string; sub: string; accent: string }) {
+  return (
+    <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 16, border: '1px solid #eef1f5', background: '#fff', padding: 20 }}>
+      <span aria-hidden style={{ position: 'absolute', insetInline: 0, top: 0, height: 3, background: accent }} />
+      <div style={{ display: 'flex', height: 36, width: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 10, background: accent + '20', fontSize: 17, marginBottom: 10 }}>{icon}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{num}</div>
+      <div style={{ marginTop: 6, fontSize: 10.5, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '.06em' }}>{label}</div>
+      <div style={{ marginTop: 2, fontSize: 11.5, color: '#9CA3AF' }}>{sub}</div>
+    </div>
+  );
+}
+
 export default function TutorAttendancePage() {
   const [phone, setPhone] = useState('');
   const [tutorName, setTutorName] = useState<string | null>(null);
@@ -36,20 +66,21 @@ export default function TutorAttendancePage() {
   const [loginError, setLoginError] = useState('');
 
   const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [existing, setExisting] = useState<Record<string, { id: string; status: AttendanceStatus }>>({});
-  const [selections, setSelections] = useState<Record<string, AttendanceStatus>>({});
+  const [existing, setExisting] = useState<Record<string, { id: string; status: AttendanceStatus; notes: string }>>({});
+  const [selections, setSelections] = useState<Record<string, { status: AttendanceStatus; notes: string }>>({});
   const [loadingAssignments, setLoadingAssignments] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  // Monthly history tab
+  // "This Month" report tab
   const [view, setView] = useState<'mark' | 'history'>('mark');
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyLoaded, setHistoryLoaded] = useState(false);
   const [historyError, setHistoryError] = useState('');
   const [monthLabel, setMonthLabel] = useState('');
-  const [historyRecords, setHistoryRecords] = useState<{ id: string; studentName: string; subject: string; classLevel: string; date: string; status: AttendanceStatus }[]>([]);
-  const [historySummary, setHistorySummary] = useState<{ studentName: string; subject: string; present: number; absent: number; holiday: number; cancelled: number; total: number }[]>([]);
+  const [historyRecords, setHistoryRecords] = useState<HistoryRecord[]>([]);
+  const [studentFilter, setStudentFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<AttendanceStatus | 'all'>('all');
 
   async function loadHistory() {
     if (historyLoaded) return; // don't re-fetch every tab switch
@@ -64,7 +95,6 @@ export default function TutorAttendancePage() {
       const data = await res.json();
       if (res.ok) {
         setHistoryRecords(data.records);
-        setHistorySummary(data.summary);
         setMonthLabel(data.monthLabel);
         setHistoryLoaded(true);
       } else {
@@ -101,8 +131,8 @@ export default function TutorAttendancePage() {
       setTutorName(data.tutorName);
       setAssignments(data.assignments);
       setExisting(data.existing);
-      const preFilled: Record<string, AttendanceStatus> = {};
-      Object.entries(data.existing as Record<string, { status: AttendanceStatus }>).forEach(([id, rec]) => { preFilled[id] = rec.status; });
+      const preFilled: Record<string, { status: AttendanceStatus; notes: string }> = {};
+      Object.entries(data.existing as Record<string, { status: AttendanceStatus; notes: string }>).forEach(([id, rec]) => { preFilled[id] = { status: rec.status, notes: rec.notes || '' }; });
       setSelections(preFilled);
     } catch (err) {
       console.error(err);
@@ -112,20 +142,24 @@ export default function TutorAttendancePage() {
   }
 
   // Clicking the already-selected status again clears it; clicking a
-  // different status switches to it. No double-click needed — this avoids
-  // the stale-closure timing issue double-click had (the button's "selected"
-  // value could still reflect the pre-click render when the second click of
-  // a dblclick fired, since React state updates aren't synchronous).
+  // different status switches to it, keeping whatever note is already typed.
   function selectStatus(assignmentId: string, status: AttendanceStatus) {
     setSelections(prev => {
-      if (prev[assignmentId] === status) {
+      if (prev[assignmentId]?.status === status) {
         const next = { ...prev };
         delete next[assignmentId];
         return next;
       }
-      return { ...prev, [assignmentId]: status };
+      return { ...prev, [assignmentId]: { status, notes: prev[assignmentId]?.notes || '' } };
     });
     setSubmitted(false);
+  }
+
+  function setNote(assignmentId: string, notes: string) {
+    setSelections(prev => {
+      if (!prev[assignmentId]) return prev; // can't attach a note before a status is picked
+      return { ...prev, [assignmentId]: { ...prev[assignmentId], notes } };
+    });
   }
 
   // ── Submit everything via the API route ──
@@ -140,6 +174,7 @@ export default function TutorAttendancePage() {
       });
       if (!res.ok) throw new Error('Submit failed');
       setSubmitted(true);
+      setHistoryLoaded(false); // force a refresh next time "This Month" is opened
     } catch (err) {
       console.error(err);
       alert('Could not save attendance. Please check your connection and try again.');
@@ -149,35 +184,34 @@ export default function TutorAttendancePage() {
 
   function switchAccount() {
     setTutorName(null); setPhone(''); setAssignments([]); setExisting({}); setSelections({}); setSubmitted(false);
-    setView('mark'); setHistoryLoaded(false); setHistoryRecords([]); setHistorySummary([]); setHistoryError('');
+    setView('mark'); setHistoryLoaded(false); setHistoryRecords([]); setHistoryError('');
+    setStudentFilter('all'); setStatusFilter('all');
   }
 
   const markedCount = Object.keys(selections).length;
   const totalCount = assignments.length;
   const allMarked = totalCount > 0 && markedCount === totalCount;
 
-  // ── UI ──
+  const studentNames = Array.from(new Set(historyRecords.map(r => r.studentName)));
+  const filteredHistory = historyRecords
+    .filter(r => studentFilter === 'all' || r.studentName === studentFilter)
+    .filter(r => statusFilter === 'all' || r.status === statusFilter);
+  const totalSessions = filteredHistory.length;
+  const presentCount = filteredHistory.filter(r => r.status === 'present').length;
+  const absentCount = filteredHistory.filter(r => r.status === 'absent').length;
+  const attendanceRate = totalSessions > 0 ? Math.round((presentCount / totalSessions) * 100) : 0;
 
-  const wrap: React.CSSProperties = {
-    minHeight: '100vh', background: '#0A0F1E', display: 'flex', flexDirection: 'column',
-    alignItems: 'center', padding: '32px 16px', fontFamily: 'inherit', position: 'relative',
-  };
-  const card: React.CSSProperties = {
-    width: '100%', maxWidth: 480, background: '#fff', borderRadius: 16, padding: 24,
-    boxShadow: '0 20px 60px -20px rgba(0,0,0,.5)',
-  };
-  const backBtn: React.CSSProperties = {
-    position: 'absolute', top: 16, left: 16, display: 'inline-flex', alignItems: 'center', gap: 6,
-    padding: '8px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.08)', color: '#fff',
-    fontSize: 12.5, fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)',
-  };
+  // ── Login screen — compact, dark, quick action ──
 
   if (!tutorName) {
+    const wrap: React.CSSProperties = { minHeight: '100vh', background: '#0A0F1E', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px', position: 'relative' };
+    const card: React.CSSProperties = { width: '100%', maxWidth: 480, background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 20px 60px -20px rgba(0,0,0,.5)' };
+    const backBtn: React.CSSProperties = { position: 'absolute', top: 16, left: 16, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 12.5, fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)' };
     return (
       <div style={wrap}>
         <Link href="/" style={backBtn}>← Back to Website</Link>
         <div style={{ marginBottom: 24, textAlign: 'center', color: '#fff', marginTop: 36 }}>
-          <div style={{ fontSize: 28, marginBottom: 4 }}>📚</div>
+          <img src="/logo.png" alt="Jilani Home Tutor" style={{ height: 48, width: 'auto', marginBottom: 8 }} />
           <div style={{ fontSize: 18, fontWeight: 700 }}>Jilani Home Tutor</div>
           <div style={{ fontSize: 12.5, opacity: .6 }}>Daily Attendance Check-in</div>
         </div>
@@ -194,11 +228,7 @@ export default function TutorAttendancePage() {
               required
             />
             {loginError && <p style={{ color: '#C0392B', fontSize: 12.5, marginBottom: 12 }}>{loginError}</p>}
-            <button
-              type="submit"
-              disabled={loadingLogin}
-              style={{ width: '100%', padding: '13px', fontSize: 14.5, fontWeight: 700, color: '#fff', background: 'linear-gradient(135deg,#1A6FBF,#2c8ce0)', border: 'none', borderRadius: 10, cursor: 'pointer', opacity: loadingLogin ? .6 : 1 }}
-            >
+            <button type="submit" disabled={loadingLogin} style={{ width: '100%', padding: '13px', fontSize: 14.5, fontWeight: 700, color: '#fff', background: 'linear-gradient(135deg,#1A6FBF,#2c8ce0)', border: 'none', borderRadius: 10, cursor: 'pointer', opacity: loadingLogin ? .6 : 1 }}>
               {loadingLogin ? 'Checking…' : 'Continue →'}
             </button>
           </form>
@@ -207,192 +237,222 @@ export default function TutorAttendancePage() {
     );
   }
 
+  // ── Full page after login — light theme, header bar + tabs ──
+
   return (
-    <div style={wrap}>
-      <Link href="/" style={backBtn}>← Back to Website</Link>
-      <div style={{ marginBottom: 20, textAlign: 'center', color: '#fff', marginTop: 36 }}>
-        <div style={{ fontSize: 15, opacity: .6 }}>{todayDisplay()}</div>
-        <div style={{ fontSize: 20, fontWeight: 700, marginTop: 4 }}>Hi, {tutorName} 👋</div>
+    <div style={{ minHeight: '100vh', background: '#F7F9FC' }}>
+      {/* Header bar */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #eef1f5', padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <img src="/logo.png" alt="Jilani Home Tutor" style={{ height: 30, width: 'auto' }} />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: '#111827' }}>Attendance</div>
+          <div style={{ fontSize: 11.5, color: '#6B7280' }}>Hi, {tutorName} · {todayDisplay()}</div>
+        </div>
+        <Link href="/" style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', textDecoration: 'none', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: 8 }}>← Website</Link>
+        <button onClick={switchAccount} style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' }}>Switch Account</button>
       </div>
 
-      <div style={{ display: 'flex', gap: 6, marginBottom: 14, background: 'rgba(255,255,255,0.06)', padding: 4, borderRadius: 10, width: '100%', maxWidth: 560 }}>
-        <button
-          onClick={() => setView('mark')}
-          style={{
-            flex: 1, padding: '9px 4px', borderRadius: 7, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', border: 'none',
-            background: view === 'mark' ? '#fff' : 'transparent', color: view === 'mark' ? '#111827' : 'rgba(255,255,255,0.7)',
-          }}
-        >
-          Mark Attendance
-        </button>
-        <button
-          onClick={() => { setView('history'); loadHistory(); }}
-          style={{
-            flex: 1, padding: '9px 4px', borderRadius: 7, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', border: 'none',
-            background: view === 'history' ? '#fff' : 'transparent', color: view === 'history' ? '#111827' : 'rgba(255,255,255,0.7)',
-          }}
-        >
-          This Month
-        </button>
-      </div>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '20px 16px 40px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {view === 'mark' && (
-      <div style={{ ...card, maxWidth: 560 }}>
-        {submitted ? (
-          <div style={{ textAlign: 'center', padding: '24px 8px' }}>
-            <div style={{ fontSize: 40, marginBottom: 10 }}>✅</div>
-            <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px' }}>Attendance Submitted</h2>
-            <p style={{ fontSize: 12.5, color: '#6B7280', margin: '0 0 18px' }}>Marked {markedCount} of {totalCount} classes for today. Thank you!</p>
-            <Link href="/" style={{ display: 'inline-block', fontSize: 13, fontWeight: 700, color: '#1A6FBF', textDecoration: 'none' }}>← Back to Website</Link>
-          </div>
-        ) : (
-          <>
-            <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>Mark Today's Attendance</h2>
-            <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 18px' }}>
-              Tap a status for each class, then press <strong>Done</strong> at the bottom to submit. Double-tap a selected status to clear it.
-            </p>
-          </>
-        )}
-
-        {loadingAssignments && <p style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', padding: '20px 0' }}>Loading your classes…</p>}
-
-        {!loadingAssignments && assignments.length === 0 && (
-          <p style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', padding: '20px 0' }}>No active assignments found for your account. Contact Jilani if this looks wrong.</p>
-        )}
-
-        {!submitted && !loadingAssignments && assignments.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {assignments.map(a => {
-              const selected = selections[a.id];
-              return (
-                <div key={a.id} style={{ border: '1.5px solid #eef1f5', borderRadius: 12, padding: 14 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 14 }}>{a.parentName}</div>
-                      <div style={{ fontSize: 12, color: '#6B7280' }}>{a.subject} · {a.classLevel}</div>
-                    </div>
-                    {selected && (
-                      <span style={{
-                        fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 100,
-                        background: STATUS_OPTIONS.find(s => s.key === selected)?.color + '20',
-                        color: STATUS_OPTIONS.find(s => s.key === selected)?.color,
-                      }}>
-                        {selected}
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
-                    {STATUS_OPTIONS.map(opt => (
-                      <button
-                        key={opt.key}
-                        onClick={() => selectStatus(a.id, opt.key)}
-                        style={{
-                          padding: '9px 4px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                          border: selected === opt.key ? `2px solid ${opt.color}` : '1.5px solid #e5e7eb',
-                          background: selected === opt.key ? opt.color + '15' : '#fff',
-                          color: selected === opt.key ? opt.color : '#374151',
-                        }}
-                      >
-                        {opt.icon} {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {!submitted && !loadingAssignments && assignments.length > 0 && (
-          <>
-            <p style={{ fontSize: 11.5, color: '#9CA3AF', textAlign: 'center', margin: '14px 0 8px' }}>
-              {markedCount} of {totalCount} marked
-            </p>
-            <button
-              onClick={handleSubmit}
-              disabled={submitting || markedCount === 0}
-              style={{
-                width: '100%', padding: '13px', fontSize: 14.5, fontWeight: 700, color: '#fff',
-                background: allMarked ? 'linear-gradient(135deg,#1A7A4A,#2ba85f)' : 'linear-gradient(135deg,#1A6FBF,#2c8ce0)',
-                border: 'none', borderRadius: 10, cursor: 'pointer',
-                opacity: submitting || markedCount === 0 ? .5 : 1,
-              }}
-            >
-              {submitting ? 'Saving…' : `Done — Submit Attendance (${markedCount}/${totalCount})`}
-            </button>
-          </>
-        )}
-
-        {!submitted && (
+        {/* Tabs */}
+        <div style={{ display: 'inline-flex', gap: 4, background: '#eef1f5', padding: 4, borderRadius: 10, width: 'fit-content' }}>
           <button
-            onClick={switchAccount}
-            style={{ marginTop: 16, width: '100%', padding: '10px', fontSize: 12.5, fontWeight: 600, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer' }}
+            onClick={() => setView('mark')}
+            style={{ padding: '8px 16px', borderRadius: 7, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', border: 'none', background: view === 'mark' ? '#fff' : 'transparent', color: view === 'mark' ? '#111827' : '#6B7280', boxShadow: view === 'mark' ? '0 1px 3px rgba(0,0,0,.08)' : 'none' }}
           >
-            Not you? Switch account
+            Mark Attendance
           </button>
-        )}
-      </div>
-      )}
-
-      {view === 'history' && (
-        <div style={{ ...card, maxWidth: 560 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>Attendance — {monthLabel || 'This Month'}</h2>
-          <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 18px' }}>Your attendance records for the current month, per student.</p>
-
-          {historyLoading && <p style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', padding: '20px 0' }}>Loading your history…</p>}
-
-          {historyError && (
-            <p style={{ fontSize: 12.5, color: '#C0392B', textAlign: 'center', padding: '16px 0' }}>{historyError}</p>
-          )}
-
-          {!historyLoading && historyLoaded && historySummary.length === 0 && (
-            <p style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', padding: '20px 0' }}>No attendance marked yet this month.</p>
-          )}
-
-          {!historyLoading && historySummary.length > 0 && (
-            <>
-              {/* Per-student summary */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
-                {historySummary.map(s => (
-                  <div key={`${s.studentName}::${s.subject}`} style={{ border: '1.5px solid #eef1f5', borderRadius: 12, padding: '12px 14px' }}>
-                    <div style={{ fontWeight: 700, fontSize: 13.5 }}>{s.studentName}</div>
-                    <div style={{ fontSize: 11.5, color: '#6B7280', marginBottom: 8 }}>{s.subject}</div>
-                    <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 11.5, color: '#1A7A4A', fontWeight: 700 }}>✅ {s.present} present</span>
-                      <span style={{ fontSize: 11.5, color: '#C0392B', fontWeight: 700 }}>❌ {s.absent} absent</span>
-                      <span style={{ fontSize: 11.5, color: '#C8941A', fontWeight: 700 }}>🏖️ {s.holiday} holiday</span>
-                      <span style={{ fontSize: 11.5, color: '#888', fontWeight: 700 }}>🚫 {s.cancelled} cancelled</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Full day-by-day list */}
-              <div style={{ borderTop: '1.5px solid #eef1f5', paddingTop: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 8 }}>Day-by-day</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 260, overflowY: 'auto' }}>
-                  {historyRecords.map(r => {
-                    const opt = STATUS_OPTIONS.find(o => o.key === r.status);
-                    return (
-                      <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, padding: '6px 0', borderBottom: '1px dashed #eef1f5' }}>
-                        <span>{r.date} · {r.studentName} ({r.subject})</span>
-                        <span style={{ fontWeight: 700, color: opt?.color }}>{opt?.icon} {r.status}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
-
           <button
-            onClick={switchAccount}
-            style={{ marginTop: 16, width: '100%', padding: '10px', fontSize: 12.5, fontWeight: 600, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer' }}
+            onClick={() => { setView('history'); loadHistory(); }}
+            style={{ padding: '8px 16px', borderRadius: 7, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', border: 'none', background: view === 'history' ? '#fff' : 'transparent', color: view === 'history' ? '#111827' : '#6B7280', boxShadow: view === 'history' ? '0 1px 3px rgba(0,0,0,.08)' : 'none' }}
           >
-            Not you? Switch account
+            This Month
           </button>
         </div>
-      )}
+
+        {/* ── Mark Attendance tab ── */}
+        {view === 'mark' && (
+          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eef1f5', padding: 22, maxWidth: 640 }}>
+            {submitted ? (
+              <div style={{ textAlign: 'center', padding: '24px 8px' }}>
+                <div style={{ fontSize: 40, marginBottom: 10 }}>✅</div>
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px' }}>Attendance Submitted</h2>
+                <p style={{ fontSize: 12.5, color: '#6B7280', margin: 0 }}>Marked {markedCount} of {totalCount} classes for today. Thank you!</p>
+              </div>
+            ) : (
+              <>
+                <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>Mark Today's Attendance</h2>
+                <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 18px' }}>
+                  Tap a status for each class, then press <strong>Done</strong> at the bottom to submit. Tap a selected status again to clear it.
+                </p>
+              </>
+            )}
+
+            {loadingAssignments && <p style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', padding: '20px 0' }}>Loading your classes…</p>}
+
+            {!loadingAssignments && assignments.length === 0 && (
+              <p style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', padding: '20px 0' }}>No active assignments found for your account. Contact Jilani if this looks wrong.</p>
+            )}
+
+            {!submitted && !loadingAssignments && assignments.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {assignments.map(a => {
+                  const selected = selections[a.id]?.status;
+                  const note = selections[a.id]?.notes || '';
+                  return (
+                    <div key={a.id} style={{ border: '1.5px solid #eef1f5', borderRadius: 12, padding: 14 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 14 }}>{a.parentName}</div>
+                          <div style={{ fontSize: 12, color: '#6B7280' }}>{a.subject} · {a.classLevel}</div>
+                        </div>
+                        {selected && (
+                          <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 100, background: STATUS_OPTIONS.find(s => s.key === selected)?.color + '20', color: STATUS_OPTIONS.find(s => s.key === selected)?.color }}>
+                            {selected}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                        {STATUS_OPTIONS.map(opt => (
+                          <button
+                            key={opt.key}
+                            onClick={() => selectStatus(a.id, opt.key)}
+                            style={{
+                              padding: '9px 4px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                              border: selected === opt.key ? `2px solid ${opt.color}` : '1.5px solid #e5e7eb',
+                              background: selected === opt.key ? opt.color + '15' : '#fff',
+                              color: selected === opt.key ? opt.color : '#374151',
+                            }}
+                          >
+                            {opt.icon} {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                      {selected && (
+                        <div style={{ marginTop: 10 }}>
+                          <textarea
+                            value={note}
+                            onChange={e => setNote(a.id, e.target.value)}
+                            placeholder={selected === 'absent' ? "Reason for absence (optional)…" : selected === 'cancelled' ? "Reason for cancellation (optional)…" : "Note (optional)…"}
+                            maxLength={500}
+                            rows={2}
+                            style={{ width: '100%', padding: '8px 10px', fontSize: 12.5, border: '1.5px solid #e5e7eb', borderRadius: 8, resize: 'vertical', fontFamily: 'inherit' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {!submitted && !loadingAssignments && assignments.length > 0 && (
+              <>
+                <p style={{ fontSize: 11.5, color: '#9CA3AF', textAlign: 'center', margin: '14px 0 8px' }}>{markedCount} of {totalCount} marked</p>
+                <button
+                  onClick={handleSubmit}
+                  disabled={submitting || markedCount === 0}
+                  style={{
+                    width: '100%', padding: '13px', fontSize: 14.5, fontWeight: 700, color: '#fff',
+                    background: allMarked ? 'linear-gradient(135deg,#1A7A4A,#2ba85f)' : 'linear-gradient(135deg,#1A6FBF,#2c8ce0)',
+                    border: 'none', borderRadius: 10, cursor: 'pointer', opacity: submitting || markedCount === 0 ? .5 : 1,
+                  }}
+                >
+                  {submitting ? 'Saving…' : `Done — Submit Attendance (${markedCount}/${totalCount})`}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── This Month tab — full report, matches parent report style ── */}
+        {view === 'history' && (
+          <>
+            {historyError && (
+              <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: 12, padding: 16, color: '#9f1239', fontSize: 12.5 }}>{historyError}</div>
+            )}
+
+            {historyLoading && (
+              <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eef1f5', padding: 40, textAlign: 'center', color: '#6B7280', fontSize: 13 }}>Loading your history…</div>
+            )}
+
+            {!historyLoading && !historyError && historyLoaded && (
+              <>
+                {/* Stat cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
+                  <StatCard icon="📋" num={String(totalSessions)} label={`Sessions — ${monthLabel}`} sub="all statuses" accent="#1A6FBF" />
+                  <StatCard icon="✅" num={`${attendanceRate}%`} label="Attendance Rate" sub={`${presentCount} present`} accent="#1A7A4A" />
+                  <StatCard icon="❌" num={String(absentCount)} label="Absences" sub={monthLabel} accent="#C0392B" />
+                  <StatCard icon="🎓" num={String(studentNames.length)} label="Students Tracked" sub="with records" accent="#C8941A" />
+                </div>
+
+                {/* Report table */}
+                <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eef1f5', overflow: 'hidden' }}>
+                  <div style={{ padding: '16px 18px 0' }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#111827', marginBottom: 12 }}>📅 Attendance Records — {monthLabel} ({filteredHistory.length})</div>
+
+                    {studentNames.length > 1 && (
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+                        <span style={{ fontSize: 11.5, fontWeight: 700, color: '#9CA3AF', alignSelf: 'center', marginRight: 2 }}>Student:</span>
+                        {['all', ...studentNames].map(name => (
+                          <button key={name} onClick={() => setStudentFilter(name)}
+                            style={{ fontSize: 11.5, fontWeight: 700, padding: '5px 12px', borderRadius: 100, cursor: 'pointer', border: '1px solid', borderColor: studentFilter === name ? '#111827' : '#e5e7eb', background: studentFilter === name ? '#111827' : '#fff', color: studentFilter === name ? '#fff' : '#374151' }}>
+                            {name === 'all' ? 'All' : name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: '#9CA3AF', alignSelf: 'center', marginRight: 2 }}>Status:</span>
+                      {(['all', 'present', 'absent', 'holiday', 'cancelled'] as const).map(s => (
+                        <button key={s} onClick={() => setStatusFilter(s)}
+                          style={{ fontSize: 11.5, fontWeight: 700, padding: '5px 12px', borderRadius: 100, cursor: 'pointer', border: '1px solid', borderColor: statusFilter === s ? '#111827' : '#e5e7eb', background: statusFilter === s ? '#111827' : '#fff', color: statusFilter === s ? '#fff' : '#374151', textTransform: 'capitalize' }}>
+                          {s === 'all' ? 'All' : `${STATUS_META[s].icon} ${s}`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+                      <thead>
+                        <tr style={{ background: '#fafbfc', borderTop: '1px solid #eef1f5', borderBottom: '1px solid #eef1f5' }}>
+                          {['Date', 'Student', 'Subject', 'Duration', 'Status', 'Notes'].map(h => (
+                            <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredHistory.length === 0 && (
+                          <tr><td colSpan={6} style={{ textAlign: 'center', padding: '32px 14px', color: '#9CA3AF' }}>No attendance records match this filter.</td></tr>
+                        )}
+                        {filteredHistory.map(r => {
+                          const meta = STATUS_META[r.status];
+                          return (
+                            <tr key={r.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                              <td style={{ padding: '10px 14px', color: '#1A6FBF', whiteSpace: 'nowrap' }}>{r.date}</td>
+                              <td style={{ padding: '10px 14px', fontWeight: 600, color: '#111827' }}>{r.studentName}</td>
+                              <td style={{ padding: '10px 14px' }}>{r.subject} <span style={{ color: '#9CA3AF', fontSize: 11 }}>({r.classLevel})</span></td>
+                              <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>{r.sessionDuration || 1}hr</td>
+                              <td style={{ padding: '10px 14px' }}>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 100, fontSize: 11.5, fontWeight: 700, background: meta.bg, color: meta.color }}>
+                                  {meta.icon} {r.status}
+                                </span>
+                              </td>
+                              <td style={{ padding: '10px 14px', color: '#6B7280', maxWidth: 200, fontStyle: r.notes ? 'italic' : 'normal' }}>{r.notes || '—'}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
