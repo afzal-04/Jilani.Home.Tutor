@@ -123,8 +123,8 @@ export default function TutorAttendancePage() {
       const data = await res.json();
       if (!res.ok) {
         setLoginError(data.error === 'No tutor found with that phone number'
-          ? "We couldn't find a tutor with that phone number. Please check and try again."
-          : 'Something went wrong. Please try again.');
+          ? "We couldn't find a tutor with that phone number. Please verify your 10-digit registered number."
+          : 'Unable to verify. Please check and try again.');
         setLoadingLogin(false);
         return;
       }
@@ -136,7 +136,7 @@ export default function TutorAttendancePage() {
       setSelections(preFilled);
     } catch (err) {
       console.error(err);
-      setLoginError('Something went wrong. Please try again.');
+      setLoginError('Connection error. Please try again in a few moments.');
     }
     setLoadingLogin(false);
   }
@@ -201,43 +201,339 @@ export default function TutorAttendancePage() {
   const absentCount = filteredHistory.filter(r => r.status === 'absent').length;
   const attendanceRate = totalSessions > 0 ? Math.round((presentCount / totalSessions) * 100) : 0;
 
-  // ── Login screen — compact, dark, quick action ──
-
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 1. LOGIN SCREEN — Atmospheric Midnight Navy, Glassmorphic Card, Ultra-Premium
+  // ─────────────────────────────────────────────────────────────────────────────
   if (!tutorName) {
-    const wrap: React.CSSProperties = { minHeight: '100vh', background: '#0A0F1E', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px', position: 'relative' };
-    const card: React.CSSProperties = { width: '100%', maxWidth: 480, background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 20px 60px -20px rgba(0,0,0,.5)' };
-    const backBtn: React.CSSProperties = { position: 'absolute', top: 16, left: 16, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 12.5, fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)' };
     return (
-      <div style={wrap}>
-        <Link href="/" style={backBtn}>← Back to Website</Link>
-        <div style={{ marginBottom: 24, textAlign: 'center', color: '#fff', marginTop: 36 }}>
-          <img src="/logo.png" alt="Jilani Home Tutor" style={{ height: 48, width: 'auto', marginBottom: 8 }} />
-          <div style={{ fontSize: 18, fontWeight: 700 }}>Jilani Home Tutor</div>
-          <div style={{ fontSize: 12.5, opacity: .6 }}>Daily Attendance Check-in</div>
-        </div>
-        <div style={card}>
-          <h1 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 6px' }}>Tutor Login</h1>
-          <p style={{ fontSize: 12.5, color: '#6B7280', margin: '0 0 18px' }}>Enter your registered phone number to mark today's attendance.</p>
-          <form onSubmit={handleLogin}>
-            <input
-              type="tel"
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
-              placeholder="+91 XXXXX XXXXX"
-              style={{ width: '100%', padding: '12px 14px', fontSize: 15, border: '1.5px solid #e5e7eb', borderRadius: 10, marginBottom: 12 }}
-              required
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'radial-gradient(ellipse at 50% -20%, #1E3A8A 0%, #0B0F19 65%, #05070B 100%)',
+          color: '#F8FAFC',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '24px 16px',
+          position: 'relative',
+          fontFamily: "var(--font-body), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        }}
+      >
+        {/* Ambient Top Glow */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '600px',
+            height: '300px',
+            background: 'radial-gradient(circle, rgba(37,99,235,0.18) 0%, rgba(0,0,0,0) 70%)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Top Navbar */}
+        <div
+          style={{
+            maxWidth: 1100,
+            width: '100%',
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            position: 'relative',
+            zIndex: 10,
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '9px 16px',
+              borderRadius: 12,
+              background: 'rgba(255, 255, 255, 0.07)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              color: '#E2E8F0',
+              fontSize: 13,
+              fontWeight: 600,
+              textDecoration: 'none',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            ← Back to Website
+          </Link>
+
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '6px 14px',
+              borderRadius: 999,
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+              color: '#34D399',
+              fontSize: 12,
+              fontWeight: 600,
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                background: '#10B981',
+                boxShadow: '0 0 10px #10B981',
+              }}
             />
-            {loginError && <p style={{ color: '#C0392B', fontSize: 12.5, marginBottom: 12 }}>{loginError}</p>}
-            <button type="submit" disabled={loadingLogin} style={{ width: '100%', padding: '13px', fontSize: 14.5, fontWeight: 700, color: '#fff', background: 'linear-gradient(135deg,#1A6FBF,#2c8ce0)', border: 'none', borderRadius: 10, cursor: 'pointer', opacity: loadingLogin ? .6 : 1 }}>
-              {loadingLogin ? 'Checking…' : 'Continue →'}
-            </button>
-          </form>
+            Live Tutor Portal
+          </div>
+        </div>
+
+        {/* Center Card Container */}
+        <div
+          style={{
+            maxWidth: 440,
+            width: '100%',
+            margin: '40px auto',
+            position: 'relative',
+            zIndex: 10,
+          }}
+        >
+          {/* Brand Header */}
+          <div style={{ textAlign: 'center', marginBottom: 28 }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                padding: '12px 20px',
+                borderRadius: 20,
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: '0 20px 40px -10px rgba(0,0,0,0.6)',
+                backdropFilter: 'blur(12px)',
+                marginBottom: 16,
+              }}
+            >
+              <img
+                src="/logo.png"
+                alt="Jilani Home Tutor"
+                style={{ height: 44, width: 'auto', objectFit: 'contain' }}
+              />
+            </div>
+            <h1
+              style={{
+                fontSize: 24,
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: '#FFFFFF',
+                margin: '0 0 8px',
+              }}
+            >
+              Tutor Attendance Portal
+            </h1>
+            <p
+              style={{
+                fontSize: 13.5,
+                color: '#94A3B8',
+                lineHeight: 1.5,
+                margin: 0,
+              }}
+            >
+              Mark today&apos;s sessions and review your monthly attendance log.
+            </p>
+          </div>
+
+          {/* Form Card */}
+          <div
+            style={{
+              background: 'rgba(15, 23, 42, 0.85)',
+              borderRadius: 24,
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.8)',
+              padding: '32px 28px',
+              backdropFilter: 'blur(20px)',
+              position: 'relative',
+            }}
+          >
+            {/* Top Glowing Gradient Accent */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 32,
+                right: 32,
+                height: 2,
+                background: 'linear-gradient(90deg, transparent, #3B82F6, #60A5FA, transparent)',
+              }}
+            />
+
+            <form onSubmit={handleLogin}>
+              <div style={{ marginBottom: 20 }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: '#CBD5E1',
+                    marginBottom: 8,
+                  }}
+                >
+                  Registered Mobile Number
+                </label>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: 14,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: '#94A3B8',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    🇮🇳 +91
+                  </span>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="98765 43210"
+                    maxLength={14}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '14px 14px 14px 72px',
+                      fontSize: 15,
+                      fontWeight: 600,
+                      color: '#FFFFFF',
+                      background: 'rgba(2, 6, 23, 0.7)',
+                      border: '1.5px solid rgba(255, 255, 255, 0.15)',
+                      borderRadius: 14,
+                      outline: 'none',
+                      transition: 'border 0.2s',
+                    }}
+                    onFocus={(e) => (e.target.style.borderColor = '#3B82F6')}
+                    onBlur={(e) => (e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)')}
+                  />
+                </div>
+                <p style={{ fontSize: 11.5, color: '#64748B', marginTop: 6, marginBottom: 0 }}>
+                  Enter the phone number given during tutor registration.
+                </p>
+              </div>
+
+              {loginError && (
+                <div
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    background: 'rgba(239, 68, 68, 0.12)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    color: '#FCA5A5',
+                    fontSize: 12.5,
+                    lineHeight: 1.4,
+                    marginBottom: 18,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <span>⚠️</span>
+                  <span>{loginError}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loadingLogin}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  fontSize: 14.5,
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+                  border: 'none',
+                  borderRadius: 14,
+                  cursor: loadingLogin ? 'not-allowed' : 'pointer',
+                  opacity: loadingLogin ? 0.7 : 1,
+                  boxShadow: '0 10px 25px -5px rgba(37, 99, 235, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                {loadingLogin ? 'Verifying Phone…' : 'View Attendance Dashboard →'}
+              </button>
+            </form>
+
+            {/* Feature Trust Pills */}
+            <div
+              style={{
+                marginTop: 26,
+                paddingTop: 20,
+                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 8,
+                textAlign: 'center',
+                fontSize: 11,
+                color: '#94A3B8',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 16, marginBottom: 2 }}>🔒</div>
+                <div style={{ fontWeight: 600, color: '#CBD5E1' }}>100% Private</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 16, marginBottom: 2 }}>⚡</div>
+                <div style={{ fontWeight: 600, color: '#CBD5E1' }}>Daily Sync</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 16, marginBottom: 2 }}>📋</div>
+                <div style={{ fontWeight: 600, color: '#CBD5E1' }}>Accurate Logs</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Help link */}
+          <div style={{ textAlign: 'center', marginTop: 22, fontSize: 12.5, color: '#64748B' }}>
+            Need login assistance?{' '}
+            <a
+              href="https://wa.me/917999854628?text=Hello%20Jilani%20Home%20Tutor,%20I%20need%20assistance%20logging%20into%20the%20Tutor%20Attendance%20Portal."
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: '#60A5FA', fontWeight: 600, textDecoration: 'underline' }}
+            >
+              WhatsApp Academic Coordinator
+            </a>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div
+          style={{
+            textAlign: 'center',
+            fontSize: 11.5,
+            color: '#475569',
+            paddingTop: 16,
+            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            position: 'relative',
+            zIndex: 10,
+          }}
+        >
+          © {new Date().getFullYear()} Jilani Home Tutor · Raipur, CG. All Rights Reserved.
         </div>
       </div>
     );
   }
 
-  // ── Full page after login — light theme, header bar + tabs ──
+  // ── Full page after login — original light theme, header bar + tabs ──
 
   return (
     <div style={{ minHeight: '100vh', background: '#F7F9FC' }}>
@@ -281,7 +577,7 @@ export default function TutorAttendancePage() {
               </div>
             ) : (
               <>
-                <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>Mark Today's Attendance</h2>
+                <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>Mark Today&apos;s Attendance</h2>
                 <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 18px' }}>
                   Tap a status for each class, then press <strong>Done</strong> at the bottom to submit. Tap a selected status again to clear it.
                 </p>
