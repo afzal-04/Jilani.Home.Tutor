@@ -44,7 +44,7 @@ export const metadata: Metadata = {
       'Expert home tutors for Class 1–12 in Raipur. Personalised 1-on-1 attention. Guaranteed improvement in marks. Book your FREE demo class today!',
     images: [
       {
-        url: 'https://jilani-home-tutor.vercel.app/og-image.jpg',
+        url: 'https://jilani-home-tutor.vercel.app/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Jilani Home Tutor – Best Home Tutor in Raipur',
@@ -58,7 +58,20 @@ export const metadata: Metadata = {
     title: 'Best Home Tutor in Raipur | Jilani Home Tutor',
     description:
       'Expert home tutors for Class 1–12 in Raipur. Book a FREE demo class today!',
-    images: ['https://jilani-home-tutor.vercel.app/og-image.jpg'],
+    images: ['https://jilani-home-tutor.vercel.app/og-image.png'],
+  },
+
+  // ── Icons / Favicons ──
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-32.png', type: 'image/png', sizes: '32x32' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
   },
 
   // ── App metadata ──
@@ -81,8 +94,8 @@ const localBusinessSchema = {
   telephone: '+917999854628',
   email: 'jilanihometutor@gmail.com',
   priceRange: '₹₹',
-  image: 'https://jilani-home-tutor.vercel.app/og-image.jpg',
-  logo: 'https://jilani-home-tutor.vercel.app/favicon.ico',
+  image: 'https://jilani-home-tutor.vercel.app/og-image.png',
+  logo: 'https://jilani-home-tutor.vercel.app/logo.png',
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Raipur',
@@ -253,6 +266,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        {/* Favicons & Icons */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.png" type="image/png" sizes="192x192" />
+        <link rel="icon" href="/icon-32.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+
         {/* Geo tags */}
         <meta name="geo.region" content="IN-CT" />
         <meta name="geo.placename" content="Raipur, Chhattisgarh" />
