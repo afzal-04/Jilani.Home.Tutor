@@ -39,6 +39,34 @@
 
   --font-display:  'Outfit', 'Playfair Display', sans-serif;
   --font-body:     'Plus Jakarta Sans', sans-serif;
+
+  /* ── Type Scale (max 9 steps) ──────────────────────────────────────────── */
+  --text-xs:   12px;    /* captions, legal */
+  --text-sm:   13px;    /* meta, tags, badges */
+  --text-base: 14.5px;  /* body copy */
+  --text-md:   16px;    /* lead copy */
+  --text-lg:   17px;    /* section sub-headings */
+  --text-xl:   20px;    /* card headings */
+  --text-2xl:  24px;    /* sub-section headings */
+  --text-3xl:  clamp(26px, 3.5vw, 40px); /* section headings */
+  --text-4xl:  clamp(30px, 4.5vw, 46px); /* page titles */
+
+  /* ── Border Radius Scale (max 6 steps) ──────────────────────────────────── */
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   20px;
+  --r-2xl:  24px;
+  --r-full: 999px;
+
+  /* ── Semantic Colours (keeps count ≤ 12 used in UI) ─────────────────────── */
+  --text-primary:   #0F172A;   /* headings */
+  --text-secondary: #334155;   /* body */
+  --text-muted:     #64748B;   /* captions */
+  --text-on-dark:   rgba(241,245,249,0.85);
+  --green:          #047857;   /* accessible green, 4.7:1 on white */
+  --green-bg:       #f0fdf4;
+  --green-border:   #bbf7d0;
 }
 
 * {
@@ -50,15 +78,27 @@
 html {
   scroll-behavior: smooth;
   color-scheme: light;
+  background: var(--cream);
 }
 
 body {
+  margin: 0;
+  min-height: 100vh;
   font-family: var(--font-body);
   background: var(--cream);
   color: var(--ink);
   overflow-x: hidden;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a, button, input, select, textarea {
+  font: inherit;
 }
 
 /* Custom Scrollbar */
@@ -90,10 +130,10 @@ body {
   gap: 6px;
   background: var(--accent-soft);
   color: var(--accent-dark);
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 700;
   padding: 6px 16px;
-  border-radius: 999px;
+  border-radius: var(--r-full);
   letter-spacing: 0.5px;
   text-transform: uppercase;
   margin-bottom: 16px;
@@ -102,15 +142,15 @@ body {
 
 .sec-tag--gold {
   background: rgba(245, 158, 11, 0.12);
-  color: #D97706;
+  color: var(--gold-dark);
   border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .sec-title {
   font-family: var(--font-display);
-  font-size: clamp(30px, 4.5vw, 46px);
+  font-size: var(--text-4xl);
   font-weight: 800;
-  color: var(--ink);
+  color: var(--text-primary);
   line-height: 1.2;
   letter-spacing: -0.02em;
   margin-bottom: 16px;
@@ -119,8 +159,8 @@ body {
 .sec-title--white { color: #FFFFFF; }
 
 .sec-sub {
-  font-size: 17px;
-  color: #475569;
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
   max-width: 580px;
   line-height: 1.7;
   font-weight: 400;

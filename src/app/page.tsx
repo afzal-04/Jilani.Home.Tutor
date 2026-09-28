@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 import Navbar        from '@/components/Navbar';
 import WhatsappButton from '@/components/WhatsappButton';
 import Hero          from '@/sections/Hero';
-import Trust         from '@/sections/Trust';
 import Problems      from '@/sections/Problems';
 import WhyUs         from '@/sections/WhyUs';
 import Services      from '@/sections/Services';
@@ -20,7 +19,6 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
-        <Trust />
         <Problems />
         <WhyUs />
         <Services />

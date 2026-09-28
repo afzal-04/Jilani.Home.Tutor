@@ -33,15 +33,6 @@ const problems = [
     desc: 'STEM subjects build recursively. One missed basic concept creates long-term fear and anxiety.',
     sol: 'Rebuilding core fundamentals from scratch with infinite patience',
   },
-  {
-    id: '04',
-    badge: '📝 Board Exam Anxiety',
-    image: '/board-exam.png',
-    alt: 'Student stressed about board exams',
-    title: 'Board & Competitive Pressure',
-    desc: 'Class 10 & 12 results define career paths. Pressure mounts without structured daily mentoring.',
-    sol: 'Targeted board prep, timed mock tests & regular feedback',
-  },
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -49,7 +40,7 @@ const problems = [
 export default function Problems() {
   return (
     <section className={styles.section} id="problems">
-      <div className="sec-inner">
+      <div className={styles.inner}>
         <div className={styles.headerWrap}>
           <Reveal>
             <span className={styles.secBadge}>
@@ -96,7 +87,7 @@ export default function Problems() {
                   
                   <div className={styles.solBox}>
                     <div className={styles.solBadge}>
-                      <span className={styles.checkIcon}>✓</span>
+                      <span className={styles.checkIcon} aria-hidden="true">✓</span>
                       <span className={styles.solHeading}>Jilani Solution</span>
                     </div>
                     <p className={styles.solText}>{sol}</p>

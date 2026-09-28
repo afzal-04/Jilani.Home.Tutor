@@ -159,7 +159,7 @@
 }
 
 .ctaWa {
-  background: #25D366;
+  background: #128C7E;
   color: #FFFFFF;
   padding: 13px 26px;
   border-radius: 12px;
@@ -168,12 +168,12 @@
   text-decoration: none;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   white-space: nowrap;
-  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.3);
+  box-shadow: 0 6px 18px rgba(18, 140, 126, 0.35);
 }
 
 .ctaWa:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(37, 211, 102, 0.45);
+  box-shadow: 0 10px 24px rgba(18, 140, 126, 0.5);
 }
 
 /* ── View More button ── */
@@ -184,9 +184,9 @@
   gap: 8px;
   margin: 24px auto 0;
   padding: 14px 32px;
-  border: 2px dashed var(--gold-light);
-  background: transparent;
-  color: var(--gold-light);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  background: #fff7ed;
+  color: #b45309;
   border-radius: 14px;
   font-size: 14.5px;
   font-weight: 700;
@@ -196,11 +196,12 @@
   letter-spacing: 0.3px;
   width: 100%;
   max-width: 860px;
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.08);
 }
 
 .viewMoreBtn:hover {
-  background: rgba(245, 158, 11, 0.08);
-  border-style: solid;
+  background: #ffedd5;
+  border-color: rgba(217, 119, 6, 0.7);
   transform: translateY(-2px);
 }
 

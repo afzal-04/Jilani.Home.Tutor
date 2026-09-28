@@ -108,7 +108,7 @@ export default function Footer() {
         </div>
 
         <div className={styles.colLinks}>
-          <h4 className={styles.colTitle}>Quick Links</h4>
+          <h3 className={styles.colTitle}>Quick Links</h3>
           <ul className={styles.linkList}>
             <li><Link href="/">Home</Link></li>
             <li><Link href="#services">Our Services</Link></li>
@@ -120,7 +120,7 @@ export default function Footer() {
         </div>
 
         <div className={styles.colServices}>
-          <h4 className={styles.colTitle}>Classes Covered</h4>
+          <h3 className={styles.colTitle}>Classes Covered</h3>
           <ul className={styles.linkList}>
             <li><Link href="#services">Primary (Class 1–5)</Link></li>
             <li><Link href="#services">Middle School (Class 6–8)</Link></li>
@@ -134,7 +134,7 @@ export default function Footer() {
         {/* ── Google Map Location Column ── */}
         <div className={styles.colMap}>
           <div className={styles.mapHeader}>
-            <h4 className={styles.colTitle}>📍 Our Location</h4>
+            <h3 className={styles.colTitle}>📍 Our Location</h3>
             <a
               href="https://www.google.com/maps/place/Jilani+Home+Tutor+-+Home+Tuition+in+Raipur/data=!4m2!3m1!1s0x0:0x43920a5ba8fc6790?sa=X&ved=1t:2428&hl=en-GB&ictx=111"
               target="_blank"

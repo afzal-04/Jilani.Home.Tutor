@@ -272,7 +272,7 @@ export default function Register() {
               </div>
 
               {/* Subject with Other option */}
-              <div className={`form-group ${styles.fullCol}`}>
+              <div className="form-group">
                 <label htmlFor="reg-psubject">Subject Needed *</label>
                 <select id="reg-psubject" value={pForm.subject} onChange={e => setPForm({ ...pForm, subject: e.target.value })} required>
                   <option value="">Select Subject</option>

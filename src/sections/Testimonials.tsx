@@ -95,13 +95,13 @@ export default function Testimonials() {
           {visible.map((t) => (
             <div key={t.name} className={styles.card}>
               <div className={styles.topRow}>
-                <div className={styles.stars}>★★★★★</div>
+                <div className={styles.stars} role="img" aria-label="5 out of 5 stars">★★★★★</div>
                 <span className={styles.scoreBadge}>{t.score}</span>
               </div>
               <div className={styles.subjectTag}>{t.subject}</div>
               <p className={styles.text}>{t.text}</p>
               <div className={styles.author}>
-                <div className={styles.avatar}>{t.initial}</div>
+                <div className={styles.avatar} aria-hidden="true">{t.initial}</div>
                 <div>
                   <div className={styles.name}>{t.name}</div>
                   <div className={styles.loc}>Parent · {t.location}</div>

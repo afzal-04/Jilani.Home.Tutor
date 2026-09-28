@@ -55,6 +55,9 @@ const Icons = {
   ),
 };
 
+const BRAND_BG = 'linear-gradient(135deg, #f59e0b, #d97706)';
+const BRAND_ACCENT = '#d97706';
+
 const services = [
   {
     icon: Icons.book,
@@ -63,8 +66,6 @@ const services = [
     desc: 'Build strong foundations early. Our patient, child-friendly tutors make learning fun and effective.',
     subjects: ['All Subjects', 'English', 'Maths', 'EVS', 'Hindi'],
     popular: false,
-    color: '#10b981',
-    bg: 'linear-gradient(135deg, #10b981, #059669)',
   },
   {
     icon: Icons.beaker,
@@ -73,8 +74,6 @@ const services = [
     desc: 'Critical years where concepts get harder. We strengthen Maths & Science before the board years arrive.',
     subjects: ['Maths', 'Science', 'English', 'Hindi', 'Social Science'],
     popular: false,
-    color: '#3b82f6',
-    bg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
   },
   {
     icon: Icons.trophy,
@@ -84,8 +83,6 @@ const services = [
     subjects: ['Maths', 'Science', 'English', 'Hindi', 'S. Science'],
     popular: true,
     badge: '🔥 Most Popular',
-    color: '#f59e0b',
-    bg: 'linear-gradient(135deg, #f59e0b, #d97706)',
   },
   {
     icon: Icons.atom,
@@ -94,8 +91,6 @@ const services = [
     desc: 'Expert tutors for Class 12 boards and college entrance. Science and Commerce streams both covered.',
     subjects: ['Physics', 'Chemistry', 'Maths', 'Biology', 'Accounts'],
     popular: false,
-    color: '#8b5cf6',
-    bg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
   },
   {
     icon: Icons.target,
@@ -104,8 +99,6 @@ const services = [
     desc: 'Structured preparation for JEE Mains, NEET, and government job exams with expert subject tutors.',
     subjects: ['Physics', 'Chemistry', 'Biology', 'Maths', 'Reasoning'],
     popular: false,
-    color: '#ef4444',
-    bg: 'linear-gradient(135deg, #ef4444, #dc2626)',
   },
   {
     icon: Icons.palette,
@@ -114,8 +107,6 @@ const services = [
     desc: 'Drawing, music, dance, and summer skill classes for kids. Fun, structured, and taught at home.',
     subjects: ['Drawing', 'Music', 'Dance', 'Summer Batch', 'Craft'],
     popular: false,
-    color: '#ec4899',
-    bg: 'linear-gradient(135deg, #ec4899, #db2777)',
   },
 ];
 
@@ -133,24 +124,32 @@ export default function Services() {
             <Reveal key={s.num} delay={i * 70}>
               <div className={styles.card} style={{ '--color': s.color } as React.CSSProperties}>
                 {s.popular && (
-                  <div className={styles.ribbon} style={{ background: s.bg }}>{s.badge}</div>
+                  <div className={styles.ribbon} style={{ background: BRAND_BG }}>{s.badge}</div>
                 )}
                 <div className={styles.cardTop}>
-                  <div className={styles.iconBox} style={{ background: s.bg }}>
+                  <div className={styles.iconBox} style={{ background: BRAND_BG }}>
                     {s.icon}
                   </div>
-                  <div className={styles.num}>{s.num}</div>
+                  <div className={styles.num} style={{ color: BRAND_ACCENT }}>{s.num}</div>
                 </div>
                 <h3 className={styles.title}>{s.title}</h3>
                 <p className={styles.desc}>{s.desc}</p>
                 <div className={styles.pills}>
                   {s.subjects.map(sub => (
-                    <span key={sub} className={styles.pill} style={{ color: s.color, background: s.color + '12', borderColor: s.color + '30' }}>
+                    <span
+                      key={sub}
+                      className={styles.pill}
+                      style={{
+                        color: '#B45309',
+                        background: 'rgba(217, 119, 6, 0.08)',
+                        borderColor: 'rgba(217, 119, 6, 0.28)',
+                      }}
+                    >
                       {sub}
                     </span>
                   ))}
                 </div>
-                <a href="#register" className={styles.cta} style={{ '--btn-bg': s.bg } as React.CSSProperties}>
+                <a href="#register" className={styles.cta} style={{ '--btn-bg': BRAND_BG } as React.CSSProperties}>
                   Book Free Demo →
                 </a>
               </div>

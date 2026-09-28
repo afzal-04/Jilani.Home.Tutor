@@ -83,11 +83,10 @@
 }
 
 .logoSub {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--gold);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: #b45309;
+  letter-spacing: 0.3px;
   line-height: 1;
 }
 
@@ -146,7 +145,7 @@
 /* Header WhatsApp link */
 .waHeaderLink {
   text-decoration: none;
-  color: #059669;
+  color: #047857;
   font-size: 13px;
   font-weight: 600;
   padding: 8px 13px;

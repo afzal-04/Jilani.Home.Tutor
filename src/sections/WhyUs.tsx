@@ -51,7 +51,7 @@ const reasons = [
     shadow: 'rgba(245,158,11,0.35)',
     accent: '#f59e0b',
     title: 'Experienced & Verified Tutors',
-    stat: '3+ Years',
+    stat: '4+ Years',
     statLabel: 'avg. experience',
     desc: 'Every tutor is background-verified and tested before joining. Only the top 10% make it through our selection.',
   },

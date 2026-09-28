@@ -67,7 +67,7 @@
 }
 
 .brandTagline {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--gold-light);
   text-transform: uppercase;
@@ -247,9 +247,9 @@
 }
 
 .waBtn {
-  background: #25D366;
+  background: #128C7E;
   color: #FFFFFF;
-  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.25);
+  box-shadow: 0 4px 14px rgba(18, 140, 126, 0.25);
 }
 
 .phoneBtn:hover,
@@ -305,6 +305,13 @@
 }
 
 /* ── Links Columns ── */
+.colLinks,
+.colServices {
+  display: flex;
+  flex-direction: column;
+  padding-top: 4px;
+}
+
 .colTitle {
   font-family: var(--font-display);
   font-size: 16px;
@@ -343,7 +350,7 @@
 .mapHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -492,7 +499,7 @@
 
 .subtext {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.35);
+  color: #94a3b8;
   margin-top: 2px;
 }
 

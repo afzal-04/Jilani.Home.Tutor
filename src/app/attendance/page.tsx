@@ -49,12 +49,28 @@ const STATUS_META: Record<AttendanceStatus, { icon: string; color: string; bg: s
 
 function StatCard({ icon, num, label, sub, accent }: { icon: string; num: string; label: string; sub: string; accent: string }) {
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 16, border: '1px solid #eef1f5', background: '#fff', padding: 20 }}>
+    <div
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: 16,
+        border: '1px solid #e2e8f0',
+        background: '#fff',
+        padding: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <span aria-hidden style={{ position: 'absolute', insetInline: 0, top: 0, height: 3, background: accent }} />
       <div style={{ display: 'flex', height: 36, width: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 10, background: accent + '20', fontSize: 17, marginBottom: 10 }}>{icon}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{num}</div>
-      <div style={{ marginTop: 6, fontSize: 10.5, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '.06em' }}>{label}</div>
-      <div style={{ marginTop: 2, fontSize: 11.5, color: '#9CA3AF' }}>{sub}</div>
+      <div style={{ marginTop: 8, minHeight: 28, display: 'flex', alignItems: 'center', fontSize: 11, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '.06em' }}>
+        {label}
+      </div>
+      <div style={{ marginTop: 'auto', paddingTop: 6, fontSize: 12, color: '#475569', fontWeight: 500 }}>
+        {sub}
+      </div>
     </div>
   );
 }
@@ -219,6 +235,28 @@ export default function TutorAttendancePage() {
           fontFamily: "var(--font-body), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         }}
       >
+        {/* Skip Link for Keyboard Accessibility (WCAG 2.4.1) */}
+        <a
+          href="#main-content"
+          style={{
+            position: 'absolute',
+            left: -9999,
+            top: 12,
+            zIndex: 999,
+            padding: '10px 18px',
+            background: '#2563EB',
+            color: '#ffffff',
+            borderRadius: 8,
+            fontWeight: 700,
+            fontSize: 13,
+            textDecoration: 'none',
+          }}
+          onFocus={e => { e.currentTarget.style.left = '16px'; }}
+          onBlur={e => { e.currentTarget.style.left = '-9999px'; }}
+        >
+          Skip to main content
+        </a>
+
         {/* Ambient Top Glow */}
         <div
           style={{
@@ -234,7 +272,8 @@ export default function TutorAttendancePage() {
         />
 
         {/* Top Navbar */}
-        <div
+        <header
+          role="banner"
           style={{
             maxWidth: 1100,
             width: '100%',
@@ -291,10 +330,11 @@ export default function TutorAttendancePage() {
             />
             Live Tutor Portal
           </div>
-        </div>
+        </header>
 
-        {/* Center Card Container */}
-        <div
+        {/* Center Card Container (Main Landmark) */}
+        <main
+          id="main-content"
           style={{
             maxWidth: 440,
             width: '100%',
@@ -502,7 +542,7 @@ export default function TutorAttendancePage() {
           </div>
 
           {/* Help link */}
-          <div style={{ textAlign: 'center', marginTop: 22, fontSize: 12.5, color: '#64748B' }}>
+          <div style={{ textAlign: 'center', marginTop: 22, fontSize: 13, color: '#94A3B8' }}>
             Need login assistance?{' '}
             <a
               href="https://wa.me/917999854628?text=Hello%20Jilani%20Home%20Tutor,%20I%20need%20assistance%20logging%20into%20the%20Tutor%20Attendance%20Portal."
@@ -513,97 +553,269 @@ export default function TutorAttendancePage() {
               WhatsApp Academic Coordinator
             </a>
           </div>
-        </div>
+        </main>
 
         {/* Footer */}
-        <div
+        <footer
           style={{
             textAlign: 'center',
-            fontSize: 11.5,
-            color: '#475569',
+            fontSize: 12,
+            color: '#94A3B8',
             paddingTop: 16,
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
             position: 'relative',
             zIndex: 10,
           }}
         >
           © {new Date().getFullYear()} Jilani Home Tutor · Raipur, CG. All Rights Reserved.
-        </div>
+        </footer>
       </div>
     );
   }
 
-  // ── Full page after login — original light theme, header bar + tabs ──
+  // ── Full page after login — accessible semantic landmarks, header bar + distinct controls ──
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F7F9FC' }}>
-      {/* Header bar */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #eef1f5', padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <img src="/logo.png" alt="Jilani Home Tutor" style={{ height: 30, width: 'auto' }} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: '#111827' }}>Attendance</div>
-          <div style={{ fontSize: 11.5, color: '#6B7280' }}>Hi, {tutorName} · {todayDisplay()}</div>
+    <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
+      {/* Skip Link for Keyboard Accessibility (WCAG 2.4.1) */}
+      <a
+        href="#main-content"
+        style={{
+          position: 'absolute',
+          left: -9999,
+          top: 12,
+          zIndex: 999,
+          padding: '10px 18px',
+          background: '#1A6FBF',
+          color: '#ffffff',
+          borderRadius: 8,
+          fontWeight: 700,
+          fontSize: 13,
+          textDecoration: 'none',
+        }}
+        onFocus={e => { e.currentTarget.style.left = '16px'; }}
+        onBlur={e => { e.currentTarget.style.left = '-9999px'; }}
+      >
+        Skip to main content
+      </a>
+
+      {/* Header bar with semantic <header> and <h1> (WCAG 1.3.1 & 2.4.6) */}
+      <header
+        role="banner"
+        style={{
+          background: '#ffffff',
+          borderBottom: '1px solid #e2e8f0',
+          padding: '14px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          flexWrap: 'wrap',
+        }}
+      >
+        <img src="/logo.png" alt="Jilani Home Tutor Logo" style={{ height: 32, width: 'auto' }} />
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <h1 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0, lineHeight: 1.2 }}>
+            Tutor Attendance Portal
+          </h1>
+          <div style={{ fontSize: 12, color: '#475569', marginTop: 2 }}>
+            Hi, <strong>{tutorName}</strong> · {todayDisplay()}
+          </div>
         </div>
-        <Link href="/" style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', textDecoration: 'none', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: 8 }}>← Website</Link>
-        <button onClick={switchAccount} style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' }}>Switch Account</button>
-      </div>
-
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '20px 16px 40px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-        {/* Tabs */}
-        <div style={{ display: 'inline-flex', gap: 4, background: '#eef1f5', padding: 4, borderRadius: 10, width: 'fit-content' }}>
-          <button
-            onClick={() => setView('mark')}
-            style={{ padding: '8px 16px', borderRadius: 7, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', border: 'none', background: view === 'mark' ? '#fff' : 'transparent', color: view === 'mark' ? '#111827' : '#6B7280', boxShadow: view === 'mark' ? '0 1px 3px rgba(0,0,0,.08)' : 'none' }}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Link
+            href="/"
+            style={{
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: '#334155',
+              textDecoration: 'none',
+              padding: '7px 12px',
+              border: '1px solid #cbd5e1',
+              borderRadius: 8,
+              background: '#ffffff',
+            }}
           >
-            Mark Attendance
-          </button>
+            ← Website
+          </Link>
           <button
-            onClick={() => { setView('history'); loadHistory(); }}
-            style={{ padding: '8px 16px', borderRadius: 7, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', border: 'none', background: view === 'history' ? '#fff' : 'transparent', color: view === 'history' ? '#111827' : '#6B7280', boxShadow: view === 'history' ? '0 1px 3px rgba(0,0,0,.08)' : 'none' }}
+            onClick={switchAccount}
+            style={{
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: '#334155',
+              background: '#ffffff',
+              border: '1px solid #cbd5e1',
+              borderRadius: 8,
+              padding: '7px 12px',
+              cursor: 'pointer',
+            }}
           >
-            This Month
+            Switch Account
           </button>
         </div>
+      </header>
 
-        {/* ── Mark Attendance tab ── */}
+      {/* Main Landmark (WCAG 2.4.1) */}
+      <main id="main-content" style={{ maxWidth: 1040, margin: '0 auto', padding: '24px 16px 48px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+
+        {/* Action & View Navigation Bar (Resolves Usability Issues 4 & 5) */}
+        <nav
+          aria-label="Portal Navigation"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 12,
+            background: '#ffffff',
+            padding: '10px 14px',
+            borderRadius: 14,
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+          }}
+        >
+          {/* View Mode Tabs */}
+          <div
+            role="tablist"
+            aria-label="Attendance Views"
+            style={{
+              display: 'inline-flex',
+              gap: 4,
+              background: '#f1f5f9',
+              padding: 4,
+              borderRadius: 10,
+            }}
+          >
+            <button
+              role="tab"
+              id="tab-mark"
+              aria-controls="panel-mark"
+              aria-selected={view === 'mark'}
+              onClick={() => setView('mark')}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 7,
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+                border: 'none',
+                background: view === 'mark' ? '#ffffff' : 'transparent',
+                color: view === 'mark' ? '#0f172a' : '#334155',
+                boxShadow: view === 'mark' ? '0 1px 3px rgba(0,0,0,.08)' : 'none',
+              }}
+            >
+              📝 Today&apos;s Classes
+            </button>
+            <button
+              role="tab"
+              id="tab-history"
+              aria-controls="panel-history"
+              aria-selected={view === 'history'}
+              onClick={() => { setView('history'); loadHistory(); }}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 7,
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+                border: 'none',
+                background: view === 'history' ? '#ffffff' : 'transparent',
+                color: view === 'history' ? '#0f172a' : '#334155',
+                boxShadow: view === 'history' ? '0 1px 3px rgba(0,0,0,.08)' : 'none',
+              }}
+            >
+              📊 Monthly Report
+            </button>
+          </div>
+
+          {/* Standalone Primary Action CTA (Resolves Usability Issue 4 & 5) */}
+          <div>
+            {view === 'history' ? (
+              <button
+                onClick={() => setView('mark')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '9px 18px',
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: '#1A6FBF',
+                  color: '#ffffff',
+                  boxShadow: '0 2px 6px rgba(26,111,191,0.3)',
+                }}
+              >
+                ✏️ Mark Today&apos;s Attendance
+              </button>
+            ) : (
+              <button
+                onClick={() => { setView('history'); loadHistory(); }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 14px',
+                  borderRadius: 8,
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: '1px solid #cbd5e1',
+                  background: '#ffffff',
+                  color: '#1e293b',
+                }}
+              >
+                📊 View Monthly Log →
+              </button>
+            )}
+          </div>
+        </nav>
+
+        {/* ── Mark Attendance tab panel ── */}
         {view === 'mark' && (
-          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eef1f5', padding: 22, maxWidth: 640 }}>
+          <div
+            id="panel-mark"
+            role="tabpanel"
+            aria-labelledby="tab-mark"
+            style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: 24, maxWidth: 680 }}
+          >
             {submitted ? (
               <div style={{ textAlign: 'center', padding: '24px 8px' }}>
                 <div style={{ fontSize: 40, marginBottom: 10 }}>✅</div>
-                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px' }}>Attendance Submitted</h2>
-                <p style={{ fontSize: 12.5, color: '#6B7280', margin: 0 }}>Marked {markedCount} of {totalCount} classes for today. Thank you!</p>
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>Attendance Submitted</h2>
+                <p style={{ fontSize: 13, color: '#475569', margin: 0 }}>Marked {markedCount} of {totalCount} classes for today. Thank you!</p>
               </div>
             ) : (
               <>
-                <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>Mark Today&apos;s Attendance</h2>
-                <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 18px' }}>
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>Mark Today&apos;s Attendance</h2>
+                <p style={{ fontSize: 12.5, color: '#475569', margin: '0 0 18px' }}>
                   Tap a status for each class, then press <strong>Done</strong> at the bottom to submit. Tap a selected status again to clear it.
                 </p>
               </>
             )}
 
-            {loadingAssignments && <p style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', padding: '20px 0' }}>Loading your classes…</p>}
+            {loadingAssignments && <p style={{ fontSize: 13, color: '#475569', textAlign: 'center', padding: '20px 0' }}>Loading your classes…</p>}
 
             {!loadingAssignments && assignments.length === 0 && (
-              <p style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', padding: '20px 0' }}>No active assignments found for your account. Contact Jilani if this looks wrong.</p>
+              <p style={{ fontSize: 13, color: '#475569', textAlign: 'center', padding: '20px 0' }}>No active assignments found for your account. Contact Jilani if this looks wrong.</p>
             )}
 
             {!submitted && !loadingAssignments && assignments.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {assignments.map(a => {
                   const selected = selections[a.id]?.status;
                   const note = selections[a.id]?.notes || '';
                   return (
-                    <div key={a.id} style={{ border: '1.5px solid #eef1f5', borderRadius: 12, padding: 14 }}>
+                    <div key={a.id} style={{ border: '1.5px solid #e2e8f0', borderRadius: 12, padding: 14 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                         <div>
-                          <div style={{ fontWeight: 700, fontSize: 14 }}>{a.parentName}</div>
-                          <div style={{ fontSize: 12, color: '#6B7280' }}>{a.subject} · {a.classLevel}</div>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{a.parentName}</div>
+                          <div style={{ fontSize: 12.5, color: '#475569' }}>{a.subject} · {a.classLevel}</div>
                         </div>
                         {selected && (
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 100, background: STATUS_OPTIONS.find(s => s.key === selected)?.color + '20', color: STATUS_OPTIONS.find(s => s.key === selected)?.color }}>
+                          <span style={{ fontSize: 11.5, fontWeight: 700, padding: '3px 9px', borderRadius: 100, background: STATUS_OPTIONS.find(s => s.key === selected)?.color + '20', color: STATUS_OPTIONS.find(s => s.key === selected)?.color }}>
                             {selected}
                           </span>
                         )}
@@ -615,9 +827,9 @@ export default function TutorAttendancePage() {
                             onClick={() => selectStatus(a.id, opt.key)}
                             style={{
                               padding: '9px 4px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                              border: selected === opt.key ? `2px solid ${opt.color}` : '1.5px solid #e5e7eb',
-                              background: selected === opt.key ? opt.color + '15' : '#fff',
-                              color: selected === opt.key ? opt.color : '#374151',
+                              border: selected === opt.key ? `2px solid ${opt.color}` : '1.5px solid #cbd5e1',
+                              background: selected === opt.key ? opt.color + '15' : '#ffffff',
+                              color: selected === opt.key ? opt.color : '#1e293b',
                             }}
                           >
                             {opt.icon} {opt.label}
@@ -632,7 +844,7 @@ export default function TutorAttendancePage() {
                             placeholder={selected === 'absent' ? "Reason for absence (optional)…" : selected === 'cancelled' ? "Reason for cancellation (optional)…" : "Note (optional)…"}
                             maxLength={500}
                             rows={2}
-                            style={{ width: '100%', padding: '8px 10px', fontSize: 12.5, border: '1.5px solid #e5e7eb', borderRadius: 8, resize: 'vertical', fontFamily: 'inherit' }}
+                            style={{ width: '100%', padding: '8px 10px', fontSize: 12.5, border: '1.5px solid #cbd5e1', borderRadius: 8, resize: 'vertical', fontFamily: 'inherit', color: '#0f172a' }}
                           />
                         </div>
                       )}
@@ -644,12 +856,12 @@ export default function TutorAttendancePage() {
 
             {!submitted && !loadingAssignments && assignments.length > 0 && (
               <>
-                <p style={{ fontSize: 11.5, color: '#9CA3AF', textAlign: 'center', margin: '14px 0 8px' }}>{markedCount} of {totalCount} marked</p>
+                <p style={{ fontSize: 12, color: '#475569', fontWeight: 600, textAlign: 'center', margin: '14px 0 8px' }}>{markedCount} of {totalCount} classes marked</p>
                 <button
                   onClick={handleSubmit}
                   disabled={submitting || markedCount === 0}
                   style={{
-                    width: '100%', padding: '13px', fontSize: 14.5, fontWeight: 700, color: '#fff',
+                    width: '100%', padding: '13px', fontSize: 14.5, fontWeight: 700, color: '#ffffff',
                     background: allMarked ? 'linear-gradient(135deg,#1A7A4A,#2ba85f)' : 'linear-gradient(135deg,#1A6FBF,#2c8ce0)',
                     border: 'none', borderRadius: 10, cursor: 'pointer', opacity: submitting || markedCount === 0 ? .5 : 1,
                   }}
@@ -661,82 +873,223 @@ export default function TutorAttendancePage() {
           </div>
         )}
 
-        {/* ── This Month tab — full report, matches parent report style ── */}
+        {/* ── This Month tab — full report (Resolves Usability Issues 1, 2, 3 & Accessibility) ── */}
         {view === 'history' && (
-          <>
+          <section
+            id="panel-history"
+            role="tabpanel"
+            aria-labelledby="tab-history"
+            style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+          >
             {historyError && (
-              <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: 12, padding: 16, color: '#9f1239', fontSize: 12.5 }}>{historyError}</div>
+              <div role="alert" style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: 12, padding: 16, color: '#9f1239', fontSize: 13, fontWeight: 600 }}>
+                {historyError}
+              </div>
             )}
 
             {historyLoading && (
-              <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eef1f5', padding: 40, textAlign: 'center', color: '#6B7280', fontSize: 13 }}>Loading your history…</div>
+              <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: 40, textAlign: 'center', color: '#475569', fontSize: 13.5 }}>
+                Loading your history…
+              </div>
             )}
 
             {!historyLoading && !historyError && historyLoaded && (
               <>
-                {/* Stat cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
-                  <StatCard icon="📋" num={String(totalSessions)} label={`Sessions — ${monthLabel}`} sub="all statuses" accent="#1A6FBF" />
-                  <StatCard icon="✅" num={`${attendanceRate}%`} label="Attendance Rate" sub={`${presentCount} present`} accent="#1A7A4A" />
-                  <StatCard icon="❌" num={String(absentCount)} label="Absences" sub={monthLabel} accent="#C0392B" />
-                  <StatCard icon="🎓" num={String(studentNames.length)} label="Students Tracked" sub="with records" accent="#C8941A" />
+                {/* Global Cycle Context Banner (Resolves Usability Issue 3) */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '2px 0' }}>
+                  <div>
+                    <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                      Monthly Attendance Summary
+                    </h2>
+                    <p style={{ fontSize: 13, color: '#475569', margin: '4px 0 0' }}>
+                      Verified attendance metrics across all assigned home tuition students.
+                    </p>
+                  </div>
+                  {monthLabel && (
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '6px 14px',
+                        borderRadius: 999,
+                        background: '#eff6ff',
+                        border: '1px solid #bfdbfe',
+                        color: '#1d4ed8',
+                        fontSize: 12.5,
+                        fontWeight: 700,
+                      }}
+                    >
+                      <span aria-hidden>🗓️</span>
+                      <span>Billing Cycle: {monthLabel}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 4 Stat Cards with Standard Baseline, Sentence-case Footers, and Robust Contrast (Resolves Usability Issues 1, 2, 3) */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 14, alignItems: 'stretch' }}>
+                  <StatCard
+                    icon="📋"
+                    num={String(totalSessions)}
+                    label="Total Sessions"
+                    sub="All recorded statuses"
+                    accent="#1A6FBF"
+                  />
+                  <StatCard
+                    icon="✅"
+                    num={`${attendanceRate}%`}
+                    label="Attendance Rate"
+                    sub={`${presentCount} present of ${totalSessions}`}
+                    accent="#1A7A4A"
+                  />
+                  <StatCard
+                    icon="❌"
+                    num={String(absentCount)}
+                    label="Total Absences"
+                    sub={`${absentCount} missed sessions`}
+                    accent="#C0392B"
+                  />
+                  <StatCard
+                    icon="🎓"
+                    num={String(studentNames.length)}
+                    label="Students Tracked"
+                    sub="Active student profiles"
+                    accent="#C8941A"
+                  />
                 </div>
 
                 {/* Report table */}
-                <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eef1f5', overflow: 'hidden' }}>
-                  <div style={{ padding: '16px 18px 0' }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: '#111827', marginBottom: 12 }}>📅 Attendance Records — {monthLabel} ({filteredHistory.length})</div>
+                <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+                  <div style={{ padding: '18px 20px 0' }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 14 }}>
+                      📅 Detailed Records — {monthLabel} ({filteredHistory.length})
+                    </div>
 
                     {studentNames.length > 1 && (
-                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-                        <span style={{ fontSize: 11.5, fontWeight: 700, color: '#9CA3AF', alignSelf: 'center', marginRight: 2 }}>Student:</span>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#334155', alignSelf: 'center', marginRight: 4 }}>
+                          Filter Student:
+                        </span>
                         {['all', ...studentNames].map(name => (
-                          <button key={name} onClick={() => setStudentFilter(name)}
-                            style={{ fontSize: 11.5, fontWeight: 700, padding: '5px 12px', borderRadius: 100, cursor: 'pointer', border: '1px solid', borderColor: studentFilter === name ? '#111827' : '#e5e7eb', background: studentFilter === name ? '#111827' : '#fff', color: studentFilter === name ? '#fff' : '#374151' }}>
-                            {name === 'all' ? 'All' : name}
+                          <button
+                            key={name}
+                            onClick={() => setStudentFilter(name)}
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 700,
+                              padding: '5px 14px',
+                              borderRadius: 100,
+                              cursor: 'pointer',
+                              border: '1px solid',
+                              borderColor: studentFilter === name ? '#0f172a' : '#cbd5e1',
+                              background: studentFilter === name ? '#0f172a' : '#ffffff',
+                              color: studentFilter === name ? '#ffffff' : '#1e293b',
+                            }}
+                          >
+                            {name === 'all' ? 'All Students' : name}
                           </button>
                         ))}
                       </div>
                     )}
 
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
-                      <span style={{ fontSize: 11.5, fontWeight: 700, color: '#9CA3AF', alignSelf: 'center', marginRight: 2 }}>Status:</span>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#334155', alignSelf: 'center', marginRight: 4 }}>
+                        Filter Status:
+                      </span>
                       {(['all', 'present', 'absent', 'holiday', 'cancelled'] as const).map(s => (
-                        <button key={s} onClick={() => setStatusFilter(s)}
-                          style={{ fontSize: 11.5, fontWeight: 700, padding: '5px 12px', borderRadius: 100, cursor: 'pointer', border: '1px solid', borderColor: statusFilter === s ? '#111827' : '#e5e7eb', background: statusFilter === s ? '#111827' : '#fff', color: statusFilter === s ? '#fff' : '#374151', textTransform: 'capitalize' }}>
-                          {s === 'all' ? 'All' : `${STATUS_META[s].icon} ${s}`}
+                        <button
+                          key={s}
+                          onClick={() => setStatusFilter(s)}
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 700,
+                            padding: '5px 14px',
+                            borderRadius: 100,
+                            cursor: 'pointer',
+                            border: '1px solid',
+                            borderColor: statusFilter === s ? '#0f172a' : '#cbd5e1',
+                            background: statusFilter === s ? '#0f172a' : '#ffffff',
+                            color: statusFilter === s ? '#ffffff' : '#1e293b',
+                            textTransform: 'capitalize',
+                          }}
+                        >
+                          {s === 'all' ? 'All Statuses' : `${STATUS_META[s].icon} ${s}`}
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                       <thead>
-                        <tr style={{ background: '#fafbfc', borderTop: '1px solid #eef1f5', borderBottom: '1px solid #eef1f5' }}>
+                        <tr style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
                           {['Date', 'Student', 'Subject', 'Duration', 'Status', 'Notes'].map(h => (
-                            <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                            <th
+                              key={h}
+                              scope="col"
+                              style={{
+                                textAlign: 'left',
+                                padding: '12px 16px',
+                                fontSize: 11,
+                                fontWeight: 700,
+                                color: '#334155',
+                                textTransform: 'uppercase',
+                                letterSpacing: '.05em',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {h}
+                            </th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
                         {filteredHistory.length === 0 && (
-                          <tr><td colSpan={6} style={{ textAlign: 'center', padding: '32px 14px', color: '#9CA3AF' }}>No attendance records match this filter.</td></tr>
+                          <tr>
+                            <td colSpan={6} style={{ textAlign: 'center', padding: '36px 14px', color: '#475569', fontSize: 13.5 }}>
+                              No attendance records match this filter.
+                            </td>
+                          </tr>
                         )}
                         {filteredHistory.map(r => {
                           const meta = STATUS_META[r.status];
                           return (
-                            <tr key={r.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                              <td style={{ padding: '10px 14px', color: '#1A6FBF', whiteSpace: 'nowrap' }}>{r.date}</td>
-                              <td style={{ padding: '10px 14px', fontWeight: 600, color: '#111827' }}>{r.studentName}</td>
-                              <td style={{ padding: '10px 14px' }}>{r.subject} <span style={{ color: '#9CA3AF', fontSize: 11 }}>({r.classLevel})</span></td>
-                              <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>{r.sessionDuration || 1}hr</td>
-                              <td style={{ padding: '10px 14px' }}>
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 100, fontSize: 11.5, fontWeight: 700, background: meta.bg, color: meta.color }}>
+                            <tr key={r.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                              <td style={{ padding: '12px 16px', color: '#1A6FBF', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                                {r.date}
+                              </td>
+                              <td style={{ padding: '12px 16px', fontWeight: 700, color: '#0f172a' }}>
+                                {r.studentName}
+                              </td>
+                              <td style={{ padding: '12px 16px', color: '#1e293b' }}>
+                                {r.subject}{' '}
+                                <span style={{ color: '#475569', fontSize: 12, fontWeight: 500 }}>
+                                  ({r.classLevel})
+                                </span>
+                              </td>
+                              <td style={{ padding: '12px 16px', color: '#334155', whiteSpace: 'nowrap' }}>
+                                {r.sessionDuration || 1} hr
+                              </td>
+                              <td style={{ padding: '12px 16px' }}>
+                                <span
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 5,
+                                    padding: '4px 10px',
+                                    borderRadius: 100,
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    background: meta.bg,
+                                    color: meta.color,
+                                  }}
+                                >
                                   {meta.icon} {r.status}
                                 </span>
                               </td>
-                              <td style={{ padding: '10px 14px', color: '#6B7280', maxWidth: 200, fontStyle: r.notes ? 'italic' : 'normal' }}>{r.notes || '—'}</td>
+                              <td style={{ padding: '12px 16px', color: '#334155', maxWidth: 220, fontStyle: r.notes ? 'italic' : 'normal' }}>
+                                {r.notes || '—'}
+                              </td>
                             </tr>
                           );
                         })}
@@ -746,9 +1099,9 @@ export default function TutorAttendancePage() {
                 </div>
               </>
             )}
-          </>
+          </section>
         )}
-      </div>
+      </main>
     </div>
   );
 }

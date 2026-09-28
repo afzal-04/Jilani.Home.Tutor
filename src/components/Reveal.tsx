@@ -22,7 +22,7 @@ export default function Reveal({ children, delay = 0, className = '' }: RevealPr
           observer.unobserve(el);
         }
       },
-      { threshold: 0.12 }
+      { threshold: 0.05, rootMargin: '0px 0px -20px 0px' }
     );
 
     observer.observe(el);

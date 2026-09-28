@@ -17,8 +17,14 @@ export default function WhatsappButton() {
   return (
     <div className={styles.container}>
       {showTooltip && (
-        <a href={href} target="_blank" rel="noreferrer" className={styles.tooltip}>
-          <span className={styles.onlineDot} />
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          className={styles.tooltip}
+          aria-label="Need help? Chat on WhatsApp"
+        >
+          <span className={styles.onlineDot} aria-hidden="true" />
           <span className={styles.tooltipText}>Need Help? <strong>Chat on WhatsApp</strong></span>
           <button
             type="button"
