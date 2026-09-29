@@ -122,7 +122,7 @@ export default function Services() {
         <div className={styles.grid}>
           {services.map((s, i) => (
             <Reveal key={s.num} delay={i * 70}>
-              <div className={styles.card} style={{ '--color': s.color } as React.CSSProperties}>
+              <div className={styles.card} style={{ '--color': BRAND_ACCENT } as React.CSSProperties}>
                 {s.popular && (
                   <div className={styles.ribbon} style={{ background: BRAND_BG }}>{s.badge}</div>
                 )}

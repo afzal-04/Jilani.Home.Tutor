@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import VisitorTracker from '@/components/VisitorTracker';
 
+// ─── Site URL (change ONLY here if domain ever changes) ───────────────────────
+
+const SITE_URL = 'https://www.jilanihometutor.in';
+
 // ─── Viewport ─────────────────────────────────────────────────────────────────
 
 export const viewport: Viewport = {
@@ -12,6 +16,8 @@ export const viewport: Viewport = {
 // ─── Open Graph & Metadata ────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+
   // ── Title & Description ──
   title: 'Best Home Tutor in Raipur | Jilani Home Tutor – Guaranteed Results',
   description:
@@ -30,21 +36,21 @@ export const metadata: Metadata = {
 
   // ── Canonical ──
   alternates: {
-    canonical: 'https://jilani-home-tutor.vercel.app',
+    canonical: SITE_URL,
   },
 
   // ── Open Graph (WhatsApp, Facebook, LinkedIn previews) ──
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://jilani-home-tutor.vercel.app',
+    url: SITE_URL,
     siteName: 'Jilani Home Tutor',
     title: 'Best Home Tutor in Raipur | Jilani Home Tutor',
     description:
       'Expert home tutors for Class 1–12 in Raipur. Personalised 1-on-1 attention. Guaranteed improvement in marks. Book your FREE demo class today!',
     images: [
       {
-        url: 'https://jilani-home-tutor.vercel.app/og-image.png',
+        url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
         alt: 'Jilani Home Tutor – Best Home Tutor in Raipur',
@@ -58,7 +64,7 @@ export const metadata: Metadata = {
     title: 'Best Home Tutor in Raipur | Jilani Home Tutor',
     description:
       'Expert home tutors for Class 1–12 in Raipur. Book a FREE demo class today!',
-    images: ['https://jilani-home-tutor.vercel.app/og-image.png'],
+    images: [`${SITE_URL}/og-image.png`],
   },
 
   // ── Icons / Favicons ──
@@ -75,7 +81,7 @@ export const metadata: Metadata = {
   },
 
   // ── App metadata ──
-  authors: [{ name: 'Jilani Home Tutor', url: 'https://jilani-home-tutor.vercel.app' }],
+  authors: [{ name: 'Jilani Home Tutor', url: SITE_URL }],
   creator: 'Jilani Home Tutor',
   publisher: 'Jilani Home Tutor',
 };
@@ -85,17 +91,17 @@ export const metadata: Metadata = {
 const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@type': ['LocalBusiness', 'EducationalOrganization'],
-  '@id': 'https://jilani-home-tutor.vercel.app/#business',
+  '@id': `${SITE_URL}/#business`,
   name: 'Jilani Home Tutor',
   alternateName: 'Jilani Home Tuition Raipur',
   description:
     'Jilani Home Tutor provides the best 1-on-1 home tuition for Class 1 to 12 students in Raipur. Specialised in Maths, Science, English, JEE/NEET with guaranteed results.',
-  url: 'https://jilani-home-tutor.vercel.app',
+  url: SITE_URL,
   telephone: '+917999854628',
   email: 'jilanihometutor@gmail.com',
   priceRange: '₹₹',
-  image: 'https://jilani-home-tutor.vercel.app/og-image.png',
-  logo: 'https://jilani-home-tutor.vercel.app/logo.png',
+  image: `${SITE_URL}/og-image.png`,
+  logo: `${SITE_URL}/logo.png`,
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Raipur',
@@ -160,7 +166,7 @@ const localBusinessSchema = {
   openingHoursSpecification: [
     {
       '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       opens: '07:00',
       closes: '21:00',
     },
@@ -177,9 +183,9 @@ const localBusinessSchema = {
 const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
-  '@id': 'https://jilani-home-tutor.vercel.app/#service',
+  '@id': `${SITE_URL}/#service`,
   name: 'Home Tutoring Service in Raipur',
-  provider: { '@id': 'https://jilani-home-tutor.vercel.app/#business' },
+  provider: { '@id': `${SITE_URL}/#business` },
   serviceType: 'Home Tutoring',
   description:
     'Expert 1-on-1 home tutors for Class 1 to 12 in Raipur covering Maths, Science, English, JEE/NEET prep and more. We provide personalised study plans and guaranteed score improvement.',
@@ -298,4 +304,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </body>
     </html>
   );
-}
+}

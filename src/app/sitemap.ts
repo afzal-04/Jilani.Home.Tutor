@@ -1,39 +1,37 @@
-// src/app/sitemap.ts
+
 import { MetadataRoute } from 'next';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://jilani-home-tutor.vercel.app';
+const BASE_URL = 'https://www.jilanihometutor.in';
 
-  return [
+export default function sitemap(): MetadataRoute.Sitemap {
+  const pages = [
+    // Main landing page
     {
-      url: `${baseUrl}/`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 1.0,
+      path: '/',
     },
+
+    // Parent / tutor enquiry page
     {
-      url: `${baseUrl}/find-tutor`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
+      path: '/find-tutor',
     },
+
+    // Class-specific SEO landing pages
     {
-      url: `${baseUrl}/class-10-tutor-raipur`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
+      path: '/class-10-tutor-raipur',
     },
+
+    // Location-specific SEO landing pages
     {
-      url: `${baseUrl}/shankar-nagar-home-tutor`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
+      path: '/shankar-nagar-home-tutor',
     },
+
+    // Competitive exam tuition
     {
-      url: `${baseUrl}/jee-neet-tuition-raipur`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
+      path: '/jee-neet-tuition-raipur',
     },
   ];
+
+  return pages.map((page) => ({
+    url: `${BASE_URL}${page.path}`,
+  }));
 }
