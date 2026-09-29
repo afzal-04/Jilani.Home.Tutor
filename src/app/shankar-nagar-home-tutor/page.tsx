@@ -12,12 +12,12 @@ export const metadata: Metadata = {
   description:
     'Looking for a home tutor in Shankar Nagar, Raipur? Verified expert 1-on-1 home tutors for Class 1 to 12 & entrance prep in Shankar Nagar locality. Book FREE Demo!',
   alternates: {
-    canonical: 'https://jilani-home-tutor.vercel.app/shankar-nagar-home-tutor',
+    canonical: 'https://www.jilanihometutor.in/shankar-nagar-home-tutor',
   },
   openGraph: {
     title: 'Home Tutor in Shankar Nagar, Raipur | Jilani Home Tutor',
     description: 'Verified 1-on-1 home tutors available in Shankar Nagar, Raipur for Class 1 to 12. Book a FREE demo class today!',
-    url: 'https://jilani-home-tutor.vercel.app/shankar-nagar-home-tutor',
+    url: 'https://www.jilanihometutor.in/shankar-nagar-home-tutor',
   },
 };
 
@@ -75,11 +75,14 @@ export default function ShankarNagarPage() {
 
               {/* Related Landing Pages Internal Links */}
               <div className={styles.internalLinksBox}>
-                <h3>Explore Other Tutoring Options</h3>
+                <h3>Explore Other Tutoring Options in Raipur</h3>
                 <ul>
+                  <li><Link href="/home-tutor-in-raipur">🏠 Home Tutor in Raipur (Classes 1–12 Overview)</Link></li>
                   <li><Link href="/class-10-tutor-raipur">📘 Class 10 Board Exam Specialist Tutors</Link></li>
+                  <li><Link href="/class-12-tutor-raipur">🎓 Class 12 Board & Entrance Home Tutor</Link></li>
+                  <li><Link href="/maths-home-tutor-raipur">🧮 Dedicated Maths Home Tutor in Raipur</Link></li>
                   <li><Link href="/jee-neet-tuition-raipur">🚀 JEE & NEET Entrance Home Tuition in Raipur</Link></li>
-                  <li><Link href="/find-tutor">🎓 Find Tutors in Civil Lines, Pandri & Telibandha</Link></li>
+                  <li><Link href="/find-tutor">🎓 Find Tutors Across All Localities in Raipur</Link></li>
                   <li><Link href="/">🏠 Return to Homepage</Link></li>
                 </ul>
               </div>

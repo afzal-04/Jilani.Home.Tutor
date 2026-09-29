@@ -12,12 +12,12 @@ export const metadata: Metadata = {
   description:
     'Expert 1-on-1 JEE Main, JEE Advanced & NEET home tuition in Raipur. Experienced tutors for Physics, Chemistry, Maths & Biology. Book FREE Demo Class Today!',
   alternates: {
-    canonical: 'https://jilani-home-tutor.vercel.app/jee-neet-tuition-raipur',
+    canonical: 'https://www.jilanihometutor.in/jee-neet-tuition-raipur',
   },
   openGraph: {
     title: 'JEE & NEET Home Tuition in Raipur | Jilani Home Tutor',
     description: 'Personalized 1-on-1 home coaching for JEE & NEET in Raipur. Expert Physics, Chemistry, Maths & Biology tutors.',
-    url: 'https://jilani-home-tutor.vercel.app/jee-neet-tuition-raipur',
+    url: 'https://www.jilanihometutor.in/jee-neet-tuition-raipur',
   },
 };
 
@@ -75,8 +75,11 @@ export default function JeeNeetPage() {
 
               {/* Related Landing Pages Internal Links */}
               <div className={styles.internalLinksBox}>
-                <h3>Explore Related Academic Services</h3>
+                <h3>Explore Related Academic Services in Raipur</h3>
                 <ul>
+                  <li><Link href="/home-tutor-in-raipur">🏠 Home Tutor in Raipur (Classes 1–12 Overview)</Link></li>
+                  <li><Link href="/class-12-tutor-raipur">🎓 Class 12 Board & Entrance Home Tutor</Link></li>
+                  <li><Link href="/maths-home-tutor-raipur">🧮 Dedicated Maths Home Tutor in Raipur</Link></li>
                   <li><Link href="/class-10-tutor-raipur">📘 Class 10 Board Prep Home Tutor</Link></li>
                   <li><Link href="/shankar-nagar-home-tutor">📍 Home Tutor in Shankar Nagar, Raipur</Link></li>
                   <li><Link href="/find-tutor">🎓 Request Custom Tutor Match</Link></li>

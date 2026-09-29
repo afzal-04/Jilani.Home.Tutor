@@ -1,4 +1,3 @@
-
 import { MetadataRoute } from 'next';
 
 const BASE_URL = 'https://www.jilanihometutor.in';
@@ -15,12 +14,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       path: '/find-tutor',
     },
 
+    // City-wide SEO landing page
+    {
+      path: '/home-tutor-in-raipur',
+    },
+
     // Class-specific SEO landing pages
     {
       path: '/class-10-tutor-raipur',
     },
+    {
+      path: '/class-12-tutor-raipur',
+    },
 
-    // Location-specific SEO landing pages
+    // Subject-specific SEO landing page
+    {
+      path: '/maths-home-tutor-raipur',
+    },
+
+    // Location-specific SEO landing page
     {
       path: '/shankar-nagar-home-tutor',
     },

@@ -120,14 +120,14 @@ export default function Footer() {
         </div>
 
         <div className={styles.colServices}>
-          <h3 className={styles.colTitle}>Classes Covered</h3>
+          <h3 className={styles.colTitle}>Tuition in Raipur</h3>
           <ul className={styles.linkList}>
-            <li><Link href="#services">Primary (Class 1–5)</Link></li>
-            <li><Link href="#services">Middle School (Class 6–8)</Link></li>
-            <li><Link href="#services">Class 10 Board Prep</Link></li>
-            <li><Link href="#services">Class 12 Boards & Entrance</Link></li>
-            <li><Link href="#services">JEE & NEET Home Tuition</Link></li>
-            <li><Link href="#services">Drawing, Music & Dance</Link></li>
+            <li><Link href="/home-tutor-in-raipur">Home Tutor in Raipur</Link></li>
+            <li><Link href="/class-10-tutor-raipur">Class 10 Board Prep</Link></li>
+            <li><Link href="/class-12-tutor-raipur">Class 12 Boards &amp; Entrance</Link></li>
+            <li><Link href="/maths-home-tutor-raipur">Maths Home Tutor</Link></li>
+            <li><Link href="/jee-neet-tuition-raipur">JEE &amp; NEET Home Tuition</Link></li>
+            <li><Link href="/shankar-nagar-home-tutor">Shankar Nagar Home Tutor</Link></li>
           </ul>
         </div>
 

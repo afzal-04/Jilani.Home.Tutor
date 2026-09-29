@@ -196,3 +196,238 @@
     position: static;
   }
 }
+
+/* ── Content Text Blocks ── */
+.textBlock {
+  margin-bottom: 28px;
+}
+
+.subheading {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.paragraph {
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(241, 245, 249, 0.85);
+  margin-bottom: 16px;
+}
+
+.bulletList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bulletList li {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(241, 245, 249, 0.8);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.bulletList li::before {
+  content: '✓';
+  color: #FBBF24;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+
+/* ── Process Steps ── */
+.stepsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stepCard {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.stepNum {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+}
+
+.stepDesc {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* ── Verified Areas Pills ── */
+.areasBox {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 28px;
+}
+
+.areasTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FBBF24;
+  margin-bottom: 12px;
+}
+
+.areaPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.areaPill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12.5px;
+  color: #E2E8F0;
+  font-weight: 500;
+}
+
+/* ── Direct Contact CTA Box ── */
+.directCtaBox {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 18px;
+  padding: 24px;
+  margin: 28px 0;
+  text-align: center;
+}
+
+.directCtaTitle {
+  font-size: 19px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.directCtaSub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 18px;
+}
+
+.ctaButtons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.phoneCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1E293B;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.phoneCtaBtn:hover {
+  background: #334155;
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.waCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #FFFFFF;
+  padding: 12px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+  transition: all 0.2s ease;
+}
+
+.waCtaBtn:hover {
+  background: #22c35e;
+  transform: translateY(-2px);
+}
+
+/* ── FAQ Section ── */
+.faqSection {
+  margin-top: 36px;
+}
+
+.faqItem {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 14px;
+}
+
+.faqQuestion {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.faqQuestion::before {
+  content: 'Q.';
+  color: #FBBF24;
+  font-weight: 800;
+}
+
+.faqAnswer {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+  padding-left: 24px;
+}
+

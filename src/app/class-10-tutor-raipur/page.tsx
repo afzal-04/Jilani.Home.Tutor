@@ -12,12 +12,12 @@ export const metadata: Metadata = {
   description:
     'Top-rated Class 10 home tuition in Raipur for CBSE, CG Board & ICSE. 1-on-1 personal tutoring in Maths, Science & English with guaranteed 85%+ board results. Book FREE Demo!',
   alternates: {
-    canonical: 'https://jilani-home-tutor.vercel.app/class-10-tutor-raipur',
+    canonical: 'https://www.jilanihometutor.in/class-10-tutor-raipur',
   },
   openGraph: {
     title: 'Class 10 Board Exam Home Tutor in Raipur | Jilani Home Tutor',
     description: 'Expert Class 10 home tutors in Raipur for Maths, Science & English. Guaranteed score improvement.',
-    url: 'https://jilani-home-tutor.vercel.app/class-10-tutor-raipur',
+    url: 'https://www.jilanihometutor.in/class-10-tutor-raipur',
   },
 };
 
@@ -77,6 +77,9 @@ export default function Class10Page() {
               <div className={styles.internalLinksBox}>
                 <h3>Explore Related Tutoring Programs in Raipur</h3>
                 <ul>
+                  <li><Link href="/home-tutor-in-raipur">🏠 Home Tutor in Raipur (Classes 1–12 Overview)</Link></li>
+                  <li><Link href="/class-12-tutor-raipur">🎓 Class 12 Board & Entrance Home Tutor</Link></li>
+                  <li><Link href="/maths-home-tutor-raipur">🧮 Dedicated Maths Home Tutor in Raipur</Link></li>
                   <li><Link href="/shankar-nagar-home-tutor">📍 Home Tutor in Shankar Nagar, Raipur</Link></li>
                   <li><Link href="/jee-neet-tuition-raipur">🚀 JEE & NEET Entrance Home Tuition in Raipur</Link></li>
                   <li><Link href="/find-tutor">🎓 Find Expert Tutors Across All Classes</Link></li>
