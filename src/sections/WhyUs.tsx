@@ -114,12 +114,12 @@ export default function WhyUs() {
         <div className={styles.header}>
           <Reveal><span className="sec-tag">Why Parents Trust Us</span></Reveal>
           <Reveal delay={80}><h2 className="sec-title" style={{ textAlign: 'center' }}>Why Choose Jilani Home Tutor?</h2></Reveal>
-          <Reveal delay={120}><p className="sec-sub" style={{ margin: '0 auto', textAlign: 'center' }}>The best home tutoring service in Raipur, trusted by hundreds of families</p></Reveal>
+          <Reveal delay={120}><p className="sec-sub" style={{ margin: '0 auto', textAlign: 'center' }}>Dedicated 1-on-1 home tutoring in Raipur, trusted by families across the city</p></Reveal>
           <Reveal delay={160}>
             <div className={styles.trustBar}>
-              <div className={styles.trustItem}><strong>1000+</strong><span>Happy Students</span></div>
+              <div className={styles.trustItem}><strong>1000+</strong><span>Students Assisted</span></div>
               <div className={styles.trustDivider} />
-              <div className={styles.trustItem}><strong>95%</strong><span>Score Improved</span></div>
+              <div className={styles.trustItem}><strong>1-on-1</strong><span>Personal Attention</span></div>
               <div className={styles.trustDivider} />
               <div className={styles.trustItem}><strong>4+</strong><span>Years in Raipur</span></div>
               <div className={styles.trustDivider} />
@@ -143,7 +143,7 @@ export default function WhyUs() {
                 <p className={styles.cardDesc}>{r.desc}</p>
                 <div className={styles.checkRow}>
                   <span className={styles.check} style={{ background: r.gradient }}>✓</span>
-                  <span className={styles.checkText}>Guaranteed</span>
+                  <span className={styles.checkText}>Verified</span>
                 </div>
               </div>
             </Reveal>

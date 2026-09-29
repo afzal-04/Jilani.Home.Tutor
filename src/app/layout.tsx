@@ -19,13 +19,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   // ── Title & Description ──
-  title: 'Best Home Tutor in Raipur | Jilani Home Tutor – Guaranteed Results',
+  title: 'Home Tutor in Raipur | Jilani Home Tutor',
   description:
-    'Looking for the best home tutor in Raipur? Jilani Home Tutor provides expert 1-on-1 home tuition for Class 1–12 in Maths, Science & English. Book a FREE demo class today!',
+    'Find suitable home tutors in Raipur for Classes 1–12, Maths, Science and English. Connect with Jilani Home Tutor for personalised home tuition.',
 
-  // ── Keywords (helps Bing + older crawlers) ──
+  // ── Keywords ──
   keywords:
-    'home tutor in raipur, best tutor raipur, home tuition raipur, maths tutor raipur, science tutor raipur, english tutor raipur, class 10 tutor raipur, board exam tutor raipur, tutor near me raipur, shankar nagar tutor, tatibandh tutor, class 9 tutor raipur, private tutor raipur, 1 on 1 tuition raipur',
+    'home tutor in raipur, home tuition raipur, maths tutor raipur, science tutor raipur, english tutor raipur, class 10 tutor raipur, board exam tutor raipur, tutor near me raipur, shankar nagar tutor, tatibandh tutor, class 9 tutor raipur, private tutor raipur, 1 on 1 tuition raipur',
 
   // ── Indexing ──
   robots: {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
   // ── Canonical ──
   alternates: {
-    canonical: SITE_URL,
+    canonical: '/',
   },
 
   // ── Open Graph (WhatsApp, Facebook, LinkedIn previews) ──
@@ -45,15 +45,15 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     url: SITE_URL,
     siteName: 'Jilani Home Tutor',
-    title: 'Best Home Tutor in Raipur | Jilani Home Tutor',
+    title: 'Home Tutor in Raipur | Jilani Home Tutor',
     description:
-      'Expert home tutors for Class 1–12 in Raipur. Personalised 1-on-1 attention. Guaranteed improvement in marks. Book your FREE demo class today!',
+      'Find suitable home tutors in Raipur for Classes 1–12, Maths, Science and English. Connect with Jilani Home Tutor for personalised home tuition.',
     images: [
       {
         url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'Jilani Home Tutor – Best Home Tutor in Raipur',
+        alt: 'Jilani Home Tutor – Home Tutor in Raipur',
       },
     ],
   },
@@ -61,9 +61,9 @@ export const metadata: Metadata = {
   // ── Twitter / X Card ──
   twitter: {
     card: 'summary_large_image',
-    title: 'Best Home Tutor in Raipur | Jilani Home Tutor',
+    title: 'Home Tutor in Raipur | Jilani Home Tutor',
     description:
-      'Expert home tutors for Class 1–12 in Raipur. Book a FREE demo class today!',
+      'Find suitable home tutors in Raipur for Classes 1–12, Maths, Science and English. Connect with Jilani Home Tutor for personalised home tuition.',
     images: [`${SITE_URL}/og-image.png`],
   },
 
@@ -95,7 +95,7 @@ const localBusinessSchema = {
   name: 'Jilani Home Tutor',
   alternateName: 'Jilani Home Tuition Raipur',
   description:
-    'Jilani Home Tutor provides the best 1-on-1 home tuition for Class 1 to 12 students in Raipur. Specialised in Maths, Science, English, JEE/NEET with guaranteed results.',
+    'Jilani Home Tutor connects parents and students with verified 1-on-1 home tutors for Class 1 to 12 in Raipur, covering Maths, Science, English, and competitive exams.',
   url: SITE_URL,
   telephone: '+917999854628',
   email: 'jilanihometutor@gmail.com',
@@ -104,7 +104,6 @@ const localBusinessSchema = {
   logo: `${SITE_URL}/logo.png`,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: 'Raipur',
     addressLocality: 'Raipur',
     addressRegion: 'Chhattisgarh',
     postalCode: '492001',
@@ -129,39 +128,6 @@ const localBusinessSchema = {
     { '@type': 'Place', name: 'Mowa, Raipur' },
     { '@type': 'Place', name: 'Rajendra Nagar, Raipur' },
     { '@type': 'Place', name: 'Khamardih, Raipur' },
-  ],
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    reviewCount: '120',
-    bestRating: '5',
-    worstRating: '1',
-  },
-  review: [
-    {
-      '@type': 'Review',
-      author: { '@type': 'Person', name: 'Ramesh Verma' },
-      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
-      reviewBody: 'My son was scoring 55 in Maths. After 2 months with Jilani Home Tutor, he got 85 in his half-yearly exam.',
-    },
-    {
-      '@type': 'Review',
-      author: { '@type': 'Person', name: 'Sunita Agarwal' },
-      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
-      reviewBody: 'Jilani Home Tutor built her confidence step by step. She cleared Class 10 boards with 91%.',
-    },
-    {
-      '@type': 'Review',
-      author: { '@type': 'Person', name: 'Priya Chandrakar' },
-      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
-      reviewBody: 'Matched us with a tutor within one day. Both children improved in Science within the first month.',
-    },
-    {
-      '@type': 'Review',
-      author: { '@type': 'Person', name: 'Mohit Kesharwani' },
-      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
-      reviewBody: 'In 3 months, my son scored 78 in Physics. He is now preparing for engineering entrance.',
-    },
   ],
   openingHoursSpecification: [
     {
@@ -188,7 +154,7 @@ const serviceSchema = {
   provider: { '@id': `${SITE_URL}/#business` },
   serviceType: 'Home Tutoring',
   description:
-    'Expert 1-on-1 home tutors for Class 1 to 12 in Raipur covering Maths, Science, English, JEE/NEET prep and more. We provide personalised study plans and guaranteed score improvement.',
+    '1-on-1 home tutors for Class 1 to 12 in Raipur covering Maths, Science, English, JEE/NEET prep and school subjects with personalised study plans.',
   areaServed: { '@type': 'City', name: 'Raipur' },
   offers: {
     '@type': 'Offer',
@@ -209,61 +175,6 @@ const serviceSchema = {
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Primary Class Tutor Raipur (Class 1–5)' } },
     ],
   },
-};
-
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'What is the fee for a home tutor in Raipur?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Fees depend on the class and subject. We offer a FREE demo class with no commitment. Contact us for a personalised quote — most families find our rates affordable and worth it.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Do you provide home tutors for Class 10 board exams in Raipur?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes! We specialise in Class 9 and 10 board exam preparation in Maths, Science, and English. Our students consistently score 80–95% in their boards.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'How quickly can I get a home tutor in Raipur?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'We match you with the right tutor within 24 hours of registration. Fill the form on our website and we will call you back within 2 hours.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Which areas in Raipur do you cover for home tutoring?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'We cover all major areas of Raipur including Shankar Nagar, Civil Lines, Pandri, Telibandha, Tatibandh, Devendra Nagar, Pachpedi Naka, Avanti Vihar, Byron Bazar, Mowa, Rajendra Nagar, Khamardih, and more.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Do you provide female home tutors in Raipur?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes, we have both male and female tutors available. You can specify your preference when registering and we will match accordingly.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Is the demo class really free?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Absolutely! The first demo class is completely free with no obligation. You only continue if you and your child are satisfied with the tutor.',
-      },
-    },
-  ],
 };
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
@@ -292,10 +203,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </head>
       <body>

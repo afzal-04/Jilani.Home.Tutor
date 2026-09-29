@@ -10,9 +10,9 @@ import styles from '../LandingPage.module.css';
 export const metadata: Metadata = {
   title: 'JEE & NEET Home Tutor in Raipur | 1-on-1 Entrance Coaching | Jilani Home Tutor',
   description:
-    'Expert 1-on-1 JEE Main, JEE Advanced & NEET home tuition in Raipur. Experienced tutors for Physics, Chemistry, Maths & Biology. Book FREE Demo Class Today!',
+    '1-on-1 JEE Main, JEE Advanced & NEET home tuition in Raipur. Experienced tutors for Physics, Chemistry, Maths & Biology. Book a FREE Demo Class Today!',
   alternates: {
-    canonical: 'https://www.jilanihometutor.in/jee-neet-tuition-raipur',
+    canonical: '/jee-neet-tuition-raipur',
   },
   openGraph: {
     title: 'JEE & NEET Home Tuition in Raipur | Jilani Home Tutor',
@@ -21,9 +21,41 @@ export const metadata: Metadata = {
   },
 };
 
+const JEE_NEET_FAQS = [
+  {
+    q: 'How does 1-on-1 home coaching benefit JEE and NEET aspirants?',
+    a: 'In large classroom coaching centres, students often hesitate to stop lectures for personal doubts. A dedicated home tutor focuses entirely on the student’s weak areas, walks through complex numerical derivations, and tracks revision schedules closely.',
+  },
+  {
+    q: 'Which subjects can we request home tutors for?',
+    a: 'We coordinate subject tutors for Physics, Chemistry, Mathematics (for JEE), and Biology (Botany & Zoology for NEET). You can request single-subject focus or comprehensive guidance.',
+  },
+  {
+    q: 'Is a free demo class available for competitive exam coaching?',
+    a: 'Yes, parents can book an initial free 1-on-1 demo session at home to evaluate the tutor’s problem-solving methods and conceptual clarity.',
+  },
+];
+
 export default function JeeNeetPage() {
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: JEE_NEET_FAQS.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <Navbar />
       <main className={styles.main}>
         {/* Breadcrumb & Hero */}
@@ -69,8 +101,19 @@ export default function JeeNeetPage() {
                 <span className={styles.featureIcon}>💡</span>
                 <div>
                   <h3>Individual Doubt Elimination</h3>
-                  <p>Zero backlog guarantee — clear every single doubt instantly during your private 1-on-1 home sessions.</p>
+                  <p>Clear every single doubt promptly during your private 1-on-1 home sessions without classroom pressure.</p>
                 </div>
+              </div>
+
+              {/* FAQs */}
+              <div className={styles.faqSection}>
+                <h2 className={styles.sectionHeading}>Frequently Asked Questions</h2>
+                {JEE_NEET_FAQS.map((faq) => (
+                  <div key={faq.q} className={styles.faqItem}>
+                    <h3 className={styles.faqQuestion}>{faq.q}</h3>
+                    <p className={styles.faqAnswer}>{faq.a}</p>
+                  </div>
+                ))}
               </div>
 
               {/* Related Landing Pages Internal Links */}

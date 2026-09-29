@@ -69,7 +69,7 @@ export default function Hero() {
           <div className={styles.left}>
             <div className={styles.badge}>✨ Trusted Home Tutors in Raipur</div>
             <h1 className={styles.heading}>
-              Best Home Tutor in Raipur for Class 1–12
+              Home Tutor in Raipur for Class 1–12
             </h1>
             <h2 className={styles.tagline}>
               Your Child Deserves <em>Expert</em> Attention at Home
@@ -87,12 +87,12 @@ export default function Hero() {
                 <span className={styles.statLabel}>Students</span>
               </div>
               <div className={styles.stat}>
-                <span className={styles.statNum}>95%</span>
-                <span className={styles.statLabel}>Pass Rate</span>
-              </div>
-              <div className={styles.stat}>
                 <span className={styles.statNum}>4+</span>
                 <span className={styles.statLabel}>Years</span>
+              </div>
+              <div className={styles.stat}>
+                <span className={styles.statNum}>24hr</span>
+                <span className={styles.statLabel}>Matching</span>
               </div>
             </div>
           </div>

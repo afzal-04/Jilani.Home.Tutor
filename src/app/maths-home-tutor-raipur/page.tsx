@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description:
     'Find a Maths home tutor in Raipur for school students. Jilani Home Tutor helps parents connect with suitable mathematics tutors.',
   alternates: {
-    canonical: 'https://www.jilanihometutor.in/maths-home-tutor-raipur',
+    canonical: '/maths-home-tutor-raipur',
   },
   openGraph: {
     title: 'Maths Home Tutor in Raipur | Jilani Home Tutor',

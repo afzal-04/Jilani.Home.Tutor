@@ -59,7 +59,7 @@ export default function Footer() {
           </div>
 
           <p className={styles.brandDesc}>
-            Raipur&apos;s premier 1-on-1 home tuition service. Trusted by 1000+ families for verified tutors and guaranteed score improvements.
+            Raipur&apos;s premier 1-on-1 home tuition service. Connecting families with verified home tutors for personalized academic attention.
           </p>
 
           {/* Interactive Instant Callback Form */}
@@ -190,7 +190,7 @@ export default function Footer() {
           <a href="#register">Tutor Verification Guidelines</a>
         </div>
         <p>© {new Date().getFullYear()} Jilani Home Tutor, Raipur, Chhattisgarh. All rights reserved.</p>
-        <p className={styles.subtext}>Best Home Tutor in Raipur · Guaranteed 1-on-1 Personal Attention</p>
+        <p className={styles.subtext}>Home Tutor in Raipur · Dedicated 1-on-1 Personal Attention</p>
       </div>
     </footer>
   );

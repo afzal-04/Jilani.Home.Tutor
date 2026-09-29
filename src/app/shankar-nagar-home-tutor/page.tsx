@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description:
     'Looking for a home tutor in Shankar Nagar, Raipur? Verified expert 1-on-1 home tutors for Class 1 to 12 & entrance prep in Shankar Nagar locality. Book FREE Demo!',
   alternates: {
-    canonical: 'https://www.jilanihometutor.in/shankar-nagar-home-tutor',
+    canonical: '/shankar-nagar-home-tutor',
   },
   openGraph: {
     title: 'Home Tutor in Shankar Nagar, Raipur | Jilani Home Tutor',
@@ -21,9 +21,41 @@ export const metadata: Metadata = {
   },
 };
 
+const SHANKAR_NAGAR_FAQS = [
+  {
+    q: 'Are tutors available specifically within Shankar Nagar, Raipur?',
+    a: 'Yes, we have verified home tutors residing in or near Shankar Nagar, Khamardih, Katora Talaab, and TV Tower Road who travel directly to student residences.',
+  },
+  {
+    q: 'Which school curriculums do Shankar Nagar tutors teach?',
+    a: 'Our tutors are experienced with CBSE and ICSE curricula commonly followed in schools such as DPS, KPS, NH Goel, and St. Xavier’s in Raipur.',
+  },
+  {
+    q: 'Can parents in Shankar Nagar request a free demo session?',
+    a: 'Yes, we arrange a complimentary in-home demo class so parents and students can evaluate the tutor’s teaching approach before commencing regular sessions.',
+  },
+];
+
 export default function ShankarNagarPage() {
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: SHANKAR_NAGAR_FAQS.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <Navbar />
       <main className={styles.main}>
         {/* Breadcrumb & Hero */}
@@ -33,12 +65,12 @@ export default function ShankarNagarPage() {
               <Link href="/">Home</Link> &gt; <span>Home Tutor in Shankar Nagar Raipur</span>
             </div>
             <div className={styles.badge}>📍 Shankar Nagar Locality Specialist</div>
-            <h1 className={styles.h1Title}>Best Home Tutor in Shankar Nagar, Raipur</h1>
+            <h1 className={styles.h1Title}>Home Tutor in Shankar Nagar, Raipur</h1>
             <h2 className={styles.h2Subtitle}>
-              Top-Rated Verified 1-on-1 Personal Home Tuition Right at Your Doorstep in Shankar Nagar
+              Verified 1-on-1 Personal Home Tuition at Your Doorstep in Shankar Nagar
             </h2>
             <p className={styles.desc}>
-              Shankar Nagar is one of Raipur&apos;s premier educational hubs. We have over 50+ background-verified home tutors active in Shankar Nagar, Khamardih, Katora Talaab, and TV Tower Road area ready to teach your child in the comfort of your home.
+              Shankar Nagar is one of Raipur&apos;s premier educational hubs. We have background-verified home tutors active in Shankar Nagar, Khamardih, Katora Talaab, and TV Tower Road area ready to teach your child in the comfort of your home.
             </p>
           </div>
         </section>
@@ -60,7 +92,7 @@ export default function ShankarNagarPage() {
               <div className={styles.featureCard}>
                 <span className={styles.featureIcon}>🏫</span>
                 <div>
-                  <h3>CBSE & ICSE School Curriculum Experts</h3>
+                  <h3>CBSE & ICSE School Curriculum Familiarity</h3>
                   <p>Experienced tutors familiar with syllabus of DPS, KPS, NH Goel, and St. Xavier&apos;s schools in Raipur.</p>
                 </div>
               </div>
@@ -71,6 +103,17 @@ export default function ShankarNagarPage() {
                   <h3>Verified & Trusted In-Home Mentors</h3>
                   <p>Thorough ID verification, academic check, and safety onboarding for total peace of mind for parents.</p>
                 </div>
+              </div>
+
+              {/* FAQs */}
+              <div className={styles.faqSection}>
+                <h2 className={styles.sectionHeading}>Frequently Asked Questions</h2>
+                {SHANKAR_NAGAR_FAQS.map((faq) => (
+                  <div key={faq.q} className={styles.faqItem}>
+                    <h3 className={styles.faqQuestion}>{faq.q}</h3>
+                    <p className={styles.faqAnswer}>{faq.a}</p>
+                  </div>
+                ))}
               </div>
 
               {/* Related Landing Pages Internal Links */}

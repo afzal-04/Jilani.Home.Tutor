@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description:
     'Looking for a Class 12 home tutor in Raipur? Connect with suitable tutors for board preparation, Maths, Physics, Chemistry and Biology.',
   alternates: {
-    canonical: 'https://www.jilanihometutor.in/class-12-tutor-raipur',
+    canonical: '/class-12-tutor-raipur',
   },
   openGraph: {
     title: 'Class 12 Home Tutor in Raipur | Jilani Home Tutor',
