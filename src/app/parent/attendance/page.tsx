@@ -25,8 +25,6 @@ interface ActiveClass {
 
 interface Fee {
   studentName: string;
-  tutorName: string;
-  subject: string;
   amount: number;
   status: string;
   month: string;
@@ -41,6 +39,8 @@ interface Record_ {
   date: string;
   status: AttendanceStatus;
   notes?: string;
+  remark?: string;
+  remarks?: string;
   sessionDuration?: number;
 }
 
@@ -151,6 +151,8 @@ export default function ParentAttendancePage() {
   const [fees, setFees] = useState<Fee[]>([]);
   const [studentFilter, setStudentFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<AttendanceStatus | 'all'>('all');
+  const [cycleOffset, setCycleOffset] = useState(0);
+  const [cycleLoading, setCycleLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   async function handleLogin(e: React.FormEvent) {
@@ -181,6 +183,7 @@ export default function ParentAttendancePage() {
       setFeeMonthLabel(data.feeMonthLabel || 'This Month');
       setRecords(data.records || []);
       setFees(data.fees || []);
+      setCycleOffset(data.cycleOffset ?? 0);
     } catch (err) {
       console.error(err);
       setError('Connection error. Please try again in a few moments.');
@@ -200,6 +203,33 @@ export default function ParentAttendancePage() {
     setCycleLabel('');
     setFeeMonthLabel('');
     setSearchQuery('');
+    setCycleOffset(0);
+  }
+
+  async function loadCycle(newOffset: number, currentPhone: string) {
+    setCycleLoading(true);
+    try {
+      const res = await fetch('/api/parent-attendance/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: currentPhone, cycleOffset: newOffset }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setClasses(data.classes || []);
+        setCycleLabel(data.cycleLabel || 'Current Cycle');
+        setFeeMonthLabel(data.feeMonthLabel || 'This Month');
+        setRecords(data.records || []);
+        setFees(data.fees || []);
+        setCycleOffset(data.cycleOffset ?? newOffset);
+        setStudentFilter('all');
+        setStatusFilter('all');
+        setSearchQuery('');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setCycleLoading(false);
   }
 
   const studentNames = useMemo(
@@ -211,13 +241,14 @@ export default function ParentAttendancePage() {
     return records.filter((r) => {
       const matchStudent = studentFilter === 'all' || r.studentName === studentFilter;
       const matchStatus = statusFilter === 'all' || r.status === statusFilter;
+      const remarkText = r.remark || r.remarks || r.notes || '';
       const matchQuery =
         !searchQuery.trim() ||
         r.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.tutorName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.studentName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.date?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (r.notes && r.notes.toLowerCase().includes(searchQuery.toLowerCase()));
+        remarkText.toLowerCase().includes(searchQuery.toLowerCase());
       return matchStudent && matchStatus && matchQuery;
     });
   }, [records, studentFilter, statusFilter, searchQuery]);
@@ -543,7 +574,7 @@ export default function ParentAttendancePage() {
               rel="noreferrer"
               style={{ color: '#60A5FA', fontWeight: 600, textDecoration: 'underline' }}
             >
-              WhatsApp Academic Coordinator
+              WhatsApp Us
             </a>
           </div>
         </div>
@@ -579,8 +610,82 @@ export default function ParentAttendancePage() {
         paddingBottom: 60,
       }}
     >
+      {/* ── Print Stylesheet: Downloads / Prints Attendance Record ONLY ── */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @media print {
+              @page {
+                size: A4 portrait;
+                margin: 12mm 15mm;
+              }
+              body, html {
+                background: #FFFFFF !important;
+                color: #0F172A !important;
+                font-size: 10pt !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              /* Hide all navigation, banners, metrics, classes, and assistance cards */
+              .no-print,
+              header,
+              nav,
+              footer {
+                display: none !important;
+              }
+              .print-only {
+                display: block !important;
+              }
+              main {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+              }
+              .attendance-print-card {
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                background: transparent !important;
+              }
+              .attendance-table-container {
+                overflow: visible !important;
+              }
+              .attendance-print-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                font-size: 9.5pt !important;
+              }
+              .attendance-print-table th,
+              .attendance-print-table td {
+                border: 1px solid #CBD5E1 !important;
+                padding: 6px 8px !important;
+                color: #0F172A !important;
+              }
+              .attendance-print-table th {
+                background: #F1F5F9 !important;
+                font-weight: 700 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              .attendance-print-table tr {
+                page-break-inside: avoid !important;
+              }
+            }
+            @media screen {
+              .print-only {
+                display: none !important;
+              }
+            }
+          `,
+        }}
+      />
+
       {/* ── Top Header Navigation ── */}
       <header
+        className="no-print"
         style={{
           background: '#FFFFFF',
           borderBottom: '1px solid #E2E8F0',
@@ -712,6 +817,7 @@ export default function ParentAttendancePage() {
       >
         {/* Welcome Banner Card */}
         <section
+          className="no-print"
           style={{
             background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #172554 100%)',
             borderRadius: 24,
@@ -755,7 +861,7 @@ export default function ParentAttendancePage() {
                 <span>Active Cycle: {cycleLabel || 'Current Cycle'}</span>
               </div>
               <h1 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 6px', letterSpacing: '-0.02em' }}>
-                Welcome, {parentName}
+                Welcome to Parent Portal
               </h1>
               <p style={{ fontSize: 13.5, color: '#CBD5E1', margin: 0, maxWidth: 550 }}>
                 Verified monthly attendance logs for{' '}
@@ -792,8 +898,127 @@ export default function ParentAttendancePage() {
           </div>
         </section>
 
+        {/* ── Month / Cycle Navigator ── */}
+        <section
+          className="no-print"
+          style={{
+            background: '#FFFFFF',
+            borderRadius: 20,
+            border: '1px solid #E2E8F0',
+            padding: '16px 22px',
+            boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 12,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 18 }}>🗓️</span>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.06em' }}>Viewing Cycle</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>{cycleLabel || 'Current Cycle'}</div>
+            </div>
+            {cycleOffset < 0 && (
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  padding: '3px 10px',
+                  borderRadius: 999,
+                  background: '#FEF9C3',
+                  color: '#92400E',
+                  border: '1px solid #FDE68A',
+                }}
+              >
+                Past Record
+              </span>
+            )}
+            {cycleOffset === 0 && (
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  padding: '3px 10px',
+                  borderRadius: 999,
+                  background: '#ECFDF5',
+                  color: '#047857',
+                  border: '1px solid #A7F3D0',
+                }}
+              >
+                Current
+              </span>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              disabled={cycleLoading || cycleOffset <= -12}
+              onClick={() => loadCycle(cycleOffset - 1, phone)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '8px 16px',
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: cycleOffset <= -12 ? '#CBD5E1' : '#1E293B',
+                background: cycleOffset <= -12 ? '#F8FAFC' : '#F1F5F9',
+                border: '1px solid #E2E8F0',
+                borderRadius: 10,
+                cursor: cycleOffset <= -12 || cycleLoading ? 'not-allowed' : 'pointer',
+                opacity: cycleOffset <= -12 ? 0.5 : 1,
+              }}
+            >
+              {cycleLoading ? '⏳ Loading…' : '← Previous Month'}
+            </button>
+
+            {cycleOffset < 0 && (
+              <button
+                disabled={cycleLoading}
+                onClick={() => loadCycle(0, phone)}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  color: '#1D4ED8',
+                  background: '#EFF6FF',
+                  border: '1px solid #BFDBFE',
+                  borderRadius: 10,
+                  cursor: cycleLoading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                Current Month
+              </button>
+            )}
+
+            <button
+              disabled={cycleLoading || cycleOffset >= 0}
+              onClick={() => loadCycle(cycleOffset + 1, phone)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '8px 16px',
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: cycleOffset >= 0 ? '#CBD5E1' : '#1E293B',
+                background: cycleOffset >= 0 ? '#F8FAFC' : '#F1F5F9',
+                border: '1px solid #E2E8F0',
+                borderRadius: 10,
+                cursor: cycleOffset >= 0 || cycleLoading ? 'not-allowed' : 'pointer',
+                opacity: cycleOffset >= 0 ? 0.5 : 1,
+              }}
+            >
+              Next Month →
+            </button>
+          </div>
+        </section>
+
         {/* ── Key Metrics & Stats Grid ── */}
         <section
+          className="no-print"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
@@ -911,7 +1136,7 @@ export default function ParentAttendancePage() {
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: '#EF4444' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#64748B' }}>
-                Absences
+                Absent
               </span>
               <span style={{ fontSize: 16 }}>❌</span>
             </div>
@@ -961,6 +1186,7 @@ export default function ParentAttendancePage() {
 
         {/* ── Active Classes & Tutor Contact Section ── */}
         <section
+          className="no-print"
           style={{
             background: '#FFFFFF',
             borderRadius: 20,
@@ -1087,92 +1313,9 @@ export default function ParentAttendancePage() {
           )}
         </section>
 
-        {/* ── Monthly Fees Card ── */}
-        <section
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 20,
-            border: '1px solid #E2E8F0',
-            padding: 22,
-            boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.03)',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>💳</span> Monthly Tuition Fees ({feeMonthLabel || 'Current Month'})
-            </h2>
-            {fees.length > 0 && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
-                Total: {inr(fees.reduce((s, f) => s + (f.amount || 0), 0))}
-              </span>
-            )}
-          </div>
-
-          {fees.length === 0 ? (
-            <p style={{ fontSize: 13, color: '#64748B', margin: 0 }}>No fee records generated for this cycle.</p>
-          ) : (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                gap: 12,
-              }}
-            >
-              {fees.map((f, i) => {
-                const meta =
-                  FEE_STATUS_META[f.status.toLowerCase()] || {
-                    label: f.status,
-                    color: '#475569',
-                    bg: '#F1F5F9',
-                    border: '#CBD5E1',
-                  };
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      borderRadius: 14,
-                      border: '1px solid #E2E8F0',
-                      background: '#F8FAFC',
-                      padding: '14px 16px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
-                        {f.studentName} · {f.subject}
-                      </div>
-                      <div style={{ fontSize: 11.5, color: '#64748B', marginTop: 2 }}>
-                        Tutor: {f.tutorName}
-                      </div>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', marginTop: 4 }}>
-                        {inr(f.amount)}
-                      </div>
-                    </div>
-                    <span
-                      style={{
-                        fontSize: 11.5,
-                        fontWeight: 700,
-                        padding: '4px 12px',
-                        borderRadius: 999,
-                        background: meta.bg,
-                        color: meta.color,
-                        border: `1px solid ${meta.border}`,
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {meta.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
         {/* ── Attendance Log Table & Interactive Filters ── */}
         <section
+          className="attendance-print-card"
           style={{
             background: '#FFFFFF',
             borderRadius: 20,
@@ -1181,8 +1324,8 @@ export default function ParentAttendancePage() {
             boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.03)',
           }}
         >
-          {/* Header & Filter Controls */}
-          <div style={{ padding: '20px 22px', borderBottom: '1px solid #E2E8F0' }}>
+          {/* Header & Filter Controls (hidden on print) */}
+          <div className="no-print" style={{ padding: '20px 22px', borderBottom: '1px solid #E2E8F0' }}>
             <div
               style={{
                 display: 'flex',
@@ -1202,22 +1345,49 @@ export default function ParentAttendancePage() {
                 </p>
               </div>
 
-              {/* Search Box */}
-              <input
-                type="text"
-                placeholder="🔍 Search tutor, subject, notes..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  padding: '8px 14px',
-                  fontSize: 12.5,
-                  borderRadius: 10,
-                  border: '1px solid #CBD5E1',
-                  background: '#F8FAFC',
-                  outline: 'none',
-                  minWidth: 220,
-                }}
-              />
+              {/* Actions: Print Button & Search Box */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '8px 14px',
+                    fontSize: 12.5,
+                    fontWeight: 700,
+                    color: '#1D4ED8',
+                    background: '#EFF6FF',
+                    border: '1px solid #BFDBFE',
+                    borderRadius: 10,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.15s ease',
+                  }}
+                  title="Print or Save Attendance Records as PDF"
+                >
+                  <span>🖨️</span>
+                  <span>Print / Save PDF</span>
+                </button>
+
+                {/* Search Box */}
+                <input
+                  type="text"
+                  placeholder="🔍 Search tutor, subject, remark..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    padding: '8px 14px',
+                    fontSize: 12.5,
+                    borderRadius: 10,
+                    border: '1px solid #CBD5E1',
+                    background: '#F8FAFC',
+                    outline: 'none',
+                    minWidth: 220,
+                  }}
+                />
+              </div>
             </div>
 
             {/* Filter Pills */}
@@ -1296,9 +1466,49 @@ export default function ParentAttendancePage() {
             </div>
           </div>
 
+          {/* Print-Only Official Attendance Statement Header */}
+          <div className="print-only" style={{ padding: '16px 20px 14px', borderBottom: '2px solid #0F172A', marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+              <div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                  Jilani Home Tutor
+                </div>
+                <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
+                  Official Student Tuition Attendance Record · Raipur, Chhattisgarh
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>
+                  Attendance Statement
+                </div>
+                <div style={{ fontSize: 11, color: '#64748B' }}>
+                  Cycle: {cycleLabel}
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: 8,
+                background: '#F8FAFC',
+                border: '1px solid #CBD5E1',
+                padding: '8px 12px',
+                borderRadius: 8,
+                fontSize: 11,
+              }}
+            >
+              <div><span style={{ color: '#64748B' }}>Student:</span> <strong>{studentNames.join(', ') || 'Student'}</strong></div>
+              <div><span style={{ color: '#64748B' }}>Registered Mobile:</span> <strong>+91 {phone.replace(/\D/g, '').slice(-10)}</strong></div>
+              <div><span style={{ color: '#64748B' }}>Total Sessions:</span> <strong>{totalSessions}</strong></div>
+              <div><span style={{ color: '#64748B' }}>Present / Absent:</span> <strong>{presentCount} / {absentCount}</strong></div>
+            </div>
+          </div>
+
           {/* Table */}
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, textAlign: 'left' }}>
+          <div className="attendance-table-container" style={{ overflowX: 'auto' }}>
+            <table className="attendance-print-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, textAlign: 'left' }}>
               <thead>
                 <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
                   <th style={{ padding: '12px 18px', fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
@@ -1316,8 +1526,8 @@ export default function ParentAttendancePage() {
                   <th style={{ padding: '12px 14px', fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
                     Status
                   </th>
-                  <th style={{ padding: '12px 18px', fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', textAlign: 'right' }}>
-                    Remarks
+                  <th style={{ padding: '12px 18px', fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', minWidth: 160 }}>
+                    Remark
                   </th>
                 </tr>
               </thead>
@@ -1410,14 +1620,25 @@ export default function ParentAttendancePage() {
                           </span>
                         </td>
 
-                        {/* Remarks */}
-                        <td style={{ padding: '12px 18px', textAlign: 'right', color: '#64748B', fontSize: 12 }}>
-                          {r.notes ? (
-                            <span style={{ fontStyle: 'italic', color: '#334155' }}>
-                              &ldquo;{r.notes}&rdquo;
+                        {/* Remark */}
+                        <td style={{ padding: '12px 18px', color: '#475569', fontSize: 12.5, minWidth: 160, maxWidth: 280 }}>
+                          {(r.remark || r.remarks || r.notes) ? (
+                            <span
+                              style={{
+                                fontStyle: 'italic',
+                                color: '#1E293B',
+                                background: '#F8FAFC',
+                                border: '1px solid #E2E8F0',
+                                padding: '4px 10px',
+                                borderRadius: 8,
+                                display: 'inline-block',
+                                lineHeight: 1.4,
+                              }}
+                            >
+                              &ldquo;{r.remark || r.remarks || r.notes}&rdquo;
                             </span>
                           ) : (
-                            <span style={{ color: '#CBD5E1' }}>—</span>
+                            <span style={{ color: '#94A3B8' }}>—</span>
                           )}
                         </td>
                       </tr>
@@ -1431,6 +1652,7 @@ export default function ParentAttendancePage() {
 
         {/* ── Coordinator Concierge / Help Card ── */}
         <section
+          className="no-print"
           style={{
             background: 'linear-gradient(135deg, #EFF6FF 0%, #EEF2FF 100%)',
             border: '1px solid #BFDBFE',
@@ -1462,17 +1684,17 @@ export default function ParentAttendancePage() {
             </div>
             <div>
               <div style={{ fontSize: 14.5, fontWeight: 800, color: '#0F172A' }}>
-                Questions regarding attendance or fees?
+                Questions regarding attendance?
               </div>
               <div style={{ fontSize: 12, color: '#475569', marginTop: 2 }}>
-                Our Academic Coordinator is available to help 7 days a week.
+                We are available to help 7 days a week.
               </div>
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <a
-              href="https://wa.me/917999854628?text=Hello%20Academic%20Coordinator,%20I%20have%20a%20query%20regarding%20my%20child's%20attendance."
+              href="https://wa.me/917999854628?text=Hello%20Jilani%20Home%20Tutor,%20I%20have%20a%20query%20regarding%20my%20child's%20attendance."
               target="_blank"
               rel="noreferrer"
               style={{
@@ -1486,7 +1708,7 @@ export default function ParentAttendancePage() {
                 boxShadow: '0 6px 15px -3px rgba(16, 185, 129, 0.4)',
               }}
             >
-              WhatsApp Coordinator
+              WhatsApp Us
             </a>
             <a
               href="tel:917999854628"
@@ -1501,7 +1723,7 @@ export default function ParentAttendancePage() {
                 border: '1px solid #CBD5E1',
               }}
             >
-              Call Coordinator
+              Call Us
             </a>
           </div>
         </section>

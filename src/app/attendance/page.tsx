@@ -945,7 +945,7 @@ export default function TutorAttendancePage() {
                   <StatCard
                     icon="❌"
                     num={String(absentCount)}
-                    label="Total Absences"
+                    label="Total Absent"
                     sub={`${absentCount} missed sessions`}
                     accent="#C0392B"
                   />
