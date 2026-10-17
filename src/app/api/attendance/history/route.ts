@@ -24,10 +24,17 @@ export async function POST(req: NextRequest) {
     // Fetch this tutor's active assignments so we know each class's own
     // start date — that's what the billing cycle is anchored to, not the
     // calendar month.
-    const aSnap = await db.collection('classes')
+    let aSnap = await db.collection('classes')
       .where('tutorPhone', '==', cleaned)
       .where('status', '==', 'active')
       .get();
+
+    if (aSnap.empty) {
+      aSnap = await db.collection('classes')
+        .where('tutorPhone', '==', cleaned)
+        .where('status', '==', 'completed')
+        .get();
+    }
 
     const seen = new Set<string>();
     const classesRaw = aSnap.docs

@@ -152,6 +152,7 @@ export default function ParentAttendancePage() {
   const [studentFilter, setStudentFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<AttendanceStatus | 'all'>('all');
   const [cycleOffset, setCycleOffset] = useState(0);
+  const [minCycleOffset, setMinCycleOffset] = useState(-12);
   const [cycleLoading, setCycleLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -184,6 +185,7 @@ export default function ParentAttendancePage() {
       setRecords(data.records || []);
       setFees(data.fees || []);
       setCycleOffset(data.cycleOffset ?? 0);
+      if (typeof data.minCycleOffset === 'number') setMinCycleOffset(data.minCycleOffset);
     } catch (err) {
       console.error(err);
       setError('Connection error. Please try again in a few moments.');
@@ -204,6 +206,7 @@ export default function ParentAttendancePage() {
     setFeeMonthLabel('');
     setSearchQuery('');
     setCycleOffset(0);
+    setMinCycleOffset(-12);
   }
 
   async function loadCycle(newOffset: number, currentPhone: string) {
@@ -222,6 +225,7 @@ export default function ParentAttendancePage() {
         setRecords(data.records || []);
         setFees(data.fees || []);
         setCycleOffset(data.cycleOffset ?? newOffset);
+        if (typeof data.minCycleOffset === 'number') setMinCycleOffset(data.minCycleOffset);
         setStudentFilter('all');
         setStatusFilter('all');
         setSearchQuery('');
@@ -954,7 +958,7 @@ export default function ParentAttendancePage() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
-              disabled={cycleLoading || cycleOffset <= -12}
+              disabled={cycleLoading || cycleOffset <= minCycleOffset}
               onClick={() => loadCycle(cycleOffset - 1, phone)}
               style={{
                 display: 'inline-flex',
@@ -963,15 +967,15 @@ export default function ParentAttendancePage() {
                 padding: '8px 16px',
                 fontSize: 12.5,
                 fontWeight: 700,
-                color: cycleOffset <= -12 ? '#CBD5E1' : '#1E293B',
-                background: cycleOffset <= -12 ? '#F8FAFC' : '#F1F5F9',
+                color: cycleOffset <= minCycleOffset ? '#CBD5E1' : '#1E293B',
+                background: cycleOffset <= minCycleOffset ? '#F8FAFC' : '#F1F5F9',
                 border: '1px solid #E2E8F0',
                 borderRadius: 10,
-                cursor: cycleOffset <= -12 || cycleLoading ? 'not-allowed' : 'pointer',
-                opacity: cycleOffset <= -12 ? 0.5 : 1,
+                cursor: cycleOffset <= minCycleOffset || cycleLoading ? 'not-allowed' : 'pointer',
+                opacity: cycleOffset <= minCycleOffset ? 0.5 : 1,
               }}
             >
-              {cycleLoading ? '⏳ Loading…' : '← Previous Month'}
+              {cycleLoading ? '⏳ Loading…' : '← Previous Cycle'}
             </button>
 
             {cycleOffset < 0 && (
@@ -989,7 +993,7 @@ export default function ParentAttendancePage() {
                   cursor: cycleLoading ? 'not-allowed' : 'pointer',
                 }}
               >
-                Current Month
+                Current Cycle
               </button>
             )}
 
@@ -1011,7 +1015,7 @@ export default function ParentAttendancePage() {
                 opacity: cycleOffset >= 0 ? 0.5 : 1,
               }}
             >
-              Next Month →
+              Next Cycle →
             </button>
           </div>
         </section>

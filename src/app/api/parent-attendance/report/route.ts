@@ -7,24 +7,21 @@ import { getCurrentCycle, toDateStr, formatCycleLabel } from '../../../../lib/at
 /**
  * Returns the cycle window for browsing attendance history.
  *
- * - cycleOffset === 0  →  current start-date-anchored cycle (e.g. 05 Oct – 04 Nov)
- * - cycleOffset  <  0  →  FULL CALENDAR MONTH N months ago (e.g. offset -1 = whole
- *                          of September, Sept 1 – Sept 30).
+ * All offsets use start-date-anchored billing cycles:
+ * - cycleOffset === 0  →  current billing cycle  (e.g. 05 Oct – 04 Nov)
+ * - cycleOffset === -1 →  previous billing cycle (e.g. 05 Sep – 04 Oct)
+ * - cycleOffset === -2 →  two cycles ago, etc.
  *
- * Why calendar months for history?  The start-date-anchored cycle only makes sense
- * for the *current* month — it ensures the rolling window is correct right now.
- * For past months, parents think in "September", "August", etc., and attendance
- * records are stored with real calendar dates.  Using the anchored offset would
- * silently drop records from the start of a month (e.g. Sept 1–4 when anchor is
- * Sept 5), which is exactly what caused the "only 2 days" bug.
+ * This ensures "Previous Cycle" always shows the actual billing period that
+ * the class was running, not a calendar month that may not match the real window.
  */
 function getCycleAtOffset(
   startDateStr: string,
   today: Date,
   cycleOffset: number,
 ): { startStr: string; endStr: string; label: string } {
-  // ── Past months: full calendar month ─────────────────────────────────────
-  if (cycleOffset < 0) {
+  // Fallback when there's no start date: use calendar months
+  if (!startDateStr) {
     const base = new Date(today.getFullYear(), today.getMonth() + cycleOffset, 1);
     const next = new Date(base.getFullYear(), base.getMonth() + 1, 1);
     return {
@@ -34,17 +31,20 @@ function getCycleAtOffset(
     };
   }
 
-  // ── Current cycle: start-date-anchored rolling window ────────────────────
-  if (!startDateStr) {
-    const base = new Date(today.getFullYear(), today.getMonth(), 1);
-    const next = new Date(base.getFullYear(), base.getMonth() + 1, 1);
-    return {
-      startStr: toDateStr(base),
-      endStr:   toDateStr(next),
-      label:    today.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }),
-    };
-  }
-  return getCurrentCycle(startDateStr, today);
+  // ── Start-date-anchored cycle at the given offset ────────────────────────
+  // First find the current cycle, then step back |cycleOffset| months.
+  const currentCycle = getCurrentCycle(startDateStr, today);
+  if (cycleOffset === 0) return currentCycle;
+
+  // Walk backwards from the assignment's start date by |cycleOffset| months
+  const anchor = new Date(startDateStr);
+  const cycleStart = new Date(anchor);
+  cycleStart.setMonth(cycleStart.getMonth() + cycleOffset); // cycleOffset is negative
+  const cycleEnd = new Date(cycleStart);
+  cycleEnd.setMonth(cycleEnd.getMonth() + 1);
+  const startStr = toDateStr(cycleStart);
+  const endStr = toDateStr(cycleEnd);
+  return { startStr, endStr, label: formatCycleLabel(startStr, endStr) };
 }
 
 
@@ -69,42 +69,125 @@ export async function POST(req: NextRequest) {
     const parentDocName = (parentData.name || '').trim();
     const parentDocStudent = (parentData.studentName || '').trim();
 
-    // 2) Their child's active classes — matched by parentPhone, server-side.
-    //    Dedupe in case a duplicate assignment doc exists (e.g. from "duplicate
-    //    for new month" without the old one marked completed).
+    // 2) Fetch ALL class assignments for this parent (active, completed, paused).
+    // Each assignment document represents a specific tuition cycle/month.
     const aSnap = await db.collection('classes')
       .where('parentPhone', '==', cleaned)
-      .where('status', '==', 'active')
       .get();
 
-    const seen = new Set<string>();
-    const classesRaw = aSnap.docs
-      .map(d => ({ id: d.id, ...d.data() } as any))
-      .filter(a => {
-        const key = `${a.tutorName}::${a.subject}::${a.parentName}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
+    if (aSnap.empty) {
+      return NextResponse.json({
+        parentName: parentDocName || 'Parent',
+        classes: [],
+        studentNames: [],
+        cycleLabel: 'No Cycles Available',
+        feeMonthLabel: 'This Month',
+        records: [],
+        summary: [],
+        fees: [],
+        cycleOffset: 0,
+        minCycleOffset: 0,
       });
+    }
+
+    const allAssignmentDocs = aSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+
+    // Group assignments by class key (tutorName + subject + parentName/student)
+    const classGroups = new Map<string, any[]>();
+    allAssignmentDocs.forEach(doc => {
+      const key = `${doc.tutorName}::${doc.subject}::${doc.parentName || ''}`;
+      if (!classGroups.has(key)) classGroups.set(key, []);
+      classGroups.get(key)!.push(doc);
+    });
+
+    // Sort each group's assignments chronologically ascending by startDate
+    classGroups.forEach(groupDocs => {
+      groupDocs.sort((a, b) => {
+        const dateA = (a.startDate || '').split('T')[0];
+        const dateB = (b.startDate || '').split('T')[0];
+        if (dateA && dateB) return dateA.localeCompare(dateB);
+        return (a.createdAt?._seconds || 0) - (b.createdAt?._seconds || 0);
+      });
+    });
+
+    const now = new Date();
+
+    // Determine the minimum offset possible based on the group with the most history
+    const maxCycles = Math.max(...Array.from(classGroups.values()).map(g => g.length), 1);
+    const minCycleOffset = -(maxCycles - 1);
+
+    // For the requested cycleOffset (0 = current/latest, -1 = previous assignment, etc.),
+    // pick the exact assignment document and derive its start and end window directly from the assignments.
+    const classesWithCycle: any[] = [];
+    classGroups.forEach(groupDocs => {
+      const latestIndex = groupDocs.length - 1;
+      const targetIndex = latestIndex + cycleOffset;
+
+      if (targetIndex >= 0 && targetIndex <= latestIndex) {
+        const assignment = groupDocs[targetIndex];
+        const startStr = (assignment.startDate || '').split('T')[0] || toDateStr(now);
+
+        let endStr: string;
+        let label: string;
+
+        if (targetIndex < latestIndex) {
+          // Completed past cycle: end is the start date of the NEXT assignment
+          const nextStartStr = (groupDocs[targetIndex + 1].startDate || '').split('T')[0];
+          if (nextStartStr) {
+            endStr = nextStartStr;
+            label = formatCycleLabel(startStr, endStr);
+          } else {
+            const sDate = new Date(startStr);
+            sDate.setMonth(sDate.getMonth() + 1);
+            endStr = toDateStr(sDate);
+            label = formatCycleLabel(startStr, endStr);
+          }
+        } else {
+          // Current / latest assignment cycle: continues until marked completed
+          const sDate = new Date(startStr);
+          const nominalEnd = new Date(sDate);
+          nominalEnd.setMonth(nominalEnd.getMonth() + 1);
+          const nominalEndStr = toDateStr(nominalEnd);
+          // Query allows ongoing sessions while active
+          const queryEnd = new Date(Math.max(nominalEnd.getTime(), now.getTime() + 86400000 * 60));
+          endStr = toDateStr(queryEnd);
+          label = formatCycleLabel(startStr, nominalEndStr);
+        }
+
+        classesWithCycle.push({
+          ...assignment,
+          cycle: { startStr, endStr, label },
+        });
+      } else {
+        // Offset extends beyond existing assignment records: step backwards from the oldest assignment
+        const oldestAssignment = groupDocs[0];
+        const oldestStart = (oldestAssignment.startDate || '').split('T')[0] || toDateStr(now);
+        const sDate = new Date(oldestStart);
+        sDate.setMonth(sDate.getMonth() + (targetIndex)); // targetIndex is negative
+        const eDate = new Date(sDate);
+        eDate.setMonth(eDate.getMonth() + 1);
+
+        const startStr = toDateStr(sDate);
+        const endStr = toDateStr(eDate);
+        const label = formatCycleLabel(startStr, endStr);
+
+        classesWithCycle.push({
+          ...oldestAssignment,
+          cycle: { startStr, endStr, label },
+        });
+      }
+    });
 
     // Resolve Student & Parent Names:
-    // - parentData.studentName stores the student's name.
-    // - parentData.name stores the parent's actual name if given.
     const resolvedStudentName =
       parentDocStudent ||
-      classesRaw.find(a => a.studentName)?.studentName ||
-      classesRaw[0]?.parentName ||
+      classesWithCycle.find(a => a.studentName)?.studentName ||
+      classesWithCycle[0]?.parentName ||
       '';
 
     const parentName = (parentDocName && parentDocName.toLowerCase() !== resolvedStudentName.toLowerCase())
       ? parentDocName
       : 'Parent';
-
-    const now = new Date();
-
-    // Each class gets its OWN cycle window (possibly in the past when
-    // cycleOffset < 0), anchored to its own startDate.
-    const classesWithCycle = classesRaw.map(a => ({ ...a, cycle: getCycleAtOffset(a.startDate, now, cycleOffset) }));
 
     const classes = classesWithCycle.map(a => ({
       id: a.id,
@@ -116,6 +199,7 @@ export async function POST(req: NextRequest) {
       studentName: resolvedStudentName || a.studentName || a.parentName || '',
       startDate: a.startDate || '',
       area: a.area || '',
+      status: a.status || 'active',
       cycleLabel: a.cycle.label,
     }));
 
@@ -246,6 +330,7 @@ export async function POST(req: NextRequest) {
       }),
       summary: Object.values(summaryMap),
       fees,
+      minCycleOffset,
     });
   } catch (err) {
     console.error('Parent attendance report error:', err);

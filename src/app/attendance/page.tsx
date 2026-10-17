@@ -577,6 +577,78 @@ export default function TutorAttendancePage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
+      {/* ── Print Stylesheet: Downloads / Prints Attendance Record ONLY ── */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @media print {
+              @page {
+                size: A4 portrait;
+                margin: 12mm 15mm;
+              }
+              body, html {
+                background: #FFFFFF !important;
+                color: #0F172A !important;
+                font-size: 10pt !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              .no-print,
+              header,
+              nav,
+              footer {
+                display: none !important;
+              }
+              .print-only {
+                display: block !important;
+              }
+              main {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+              }
+              .tutor-print-section {
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                background: transparent !important;
+              }
+              .attendance-table-container {
+                overflow: visible !important;
+              }
+              .tutor-print-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                font-size: 9.5pt !important;
+              }
+              .tutor-print-table th,
+              .tutor-print-table td {
+                border: 1px solid #CBD5E1 !important;
+                padding: 6px 8px !important;
+                color: #0F172A !important;
+              }
+              .tutor-print-table th {
+                background: #F1F5F9 !important;
+                font-weight: 700 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              .tutor-print-table tr {
+                page-break-inside: avoid !important;
+              }
+            }
+            @media screen {
+              .print-only {
+                display: none !important;
+              }
+            }
+          `,
+        }}
+      />
+
       {/* Skip Link for Keyboard Accessibility (WCAG 2.4.1) */}
       <a
         href="#main-content"
@@ -879,6 +951,7 @@ export default function TutorAttendancePage() {
             id="panel-history"
             role="tabpanel"
             aria-labelledby="tab-history"
+            className="tutor-print-section"
             style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
           >
             {historyError && (
@@ -896,7 +969,7 @@ export default function TutorAttendancePage() {
             {!historyLoading && !historyError && historyLoaded && (
               <>
                 {/* Global Cycle Context Banner (Resolves Usability Issue 3) */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '2px 0' }}>
+                <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '2px 0' }}>
                   <div>
                     <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', margin: 0 }}>
                       Monthly Attendance Summary
@@ -905,29 +978,70 @@ export default function TutorAttendancePage() {
                       Verified attendance metrics across all assigned home tuition students.
                     </p>
                   </div>
-                  {monthLabel && (
-                    <div
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        padding: '6px 14px',
-                        borderRadius: 999,
-                        background: '#eff6ff',
-                        border: '1px solid #bfdbfe',
-                        color: '#1d4ed8',
-                        fontSize: 12.5,
-                        fontWeight: 700,
-                      }}
-                    >
-                      <span aria-hidden>🗓️</span>
-                      <span>Billing Cycle: {monthLabel}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    {monthLabel && (
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          padding: '6px 14px',
+                          borderRadius: 999,
+                          background: '#eff6ff',
+                          border: '1px solid #bfdbfe',
+                          color: '#1d4ed8',
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                        }}
+                      >
+                        <span aria-hidden>🗓️</span>
+                        <span>Billing Cycle: {monthLabel}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Print-Only Official Attendance Statement Header */}
+                <div className="print-only" style={{ padding: '16px 0 14px', borderBottom: '2px solid #0F172A', marginBottom: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                        Jilani Home Tutor
+                      </div>
+                      <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
+                        Official Tutor Attendance Report · Raipur, Chhattisgarh
+                      </div>
                     </div>
-                  )}
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>
+                        Attendance Report
+                      </div>
+                      <div style={{ fontSize: 11, color: '#64748B' }}>
+                        Billing Cycle: {monthLabel}
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(4, 1fr)',
+                      gap: 8,
+                      background: '#F8FAFC',
+                      border: '1px solid #CBD5E1',
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      fontSize: 11,
+                    }}
+                  >
+                    <div><span style={{ color: '#64748B' }}>Tutor:</span> <strong>{tutorName}</strong></div>
+                    <div><span style={{ color: '#64748B' }}>Total Sessions:</span> <strong>{totalSessions}</strong></div>
+                    <div><span style={{ color: '#64748B' }}>Present / Absent:</span> <strong>{presentCount} / {absentCount}</strong></div>
+                    <div><span style={{ color: '#64748B' }}>Attendance Rate:</span> <strong>{attendanceRate}%</strong></div>
+                  </div>
                 </div>
 
                 {/* 4 Stat Cards with Standard Baseline, Sentence-case Footers, and Robust Contrast (Resolves Usability Issues 1, 2, 3) */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 14, alignItems: 'stretch' }}>
+                <div className="no-print" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 14, alignItems: 'stretch' }}>
                   <StatCard
                     icon="📋"
                     num={String(totalSessions)}
@@ -960,9 +1074,33 @@ export default function TutorAttendancePage() {
 
                 {/* Report table */}
                 <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-                  <div style={{ padding: '18px 20px 0' }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 14 }}>
-                      📅 Detailed Records — {monthLabel} ({filteredHistory.length})
+                  <div className="no-print" style={{ padding: '18px 20px 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a' }}>
+                        📅 Detailed Records — {monthLabel} ({filteredHistory.length})
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => window.print()}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          padding: '7px 14px',
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          color: '#1D4ED8',
+                          background: '#EFF6FF',
+                          border: '1px solid #BFDBFE',
+                          borderRadius: 8,
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}
+                        title="Print or Save Attendance Report as PDF"
+                      >
+                        <span>🖨️</span>
+                        <span>Print / Save PDF</span>
+                      </button>
                     </div>
 
                     {studentNames.length > 1 && (
@@ -1019,8 +1157,8 @@ export default function TutorAttendancePage() {
                     </div>
                   </div>
 
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                  <div className="attendance-table-container" style={{ overflowX: 'auto' }}>
+                    <table className="tutor-print-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                       <thead>
                         <tr style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
                           {['Date', 'Student', 'Subject', 'Duration', 'Status', 'Notes'].map(h => (
