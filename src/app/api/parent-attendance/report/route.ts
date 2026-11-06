@@ -92,21 +92,26 @@ export async function POST(req: NextRequest) {
 
     const allAssignmentDocs = aSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
 
-    // ── Group assignments by subject + student (NOT tutorName) ───────────────
-    // Using subject::parentName as the key means that when a tutor is replaced
-    // the new assignment is added to the SAME timeline as the old one, so
-    // cycleOffset=-1 navigates to the previous tutor's actual assignment window
-    // (startDate→nextStartDate) instead of falling into the calendar-month
-    // fallback that fires when each tutor forms a separate single-entry group.
+    // ── Group assignments by subject + classLevel (NOT tutorName or parentName) ─
+    // Key = subject::classLevel so that:
+    //  • Tutor replacements (same slot, new tutor) land in the SAME timeline,
+    //    making cycleOffset=-1 navigate to the actual previous assignment window
+    //    (startDate→nextStartDate) instead of a calendar-month fallback.
+    //  • parentName inconsistencies across class docs (e.g. "Taraprasad" vs
+    //    "Taraprasad Mukherjee") don't create duplicate groups — all docs are
+    //    already scoped to the same parentPhone, so parentName in the key is
+    //    unreliable and can be dropped safely.
     //
     // For the CURRENT view (cycleOffset === 0) we exclude completed assignments
     // so they don't appear alongside active ones.  For past browsing we keep all
     // statuses so the parent can see the full history.
+    const slotKey = (doc: any) => `${(doc.subject || '').trim()}::${(doc.classLevel || '').trim()}`;
+
     const classGroups = new Map<string, any[]>();
     allAssignmentDocs.forEach(doc => {
       // On the current cycle skip completed — only visible in past records.
       if (cycleOffset === 0 && doc.status === 'completed') return;
-      const key = `${doc.subject}::${doc.parentName || ''}`;
+      const key = slotKey(doc);
       if (!classGroups.has(key)) classGroups.set(key, []);
       classGroups.get(key)!.push(doc);
     });
@@ -115,7 +120,7 @@ export async function POST(req: NextRequest) {
     // current view rather than showing a blank screen.
     if (classGroups.size === 0 && cycleOffset === 0) {
       allAssignmentDocs.forEach(doc => {
-        const key = `${doc.subject}::${doc.parentName || ''}`;
+        const key = slotKey(doc);
         if (!classGroups.has(key)) classGroups.set(key, []);
         classGroups.get(key)!.push(doc);
       });
@@ -133,11 +138,11 @@ export async function POST(req: NextRequest) {
 
     const now = new Date();
 
-    // minCycleOffset is computed from ALL assignments (same subject::parentName key,
-    // all statuses) so "Previous Cycle" navigation reaches the full history.
+    // minCycleOffset is computed from ALL assignments (same slotKey, all statuses)
+    // so "Previous Cycle" navigation reaches the full history.
     const allGroupsForHistory = new Map<string, any[]>();
     allAssignmentDocs.forEach(doc => {
-      const key = `${doc.subject}::${doc.parentName || ''}`;
+      const key = slotKey(doc);
       if (!allGroupsForHistory.has(key)) allGroupsForHistory.set(key, []);
       allGroupsForHistory.get(key)!.push(doc);
     });
