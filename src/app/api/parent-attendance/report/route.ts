@@ -92,15 +92,36 @@ export async function POST(req: NextRequest) {
 
     const allAssignmentDocs = aSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
 
-    // Group assignments by class key (tutorName + subject + parentName/student)
+    // ── Group assignments by subject + student (NOT tutorName) ───────────────
+    // Using subject::parentName as the key means that when a tutor is replaced
+    // the new assignment is added to the SAME timeline as the old one, so
+    // cycleOffset=-1 navigates to the previous tutor's actual assignment window
+    // (startDate→nextStartDate) instead of falling into the calendar-month
+    // fallback that fires when each tutor forms a separate single-entry group.
+    //
+    // For the CURRENT view (cycleOffset === 0) we exclude completed assignments
+    // so they don't appear alongside active ones.  For past browsing we keep all
+    // statuses so the parent can see the full history.
     const classGroups = new Map<string, any[]>();
     allAssignmentDocs.forEach(doc => {
-      const key = `${doc.tutorName}::${doc.subject}::${doc.parentName || ''}`;
+      // On the current cycle skip completed — only visible in past records.
+      if (cycleOffset === 0 && doc.status === 'completed') return;
+      const key = `${doc.subject}::${doc.parentName || ''}`;
       if (!classGroups.has(key)) classGroups.set(key, []);
       classGroups.get(key)!.push(doc);
     });
 
-    // Sort each group's assignments chronologically ascending by startDate
+    // If the parent has ONLY completed classes, fall back to showing them on the
+    // current view rather than showing a blank screen.
+    if (classGroups.size === 0 && cycleOffset === 0) {
+      allAssignmentDocs.forEach(doc => {
+        const key = `${doc.subject}::${doc.parentName || ''}`;
+        if (!classGroups.has(key)) classGroups.set(key, []);
+        classGroups.get(key)!.push(doc);
+      });
+    }
+
+    // Sort every group chronologically ascending so index 0 = oldest assignment.
     classGroups.forEach(groupDocs => {
       groupDocs.sort((a, b) => {
         const dateA = (a.startDate || '').split('T')[0];
@@ -112,8 +133,15 @@ export async function POST(req: NextRequest) {
 
     const now = new Date();
 
-    // Determine the minimum offset possible based on the group with the most history
-    const maxCycles = Math.max(...Array.from(classGroups.values()).map(g => g.length), 1);
+    // minCycleOffset is computed from ALL assignments (same subject::parentName key,
+    // all statuses) so "Previous Cycle" navigation reaches the full history.
+    const allGroupsForHistory = new Map<string, any[]>();
+    allAssignmentDocs.forEach(doc => {
+      const key = `${doc.subject}::${doc.parentName || ''}`;
+      if (!allGroupsForHistory.has(key)) allGroupsForHistory.set(key, []);
+      allGroupsForHistory.get(key)!.push(doc);
+    });
+    const maxCycles = Math.max(...Array.from(allGroupsForHistory.values()).map(g => g.length), 1);
     const minCycleOffset = -(maxCycles - 1);
 
     // For the requested cycleOffset (0 = current/latest, -1 = previous assignment, etc.),
