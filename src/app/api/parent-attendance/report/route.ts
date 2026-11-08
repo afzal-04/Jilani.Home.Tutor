@@ -48,6 +48,22 @@ function getCycleAtOffset(
 }
 
 
+// Normalizes subject strings so variations like "Maths and Physics", "Maths,Physics",
+// "Physics , Maths", and "Maths & Physics" all map to the identical canonical key.
+function normalizeSubject(sub: string): string {
+  if (!sub) return '';
+  return sub
+    .toLowerCase()
+    .replace(/\band\b/g, ',')
+    .replace(/&/g, ',')
+    .replace(/\s*,\s*/g, ',')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .sort()
+    .join(',');
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -92,39 +108,32 @@ export async function POST(req: NextRequest) {
 
     const allAssignmentDocs = aSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
 
-    // ── Group assignments by subject + classLevel (NOT tutorName or parentName) ─
-    // Key = subject::classLevel so that:
-    //  • Tutor replacements (same slot, new tutor) land in the SAME timeline,
-    //    making cycleOffset=-1 navigate to the actual previous assignment window
-    //    (startDate→nextStartDate) instead of a calendar-month fallback.
-    //  • parentName inconsistencies across class docs (e.g. "Taraprasad" vs
-    //    "Taraprasad Mukherjee") don't create duplicate groups — all docs are
-    //    already scoped to the same parentPhone, so parentName in the key is
-    //    unreliable and can be dropped safely.
+    // ── Group assignments by canonical subject + classLevel ─────────────────
+    // Key = normalizeSubject(subject)::classLevel.
     //
-    // For the CURRENT view (cycleOffset === 0) we exclude completed assignments
-    // so they don't appear alongside active ones.  For past browsing we keep all
-    // statuses so the parent can see the full history.
-    const slotKey = (doc: any) => `${(doc.subject || '').trim()}::${(doc.classLevel || '').trim()}`;
+    // 1. Identify the student's currently active / ongoing tuition slots.
+    //    We ONLY follow the timeline of ongoing slots so that discontinued
+    //    past classes (e.g. an old Class 8 batch that ended months ago) do NOT
+    //    get resurrected as extra cards when viewing previous cycles of the
+    //    student's current Class 11 tuition.
+    const slotKey = (doc: any) => `${normalizeSubject(doc.subject)}::${(doc.classLevel || '').trim().toLowerCase()}`;
 
+    const activeDocs = allAssignmentDocs.filter(d => d.status === 'active' || d.status === 'paused');
+    let allowedSlotKeys = new Set(activeDocs.map(d => slotKey(d)));
+
+    // Fallback: if all classes are completed (alumni parent), allow all slots
+    if (allowedSlotKeys.size === 0) {
+      allowedSlotKeys = new Set(allAssignmentDocs.map(d => slotKey(d)));
+    }
+
+    // 2. Group all historical docs belonging to these active tuition slots
     const classGroups = new Map<string, any[]>();
     allAssignmentDocs.forEach(doc => {
-      // On the current cycle skip completed — only visible in past records.
-      if (cycleOffset === 0 && doc.status === 'completed') return;
       const key = slotKey(doc);
+      if (!allowedSlotKeys.has(key)) return;
       if (!classGroups.has(key)) classGroups.set(key, []);
       classGroups.get(key)!.push(doc);
     });
-
-    // If the parent has ONLY completed classes, fall back to showing them on the
-    // current view rather than showing a blank screen.
-    if (classGroups.size === 0 && cycleOffset === 0) {
-      allAssignmentDocs.forEach(doc => {
-        const key = slotKey(doc);
-        if (!classGroups.has(key)) classGroups.set(key, []);
-        classGroups.get(key)!.push(doc);
-      });
-    }
 
     // Sort every group chronologically ascending so index 0 = oldest assignment.
     classGroups.forEach(groupDocs => {
@@ -138,15 +147,8 @@ export async function POST(req: NextRequest) {
 
     const now = new Date();
 
-    // minCycleOffset is computed from ALL assignments (same slotKey, all statuses)
-    // so "Previous Cycle" navigation reaches the full history.
-    const allGroupsForHistory = new Map<string, any[]>();
-    allAssignmentDocs.forEach(doc => {
-      const key = slotKey(doc);
-      if (!allGroupsForHistory.has(key)) allGroupsForHistory.set(key, []);
-      allGroupsForHistory.get(key)!.push(doc);
-    });
-    const maxCycles = Math.max(...Array.from(allGroupsForHistory.values()).map(g => g.length), 1);
+    // minCycleOffset is computed from the deepest historical slot among the allowed slots
+    const maxCycles = Math.max(...Array.from(classGroups.values()).map(g => g.length), 1);
     const minCycleOffset = -(maxCycles - 1);
 
     // For the requested cycleOffset (0 = current/latest, -1 = previous assignment, etc.),
@@ -244,8 +246,11 @@ export async function POST(req: NextRequest) {
     const cycleKeyFor = (studentName: string, c: { startStr: string; endStr: string }) => `${studentName}::${c.startStr}::${c.endStr}`;
     const uniqueCycleQueries = new Map<string, { studentName: string; startStr: string; endStr: string }>();
     classesWithCycle.forEach(a => {
-      const key = cycleKeyFor(a.parentName, a.cycle);
-      if (!uniqueCycleQueries.has(key)) uniqueCycleQueries.set(key, { studentName: a.parentName, startStr: a.cycle.startStr, endStr: a.cycle.endStr });
+      const names = Array.from(new Set([a.parentName, resolvedStudentName].filter(Boolean)));
+      names.forEach(name => {
+        const key = cycleKeyFor(name, a.cycle);
+        if (!uniqueCycleQueries.has(key)) uniqueCycleQueries.set(key, { studentName: name, startStr: a.cycle.startStr, endStr: a.cycle.endStr });
+      });
     });
 
     const attResults = await Promise.all(Array.from(uniqueCycleQueries.values()).map(async q => {
@@ -260,18 +265,26 @@ export async function POST(req: NextRequest) {
     attResults.flat().forEach(doc => allAttendanceDocs.set(doc.id, doc));
 
     // Attribute each attendance doc to its matching class (studentName + subject
-    // + tutorName + falling inside that class's own cycle window) — this is what
-    // makes sessions from before the 1st of the calendar month (but after the
-    // class's actual start date) count correctly instead of being cut off.
+    // + tutorName + falling inside that class's own cycle window).
     const records: any[] = [];
+    const seenRecordIds = new Set<string>();
     const summaryMap: Record<string, { tutorName: string; subject: string; studentName: string; cycleLabel: string; present: number; absent: number; holiday: number; cancelled: number; total: number }> = {};
 
     classesWithCycle.forEach(a => {
-      const matches = Array.from(allAttendanceDocs.values()).filter(doc =>
-        doc.studentName === a.parentName && doc.subject === a.subject && doc.tutorName === a.tutorName &&
-        doc.date >= a.cycle.startStr && doc.date < a.cycle.endStr
-      );
-      matches.forEach(doc => records.push(doc));
+      const aSubNorm = normalizeSubject(a.subject);
+      const matches = Array.from(allAttendanceDocs.values()).filter(doc => {
+        const studentMatch = doc.studentName === a.parentName || doc.studentName === resolvedStudentName;
+        const subjectMatch = normalizeSubject(doc.subject) === aSubNorm;
+        const tutorMatch = !doc.tutorName || !a.tutorName || doc.tutorName.toLowerCase().trim() === a.tutorName.toLowerCase().trim();
+        const dateMatch = doc.date >= a.cycle.startStr && doc.date < a.cycle.endStr;
+        return studentMatch && subjectMatch && tutorMatch && dateMatch;
+      });
+      matches.forEach(doc => {
+        if (!seenRecordIds.has(doc.id)) {
+          seenRecordIds.add(doc.id);
+          records.push(doc);
+        }
+      });
       const key = `${a.tutorName}::${a.subject}::${a.parentName}`;
       if (!summaryMap[key]) summaryMap[key] = { tutorName: a.tutorName, subject: a.subject, studentName: a.parentName, cycleLabel: a.cycle.label, present: 0, absent: 0, holiday: 0, cancelled: 0, total: 0 };
       matches.forEach(doc => {
